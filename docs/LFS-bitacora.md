@@ -206,17 +206,29 @@ La preparación del Host y de sus requisitos necesarios demostró que es importa
 
 ## Tareas Realizadas
 (09:47 - 10:03 )
+
 Configurar variable de entorno LFS
+
 Tener umask correcto para permisos seguros
+
 Montar partición de LFS en el punto de montaje
+
 Asignar permisos de ownership y acceso
+
 Crear directorio sources con permisos correctos
+
 (10:03 - 10:37)
+
 Descargar paquetes fuente usando wget-list-systemd
+
 (10:37 - 11:07)
+
 Completar descargas faltantes desde el mirror 
+
 (11:07 - 11:21)
+
 Verificar que todos los archivos están correctamente descargados con md5sums
+
 Asignar root como dueño de los paquetes descargados
 
 
