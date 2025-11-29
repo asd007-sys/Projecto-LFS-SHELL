@@ -181,18 +181,18 @@ Partición formateada como ext4 Host completamente preparado para LFS
 La preparación del Host y de sus requisitos necesarios demostró que es importante chequear siempre si falta un paquete, porque podría ocasionar grandes problemas más adelante. Ignore la sección en un previo intento y sufrí las consecuencias.Habilitar el repositorio crb fue necesario para instalar texinfo,me tomó bastante tiempo encontrar la resolución. Poder usar parted en un disco en uso para crear una particion en la memoria libre es algo muy util y conveniente.
 
 ## Evidencias
-![requisitos-faltantes](../imagenes/lfs/sesion2/requisitos-faltantes.png)
+![requisitos-faltantes](../imagenes/LFS/sesion2/requisitos-faltantes.png)
 *Figura 1:  Requisitos que faltan en el build system(Rocky Linux)*
 
-![requisitos-cumplido](../imagenes/lfs/sesion2/requisitos-cumplido.png)
+![requisitos-cumplido](../imagenes/LFS/sesion2/requisitos-cumplido.png)
 *Figura 2:  Requisitos necesarios cumplidos*
 
-![fdisk-advertensia](../imagenes/lfs/sesion2/fdisk-advertensia.png)
+![fdisk-advertensia](../imagenes/LFS/sesion2/fdisk-advertensia.png)
 *Figura 3:  Advertensia del fdisk *
 
-![Partición LFS creada](../imagenes/lfs/sesion2/parted.png)
+![Partición LFS creada](../imagenes/LFS/sesion2/parted.png)
 *Figura 4:  Creación de la particion con parted*
 
-![Partición LFS creada](../imagenes/lfs/sesion2/lsblk.png)
+![Partición LFS creada](../imagenes/LFS/sesion2/lsblk.png)
 *Figura 5:  Output del comando lsblk para ver partition nueva para lfs*
 
