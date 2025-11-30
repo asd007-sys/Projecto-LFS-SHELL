@@ -473,3 +473,6 @@ El tool chain es creado en la carpeta $LFS/tools para separarlos del host.La cre
 *Figura 5: Pruebas extra*
 
 
+![privilegio-lfs](../imagenes/LFS/sesion4/privilegio-lfs.png)
+*Figura 5: Demostración de Privilegio lfs*
+
