@@ -349,3 +349,122 @@ Usamos el directorio $LFS/sources (/mnt/lfs/sources ) como lugar donde descargar
 *Figura 4: Integridad de archivos confirmados y no falta paquetes*
 
 
+# Sesión 4: 30 de Noviembre - 10:56 a 11:55- Configuración Completa del Usuario LFS y Estructura de Directorios, Preparación Final
+
+
+## Participantes: Marcelo Avalos
+## Objetivo: Crear estructura de directorios LFS, usuario lfs, configurar entorno de construcción
+
+## Tareas Realizadas
+
+(10:56 - 11:05)
+Crear estructura de directorios para LFS
+Crear enlaces simbólicos 
+Crear directorio lib64 para x86_64
+
+
+(11:05 - 11:27)
+Crear directorio tools para el toolchain.
+Crear grupo y usuario lfs
+Crear password para el usuario lfs
+Cambiar de ownership a los directorios de LFS, a el usuario lfs
+
+
+(11:27 - 11:55)
+Configurar archivos de entorno (.bash_profile y .bashrc)
+Verificar variables de entorno correctos
+
+## Comandos Ejecutados
+
+#### Crear estructura básica de directorios LFS
+mkdir -pv $LFS/{etc,var} $LFS/usr/{bin,lib,sbin}
+
+#### Crear enlaces simbólicos 
+for i in bin lib sbin; do
+  ln -sv usr/$i $LFS/$i
+done
+
+#### Crear lib64 
+case $(uname -m) in
+  x86_64) mkdir -pv $LFS/lib64 ;;
+esac
+
+#Crear directorio tools 
+mkdir -pv $LFS/tools
+
+#### Crear grupo y usuario lfs 
+groupadd lfs
+useradd -s /bin/bash -g lfs -m -k /dev/null lfs
+passwd lfs
+
+#### Cambiar owner
+chown -v lfs $LFS/{usr{,/*},var,etc,tools}
+case $(uname -m) in
+  x86_64) chown -v lFS/lib64 ;;
+esac
+
+#### Configurar bashrc y bash_profile
+cat > ~/.bash_profile << "EOF"
+...
+EOF
+
+cat > ~/.bashrc << "EOF"
+....
+EOF
+
+## Verificar configuración completa
+ls -la $LFS/
+ls -la $LFS/tools
+id lfs
+source ~/.bash_profile
+echo "LFS: $LFS"
+echo "LFS_TGT: $LFS_TGT"
+
+## Problemas Encontrados
+
+Problema 1: Se creó el directorio $LFS/toools en vez de $LFS/tools
+
+Causa: Se añadió una o de más al hacer el comando
+
+Solución:Se borró el directorio con rm -rf $LFS/toools y se creó de nuevo el directorio correcto.
+
+
+## Resultados Obtenidos
+
+Estructura de directorios LFS - Crear el sistema de archivos para la instalación
+
+Enlaces simbólicos configurados - Mantener compatibilidad con herramientas del sistema build
+
+Directorio tools creado - Compilar toolchain temporal separado del sistema host
+
+Usuario lfs creado - Aislar la construcción de lfs con un usuario dedicado
+
+Owner de directorios transferido - Dar permisos necesarios de construcción al usuario lfs
+
+Archivos de entorno configurados - Hacer variables para el toolchain temporal
+
+Entorno preparado - Todo listo para compilar las herramientas de desarrollo
+
+## Reflexión Técnica
+
+El tool chain es creado en la carpeta $LFS/tools para separarlos del host.La creación del usuario lfs nos asegura aislar del root con demasiados privilegios peligrosos para la construcción del lfs. A este punto se está listo para comenzar la instalación  del tool chain (binutils, gcc, and glibc).El capítulo 4 también habla de los sanity checks , que se hacen más adelante para asegurar la instalación correcta.
+
+## Evidencias
+
+
+![directorios-jerarquia-limitada](../imagenes/LFS/sesion4/directorios-jerarquia-limitada.png)
+*Figura 1: Directorios necesarios y enlaces simbólicos*
+
+![tools-en-vez-de-toools](../imagenes/LFS/sesion4/tools-en-vez-de-toools.png)
+*Figura 2: Directorio creado con nombre incorrecto*
+
+![crear-usuario-lfs-y-permisos](../imagenes/LFS/sesion4/crear-usuario-lfs-y-permisos.png)
+*Figura 3: Usario lfs creado y los permisos para crear*
+
+![bashrc-pruebas](../imagenes/LFS/sesion4/bashrc-pruebas.png)
+*Figura 4: Pruebas del funcionamiento de bashrc*
+
+![prueba-2](../imagenes/LFS/sesion4/prueba-2.png)
+*Figura 5: Pruebas extra*
+
+
