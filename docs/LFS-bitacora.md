@@ -358,21 +358,21 @@ Usamos el directorio $LFS/sources (/mnt/lfs/sources ) como lugar donde descargar
 ## Tareas Realizadas
 
 (10:56 - 11:05)
-Crear estructura de directorios para LFS
-Crear enlaces simbólicos 
-Crear directorio lib64 para x86_64
+ - Crear estructura de directorios para LFS
+ - Crear enlaces simbólicos 
+ - Crear directorio lib64 para x86_64
 
 
 (11:05 - 11:27)
-Crear directorio tools para el toolchain.
-Crear grupo y usuario lfs
-Crear password para el usuario lfs
-Cambiar de ownership a los directorios de LFS, a el usuario lfs
+ - Crear directorio tools para el toolchain.
+ - Crear grupo y usuario lfs
+ - Crear password para el usuario lfs
+ - Cambiar de ownership a los directorios de LFS, a el usuario lfs
 
 
 (11:27 - 11:55)
-Configurar archivos de entorno (.bash_profile y .bashrc)
-Verificar variables de entorno correctos
+ - Configurar archivos de entorno (.bash_profile y .bashrc)
+ - Verificar variables de entorno correctos
 
 ## Comandos Ejecutados
 
@@ -414,10 +414,15 @@ EOF
 
 ## Verificar configuración completa
 ls -la $LFS/
+
 ls -la $LFS/tools
+
 id lfs
+
 source ~/.bash_profile
+
 echo "LFS: $LFS"
+
 echo "LFS_TGT: $LFS_TGT"
 
 ## Problemas Encontrados
