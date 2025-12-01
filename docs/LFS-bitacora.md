@@ -476,3 +476,242 @@ El tool chain es creado en la carpeta $LFS/tools para separarlos del host.La cre
 ![privilegio-lfs](../imagenes/LFS/sesion4/privilegio-lfs.png)
 *Figura 5: Demostración de Privilegio lfs*
 
+
+
+---
+
+
+# Sesión 5: 1 de Diciembre - Instalación de cross-toolchain (Pass 1)
+
+
+## Objetivo: Instalar el cross-toolchain (Binutils, GCC, Linux Headers y Glibc) en el directorio $LFS/tools y la partición $LFS para preparar el entorno de cross compilation
+
+
+## Tareas Realizadas
+
+(15:22 - 15:53)
+ - 5.2. Binutils-2.45 - Pass 1. 
+
+(15:53 - 17:05)
+ - 5.3. GCC-15.2.0 - Pass 1. 
+
+(17:05 - 17:16)
+ - 5.4. Linux-6.16.1 API Headers: Instalación de los headers del kernel . 
+
+(17:16 -18:42)
+ - 5.5. Glibc-2.42 - Pass 1:. 
+ - Ejecución y verificación de las pruebas de sanity checks.
+
+
+
+
+## Comandos principales ejecutados:
+
+
+#Todos los paquetes
+
+
+tar -xf [nombre-a-instalar]
+
+
+cd [nombre-a-instalar]
+
+
+### Binutils-2.45 - Pass 1
+
+
+mkdir -v build;  #crear directorio para el build
+cd build    #acceder a dicho directorio
+
+
+#configuraciones para la compilación 1 pass.
+../configure --prefix=$LFS/tools --with-sysroot=$LFS --target=$LFS_TGT ...
+
+#compilar
+make
+
+#instalar
+make install
+
+
+### GCC-15.2.0 - Pass 1
+
+
+#Extracción de dependencias (mpfr, gmp, mpc)
+
+#sed para x86_64
+mkdir -v build; cd build
+
+
+../configure --target=$LFS_TGT --prefix=$LFS/tools --with-newlib ...
+
+
+make
+make install
+
+
+#Crear la version completa del header limits.h
+cat gcc/limitx.h ... > $(dirname $($LFS_TGT-gcc -print-libgcc-file-name))/include/limits.h
+
+
+### Linux-6.16.1 API Headers
+
+#Asegurar de eliminar configuraciones previas
+make mrproper
+
+#Genera los headers kernel 
+make headers
+
+#Copia los headers del kernel a $LFS/usr/include para que Glibc use
+cp -rv usr/include $LFS/usr
+
+### Glibc-2.42 - Pass 1
+
+#Crea enlaces simbólicos 
+case $(uname -m) in ..
+
+#Aplica parche
+patch -Np1 -i ../glibc-2.42-fhs-1.patch
+
+#Crea directorio build separado para compilación
+mkdir -v build; cd build
+
+#Configura Glibc para instalar programas en /usr/sbin en vez de /sbin
+echo "rootsbindir=/usr/sbin" > configparms
+
+
+../configure --prefix=/usr --host=$LFS_TGT --enable-kernel=5.4 ...
+
+
+make
+
+#Instala Glibc en $LFS 
+make DESTDIR=$LFS install
+
+#Usar /lib en lugar de /usr/lib
+sed '/RTLDLIST=/s@/usr@@g' -i $LFS/usr/bin/ldd
+
+
+
+### Sanity Checks
+
+
+echo 'int main(){}' | $LFS_TGT-gcc -x c - -v -Wl,--verbose &> dummy.log
+
+
+readelf -l a.out | grep ': /lib'
+
+
+grep -E -o "$LFS/lib.*/S?crt[1in].*succeeded" dummy.log
+
+
+grep -B3 "^ $LFS/usr/include" dummy.log
+
+
+grep 'SEARCH.*/usr/lib' dummy.log |sed 's|; |\n|g'
+
+
+grep "/lib.*/libc.so.6 " dummy.log
+
+
+grep found dummy.log
+
+
+rm -v a.out dummy.log
+
+
+## Resultados:
+
+
+#### Binutils – Pass 1
+Se compila solo las herramientas básicas para manipular binarios. Suficiente para que GCC Pass 1 funcione.
+
+#### GCC – Pass 1  
+Compilador de C/C++ limitado. Todavía funciona como cross-compiler y solo compila Glibc.
+
+#### Linux API Headers
+Headers públicos del kernel Linux. Definen cómo los programas de usuario hablan con el kernel.
+
+#### Glibc – Pass 1
+Biblioteca C mínima. Hace que GCC Pass 2 pueda crear programas que corran en LFS.
+
+Resultado de Sanity Checks:Se confirmó que el dynamic linker apunta a la dirección correcta de $LFS y que los archivos se encontraron.
+
+
+
+## Problemas Encontrados
+
+
+Problema: Durante la configuración de Glibc, el compilador del host arrojó una warning de que el programa msgfmt era incompatible.
+
+
+configure: WARNING: *** These auxiliary programs are missing or ... msgfmt ***
+
+
+Solución: Se continuó, según en la documentación de LFS,esto es normal.
+
+Problema: Al escribir el comando para el configure de binutils se escribió mal uno de las configuraciones.
+
+Causa: Se apretó enter sin querer antes del ‘\’ que se usa para seguir el comando en la proxima linea.
+
+Solución: Se removió todo el directorio que se extrajo, con rm -rf binutils…. , y se volvió a extraer, reseteando así la configuración.
+
+
+Problema: No es realmente un problema pero en glib, al crear los symbolic links, el output salia como :
+ '/mnt/lfs/lib64/ld-linux-x86-64.so.2' -> '../lib/ld-linux-x86-64.so.2'
+
+ '/mnt/lfs/lib64/ld-lsb-x86-64.so.3' -> '../lib/ld-linux-x86-64.so.2'
+
+Causa: aparentemente, al recibir el output de los comandos de lfs, el formato está hecho por ln -v, que funciona mostrando ‘target’ -> ‘link_name’, en cambio ls muestra: ‘link_name’ - > ‘target’,por lo que al tratar de confirmar parece estar al revez, pero, efectivamente está bien.
+
+
+
+
+## Aprendizaje:
+Se crea el chroot(el root para el $LFS), como el LFS no tiene nada todavia, usamos el toolchain del Build system (Rocky Linux) , esto se llama cross-toolchain porque se usa el toolchain de Build system para el $LFS, que vendría a ser otro systema. Tenemos que asegurarnos de que las variables de entorno de Build no se pasen al LFS que construimos, para eso usamos muchos atributos en los ./configure.
+
+
+
+## Reflexión Técnica
+
+
+Es importante prestar atención a los detalles y no obviar alguna advertencia del manual. Es muy fácil tipear algo mal, por eso se recomienda usar tee -a nombre-del-log.log para poder identificar rápidamente el problema.
+Los sanity checks son importantes para ahorrar tiempo en el largo plazo.
+
+
+## Evidencias
+
+
+![Binutils make](../imagenes/LFS/sesion5/bintutils-make.png)
+*Figura 1: Binutils make*
+
+
+![Binutils make install](../imagenes/LFS/sesion5/bintutils-make-install.png)
+*Figura 2: Binutils make install*
+
+
+![Gcc make](../imagenes/LFS/sesion5/gcc-make.png)
+*Figura 3: Gcc make*
+
+
+![Gcc make install](../imagenes/LFS/sesion5/gcc-make-install.png)
+*Figura 4: Gcc make install*
+
+
+![Glibc make](../imagenes/LFS/sesion5/glibc-make.png)
+*Figura 5: Glibc make*
+
+
+![Glibc make install](../imagenes/LFS/sesion5/glibc-make-install.png)
+*Figura 6: Glibc make install*
+
+
+![Glibc sanity check](../imagenes/LFS/sesion5/glibc-sanity-check.png)
+*Figura 7: Glibc sanity check*
+
+![prueba de ln glib](../imagenes/LFS/sesion5/prueba-de-ln-glib.png)
+*Figura 8: Output del commando de symbolic link en glib*
+
+
+
+
