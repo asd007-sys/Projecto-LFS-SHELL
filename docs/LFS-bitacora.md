@@ -713,5 +713,230 @@ Los sanity checks son importantes para ahorrar tiempo en el largo plazo.
 *Figura 8: Output del commando de symbolic link en glib*
 
 
+---
+
+
+# Sesión 6: 2 de Diciembre - Cross Compiling Temporary Tools
+
+## Objetivo: Hacer la instalación de temporary tools necesarias para el entorno de cross-compilation (Libstdc++, M4, Ncurses, Bash, Coreutils, Diffutils)
+
+## Tareas Realizadas
+
+(12:14 - 12:33)
+- 5.6. Libstdc++
+
+(12:33 -  12:50)
+- 6.2. M4-1.4.20 
+
+( 12:50 - 13:33)
+- 6.3. Ncurses-6.5-20250809 
+
+(13:33 - 13:54)
+- 6.4. Bash-5.3 
+
+(13:54 - 14:08)
+- 6.5. Coreutils-9.7 
+
+(14:08- 14:24)
+- 6.6. Diffutils-3.12
+
+
+## Comandos principales ejecutados:
+
+### Libstdc++
+
+mkdir -v build
+cd build
+
+../libstdc++-v3/configure \
+… #Usar el cross-compiler que armamos, no el que está en /usr/bin
+#Especifica donde se compila, y el directorio raíz
+#Deshabilitar la instalación de archivos pre-compilados 
+#Especificar la dirección de la carpeta a instalar los archivos include 
+#Deshabilitar bibliotecas para múltiples arquitecturas
+Make
+
+make DESTDIR=$LFS install
+
+rm -v $LFS/usr/lib/lib{stdc++{,exp,fs},supc++}.la
+
+### M4-1.4.20
+
+./configure --prefix=/usr \
+           … #Se indica el directorio raiz $LFS/usr
+#Se indica para que architectura $LFS_TGT
+#Arquitectura del sistema actual donde se está compilando
+
+Make
+
+make DESTDIR=$LFS install
+
+
+### Ncurses-6.5-20250809
+
+
+mkdir build
+pushd build
+
+  ../configure --prefix=$LFS/tools AWK=gawk
+
+
+
+
+  make -C include
+
+  make -C progs tic
+
+  install progs/tic $LFS/tools/bin
+
+popd
+
+./configure --prefix=/usr \
+         …#Se indica el directorio raiz $LFS/usr
+#Se indica para que architectura $LFS_TGT
+#Arquitectura del sistema actual donde se está compilando
+#Se usa gawk para no usar mawk que puede causar problemas
+#Se disabilità soporte para Ada
+ 
+Make
+
+make DESTDIR=$LFS install
+
+ln -sv libncursesw.so $LFS/usr/lib/libncurses.so
+
+sed -e 's/^#if.*XOPEN.*$/#if 1/' \
+    -i $LFS/usr/include/curses.h
+
+
+### Bash-5.3
+
+./configure --prefix=/usr \
+       …
+#Se deshabilita el malloc interno del bash porque puede causar problemas de segmentación. Se usa el malloc de Glib
+
+Make
+
+make DESTDIR=$LFS install
+
+ln -sv bash $LFS/bin/sh
+
+### Coreutils-9.7
+
+./configure --prefix=/usr \
+…
+#Perl necesita el hostname, entonces se habilita la compilación e instalación de hostname.
+
+
+Make
+
+make DESTDIR=$LFS install
+
+mv -v $LFS/usr/bin/chroot $LFS/usr/sbin
+
+mkdir -pv $LFS/usr/share/man/man8
+
+mv -v $LFS/usr/share/man/man1/chroot.1 $LFS/usr/share/man/man8/chroot.8
+
+sed -i 's/"1"/"8"/' $LFS/usr/share/man/man8/chroot.8
+
+### Diffutils-3.12
+
+./configure --prefix=/usr \
+           …
+#Hace que se asuma que el resultado de strcasecmp sea y por predeterminado
+
+Make
+
+make DESTDIR=$LFS install
+
+## Resultados Obtenidos
+
+#### Libstdc++  instalado exitosamente
+
+Biblioteca estándar de C++. Se instala una versión temporal para poder compilar programas en C++ durante el cross-compilation.
+
+#### M4-1.4.20 - instalado correctamente
+
+Procesador de macros utilizado por herramientas como Autoconf.Muchos paquetes usan Autoconf para generar scripts de configuración.
+
+#### Ncurses-6.5-20250809 - instalado
+
+Librería para manipular pantallas de terminal de forma independiente .Es necesario porque varios programas del sistema (como Bash) dependen de esto para manejar la interacción con la terminal.
+
+#### Bash-5.3 - instalado y enlace simbólico creado
+
+Shell del sistema.Se instala una versión temporal, que se usará dentro del entorno chroot.
+El shell es necesario para ejecutar scripts y comandos durante las siguientes fases del LFS.
+
+#### Coreutils-9.7 - instalado y ubicado correctamente
+
+Conjunto de comandos básicos del sistema (ls, cp, mv, mkdir, etc.). Necesarios para manipular archivos y directorios dentro del entorno LFS.
+
+#### Diffutils-3.12 - instalado
+
+Herramientas para comparar archivos (diff, cmp, etc.). Se usan para aplicar parches y revisar cambios en los paquetes que se compilan.
+
+
+
+
+## Problemas Encontrados
+
+Problema: Al installar ncurses queria corroborar si las ultimas lineas de sed (sed -e 's/^#if.*XOPEN.*$/#if 1/' \
+    -i $LFS/usr/include/curses.h
+funcionaron y se ejecutaron correctamente, pero no se comprendía cómo hacerlo.
+
+Solucion:Al hacer grep -n XOPEN $LFS/usr/include/curses.h, se obtuvo sólo 2 comentarios con 
+XOPEN en las líneas, y un #define _XOPEN_CURSES 1, que solo define como valor, entonces se comprobo que funciono correctamente.
+
+
+
+## Reflexión Técnica
+
+Se deshabilitó el allocador de memoria interno del Bash para usar el de Glibc que es más estable.
+Para el proceso de cross-compilation se requiere una comprensión tremenda de las dependencias entre paquetes y las herramientas que se utilizan en cada etapa. El orden influye mucho también.
+Como en la sesión anterior cada paquete requiere una configuración específica para el entorno de cross-compilation.
+Al hacer el LFS fue una sorpresa ver a Linux no como un sistema solamente, sino que múltiples componentes interdependientes que pueden ser compilados e instalados secuencialmente. 
+
+
+
+## Evidencia
+![libstdc++-make](../imagenes/LFS/sesion6/libstdc++-make.png)
+*Figura 1: ibstdc++ make*
+
+![libstdc++-make-install](../imagenes/LFS/sesion6/libstdc++-make-install.png)
+*Figura 2: libstdc++ make install*
+
+![m4-make](../imagenes/LFS/sesion6/m4-make.png)
+*Figura 3: m4 make*
+
+![m4-make-install](../imagenes/LFS/sesion6/m4-make-install.png)
+*Figura 4: m4 make install*
+
+![ncurses-make](../imagenes/LFS/sesion6/ncurses-make.png)
+*Figura 5: ncurses make*
+
+![ncurses-make-install](../imagenes/LFS/sesion6/ncurses-make-install.png)
+*Figura 6: ncurses make install*
+
+![ncurses-prob](../imagenes/LFS/sesion6/ncurses-prob.png)
+*Figura 7: ncurses problema*
+
+![bash-make](../imagenes/LFS/sesion6/bash-make.png)
+*Figura 8: bash  make*
+
+![bash-make-install](../imagenes/LFS/sesion6/bash-make-install.png)
+*Figura 9: bash make install*
+
+![coreutils-make](../imagenes/LFS/sesion6/coreutils-make.png)
+*Figura 10: coreutils make*
+
+![coreutils-make-install](../imagenes/LFS/sesion6/coreutils-make-install.png)
+*Figura 11: coreutils make install*
+
+![diffutils-make](../imagenes/LFS/sesion6/diffutils-make.png)
+*Figura 12: diffutils make*
+
+![diffutils-make](../imagenes/LFS/sesion6/diffutils-make-install.png)
+*Figura 13: diffutils make install*
 
 
