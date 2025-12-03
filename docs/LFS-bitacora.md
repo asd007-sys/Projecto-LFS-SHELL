@@ -940,3 +940,208 @@ Al hacer el LFS fue una sorpresa ver a Linux no como un sistema solamente, sino 
 *Figura 13: diffutils make install*
 
 
+---
+
+# Sesión 7: 3 de Diciembre - Cont - Cross Compiling Temporary Tools
+
+## Objetivo: Continuacion de la instalación de temporary tools necesarias para el entorno de cross-compilation (File, Findutils,Gawk,Grep,Gzip,Make)
+
+## Tareas Realizadas
+
+(11:20 - 11:41)
+ - 6.7 File 
+
+(11:40 - 11:56)
+ - 6.8 Findutils
+
+(11:56 - 12:09)
+ - 6.9 Gawk
+
+(12:09 - 12:26)
+ - 6.10 Grep
+
+(12:26 - 12:41 )
+ - 6.11 Gzip
+
+(12:41 - 13:04)
+ - 6.12 Make
+
+
+## Comandos principales ejecutados:
+
+### File-5.46
+#Creamos copia de File en el build system para crear el signature file necesario.
+mkdir build
+pushd build
+  ../configure --disable-bzlib      \  #Si existen las librerías en lfs, este config no les permite 
+               --disable-libseccomp \  #ejecutarse, para la estabilidad de la compilación.
+               --disable-xzlib      \
+               --disable-zlib
+  make
+popd
+
+ 
+#configuracion 
+./configure --prefix=/usr --host=$LFS_TGT --build=$(./config.guess)
+
+#Compilar
+make FILE_COMPILE=$(pwd)/build/src/file
+
+#Instalar
+make DESTDIR=$LFS install
+
+rm -v $LFS/usr/lib/libmagic.la
+
+
+### Findutils-4.10.0
+
+
+#Configuracion
+./configure --prefix=/usr                   \
+            --localstatedir=/var/lib/locate \
+            --host=$LFS_TGT                 \
+            --build=$(build-aux/config.guess)
+
+#Compilar
+make
+
+#Instalar
+make DESTDIR=$LFS install
+
+
+### Gawk-5.3.2
+
+#Subsistuir extras por un espacio vacio en el archivo Makefile.in
+
+sed -i 's/extras//' Makefile.in
+
+#Configuracion
+
+./configure --prefix=/usr   \
+            --host=$LFS_TGT \
+            --build=$(build-aux/config.guess)
+
+#Compilar
+make
+
+#Instalar
+make DESTDIR=$LFS install
+
+
+### Grep-3.12
+
+#Configuración para compilacion
+
+./configure --prefix=/usr   \
+            --host=$LFS_TGT \
+            --build=$(./build-aux/config.guess)
+
+#Compilar
+make
+
+#Instalar
+make DESTDIR=$LFS install
+
+### Gzip-1.14
+
+#Configuración para compilación
+./configure --prefix=/usr --host=$LFS_TGT
+
+#Compilar
+make
+
+#Instalar
+make DESTDIR=$LFS install
+
+### Make-4.4.1
+
+#Configuración del compilador
+
+./configure --prefix=/usr   \
+            --host=$LFS_TGT \
+            --build=$(build-aux/config.guess)
+
+#Compilar
+make
+
+#Instalar
+make DESTDIR=$LFS install
+
+
+
+## Resultados Obtenidos
+
+#### File-5.46  instalado 
+
+Es una utilidad de línea de comandos que determina el tipo de archivo, sea cual sea su extensión.
+
+#### Findutils-4.10.0 - instalado
+
+Es un paquete de utilidades de búsqueda, sirve para encontrar archivos y directorios en el sistema de archivos.
+
+#### Gawk-5.3.2 - instalado
+
+Es un lenguaje de programación especializado para procesar y analizar texto. Busca patrones en los datos y ejecuta acciones cuando los encuentra.
+
+#### Grep-3.12- instalado 
+
+Es una utilidad de línea de comandos para buscar patrones de texto dentro de archivos. 
+
+#### Gzip-1.14 - instalado 
+
+Es una utilidad para reducir el tamaño de los archivos para que ocupen menos espacio.
+
+#### Make-4.4.1 - instalado
+
+Es una herramienta de automatización de compilación y construcción de software.
+
+
+
+## Problemas Encontrados
+
+Ningún problema significante.
+
+
+## Reflexión Técnica
+
+Se instalaron varios paquetes chicos que sirven más adelante para la utilización y complementación del Linux LFS. Muchos de estos comparten las mismas configuraciones y pasos de compilación e instalación por lo que no hay mucho de qué hablar. Cabe recalcar tal vez que tanto gawk como grep pueden ambos cumplir la misma funcionalidad, pero grep está diseñado por simplicidad de ejecución, y usar gawk en casos simples sería un overkill o usar recursos demas para algo simple.
+
+
+
+## Evidencia
+
+![file-make](../imagenes/LFS/sesion7/file-make.png)
+*Figura 1: file make *
+
+![diffutils-make-install](../imagenes/LFS/sesion7/file-make-install.png)
+*Figura 2: file make install*
+
+![findutils-make](../imagenes/LFS/sesion7/findutils-make.png)
+*Figura 3: findutils make*
+
+![findutils-make-install](../imagenes/LFS/sesion7/findutils-make-install.png)
+*Figura 4: fintutils make install*
+
+![gawk-make](../imagenes/LFS/sesion7/gawk-make.png)
+*Figura 5: gawk make*
+
+![gawk-make-install](../imagenes/LFS/sesion7/gawk-make-install.png)
+*Figura 6: gawk make install*
+
+![grep-make](../imagenes/LFS/sesion7/grep-make.png)
+*Figura 7: grep make*
+
+![grep-make-install](../imagenes/LFS/sesion7/grep-make-install.png)
+*Figura 8: grepmake install*
+
+![gzip-make](../imagenes/LFS/sesion7/gzip-make.png)
+*Figura 9: gzip make*
+
+![gzip-make-install](../imagenes/LFS/sesion7/gzip-make-install.png)
+*Figura 10: gzip make install*
+
+![make-make](../imagenes/LFS/sesion7/make-make.png)
+*Figura 11: make make*
+
+![make-make-install](../imagenes/LFS/sesion7/make-make-install.png)
+*Figura 12: make make install*
