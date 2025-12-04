@@ -1145,3 +1145,291 @@ Se instalaron varios paquetes chicos que sirven más adelante para la utilizaci�
 
 ![make-make-install](../imagenes/LFS/sesion7/make-make-install.png)
 *Figura 12: make make install*
+
+---
+
+
+# Sesión 8: 4 de Diciembre - Cont 2 - Cross Compiling Temporary Tools
+
+
+## Objetivo: Continuacion de la instalación de temporary tools necesarias para el entorno de cross-compilation (Patch,Sed,Tar,Xz,Binutils Pass 2)
+
+
+## Tareas Realizadas
+
+
+(09:05 - 09:19 )
+ - 6.13 Patch
+
+
+(09:19 - 09:31 )
+ - 6.14 Sed
+
+
+(09:31 - 09:47)
+ - 6.15 Tar
+
+
+(09:47 - 09:56)
+ - 6.16 Xz
+
+
+(09:56-10:34 )
+ - 6.17 Binutils
+
+
+
+
+
+
+
+
+## Comandos principales ejecutados:
+
+
+### Para los make y make install uso:
+
+
+make o make install | tee -a $LFS/sources/tee/nombre-de-paquete-make.log o make-install.log
+
+
+
+
+### Patch-2.8
+#Configuracion
+
+
+./configure --prefix=/usr   \
+            --host=$LFS_TGT \
+            --build=$(build-aux/config.guess)
+
+
+#Compilar
+make
+
+
+#Instalar
+make DESTDIR=$LFS install
+
+
+
+
+### Sed-4.9
+
+
+
+
+#Configuracion
+
+
+./configure --prefix=/usr   \
+            --host=$LFS_TGT \
+            --build=$(build-aux/config.guess)
+
+
+#Compilar
+make
+
+
+#Instalar
+make DESTDIR=$LFS install
+
+
+
+
+### Tar-1.35
+
+
+#Configuracion
+
+
+./configure --prefix=/usr   \
+            --host=$LFS_TGT \
+            --build=$(build-aux/config.guess)
+
+
+#Compilar
+make
+
+
+#Instalar
+make DESTDIR=$LFS install
+
+
+
+
+
+
+### Xz-5.8.1
+
+
+
+
+#Configuracion
+
+
+./configure --prefix=/usr                     \
+            --host=$LFS_TGT                   \
+            --build=$(build-aux/config.guess) \
+            --disable-static                  \
+            --docdir=/usr/share/doc/xz-5.8.1
+
+
+#Compilar
+
+
+make
+
+
+#Instalar
+
+
+make DESTDIR=$LFS install
+
+
+#Remover el archivo libtool,causa problema.
+rm -v $LFS/usr/lib/liblzma.la
+
+
+
+
+
+
+### Binutils-2.45
+
+
+#Configuración para compilación
+./configure --prefix=/usr --host=$LFS_TGT
+
+
+#Compilar
+make
+
+
+#Instalar
+make DESTDIR=$LFS install
+
+
+### Binutils-2.45 - Pass 2
+
+
+#Configuración del compilador
+
+
+#Evitar symbolic links incorrectos
+sed '6031s/$add_dir//' -i ltmain.sh
+
+
+#Configuración para compilación
+../configure                   \
+......
+
+
+
+
+
+
+#Compilar
+make
+
+
+#Instalar
+make DESTDIR=$LFS install
+
+
+#Remover archivos libtool
+rm -v $LFS/usr/lib/lib{bfd,ctf,ctf-nobfd,opcodes,sframe}.{a,la}
+
+
+## Resultados Obtenidos
+
+
+#### Patch-2.8  instalado
+
+
+Es una herramienta que permite modificar código fuente sin redistribuir árboles completos de código. Ósea permite aplicar patches a paquetes que lo necesitan.
+
+
+#### Sed-4.9 - instalado
+
+
+Es un editor de texto no interactivo que procesa texto línea por línea.
+
+
+#### Tar-1.35 - instalado
+
+
+Es un archivador para crear y manipular archivos contenedores ,tarballs por ejemplo.
+
+
+#### Xz-5.8.1 - instalado
+
+
+Es un compresor de alta compresión. Es el formato de compresión en LFS para todos los paquetes fuente.
+
+
+#### Binutils-2.45 - Pass 2 - Instalado
+
+
+
+
+## Problemas Encontrados
+
+
+Ningún problema significante.
+
+
+## Reflexiones técnicas
+
+
+Muchos de los paquetes usan la misma configuración para compilar.
+
+
+## Evidencia
+
+
+![patch-make](../imagenes/LFS/sesion7/patch-make.png)
+*Figura 1: patch make *
+
+
+![patch-make-install](../imagenes/LFS/sesion7/patch-make-install.png)
+*Figura 2: patch make install*
+
+
+![sed-make](../imagenes/LFS/sesion7/sed-make.png)
+*Figura 3: sed make*
+
+
+![sed-make-install](../imagenes/LFS/sesion7/sed-make-install.png)
+*Figura 4: sed make install*
+
+
+![tar-make](../imagenes/LFS/sesion7/tar-make.png)
+*Figura 5: tar make*
+
+
+![tar-make-install](../imagenes/LFS/sesion7/tar-make-install.png)
+*Figura 6: tar make install*
+
+
+![xz-make](../imagenes/LFS/sesion7/xz-make.png)
+*Figura 7: xz make*
+
+
+![xz-make-install](../imagenes/LFS/sesion7/xz-make-install.png)
+*Figura 8: xz install*
+
+
+![binutils-pass2-make](../imagenes/LFS/sesion7/binutils-pass2-make.png)
+*Figura 9: binutils make*
+
+
+![binutils-pass2-make-install](../imagenes/LFS/sesion7/binutils-pass2-make-install.png)
+*Figura 10: binutils make install*
+
+
+
+
+
+
+
