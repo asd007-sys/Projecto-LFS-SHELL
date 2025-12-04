@@ -1388,43 +1388,43 @@ Muchos de los paquetes usan la misma configuración para compilar.
 ## Evidencia
 
 
-![patch-make](../imagenes/LFS/sesion7/patch-make.png)
+![patch-make](../imagenes/LFS/sesion8/patch-make.png)
 *Figura 1: patch make *
 
 
-![patch-make-install](../imagenes/LFS/sesion7/patch-make-install.png)
+![patch-make-install](../imagenes/LFS/sesion8/patch-make-install.png)
 *Figura 2: patch make install*
 
 
-![sed-make](../imagenes/LFS/sesion7/sed-make.png)
+![sed-make](../imagenes/LFS/sesion8/sed-make.png)
 *Figura 3: sed make*
 
 
-![sed-make-install](../imagenes/LFS/sesion7/sed-make-install.png)
+![sed-make-install](../imagenes/LFS/sesion8/sed-make-install.png)
 *Figura 4: sed make install*
 
 
-![tar-make](../imagenes/LFS/sesion7/tar-make.png)
+![tar-make](../imagenes/LFS/sesion8/tar-make.png)
 *Figura 5: tar make*
 
 
-![tar-make-install](../imagenes/LFS/sesion7/tar-make-install.png)
+![tar-make-install](../imagenes/LFS/sesion8/tar-make-install.png)
 *Figura 6: tar make install*
 
 
-![xz-make](../imagenes/LFS/sesion7/xz-make.png)
+![xz-make](../imagenes/LFS/sesion8/xz-make.png)
 *Figura 7: xz make*
 
 
-![xz-make-install](../imagenes/LFS/sesion7/xz-make-install.png)
+![xz-make-install](../imagenes/LFS/sesion8/xz-make-install.png)
 *Figura 8: xz install*
 
 
-![binutils-pass2-make](../imagenes/LFS/sesion7/binutils-pass2-make.png)
+![binutils-pass2-make](../imagenes/LFS/sesion8/binutils-pass2-make.png)
 *Figura 9: binutils make*
 
 
-![binutils-pass2-make-install](../imagenes/LFS/sesion7/binutils-pass2-make-install.png)
+![binutils-pass2-make-install](../imagenes/LFS/sesion8/binutils-pass2-make-install.png)
 *Figura 10: binutils make install*
 
 
