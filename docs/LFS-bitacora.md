@@ -1430,6 +1430,93 @@ Muchos de los paquetes usan la misma configuración para compilar.
 
 
 
+--- 
+
+
+
+
+# Sesión 9: 5 de Diciembre - Cont 2 - Cross Compiling Temporary Tools
+
+
+## Objetivo: Continuacion de la instalación de temporary tools necesarias para el entorno de cross-compilation (Gcc -pass 2)
+
+
+## Tareas Realizadas
+
+
+(12:45 - 14:03 )
+ - 6.18 Gcc pass 2
+
+
+
+
+## Comandos principales ejecutados:
+
+
+#Descomprimir paquetes necesarios
+
+tar -xf ../mpfr-4.2.2.tar.xz
+mv -v mpfr-4.2.2 mpfr
+tar -xf ../gmp-6.3.0.tar.xz
+mv -v gmp-6.3.0 gmp
+tar -xf ../mpc-1.3.1.tar.gz
+mv -v mpc-1.3.1 mpc
+
+#cambiar lib64 a lib en t-linux64
+
+case $(uname -m) in
+  x86_64)
+    sed -e '/m64=/s/lib64/lib/' \
+        -i.orig gcc/config/i386/t-linux64
+  ;;
+esac
+
+#Habilitar posix supports con las librerías libgcc y libstdc++
+
+sed '/thread_header =/s/@.*@/gthr-posix.h/' \
+    -i libgcc/Makefile.in libstdc++-v3/include/Makefile.in
+
+
+mkdir -v build
+cd       build
+
+
+#configuración para compilar
+
+../configure 
+
+make
+
+make DESTDIR=$LFS install
+
+
+ln -sv gcc $LFS/usr/bin/cc
+
+
+
+## Resultados Obtenidos
+
+
+#### Gcc- pass 2 - instalado
+
+## Problemas Encontrados
+
+
+Ningún problema significante.
+
+
+## Evidencia
+
+
+![gcc-pass2-make](../imagenes/LFS/sesion9/gcc-pass2-make.png)
+*Figura 1: Gcc pass 2 make *
+
+
+![gcc-pass2-make-install](../imagenes/LFS/sesion9/gcc-pass2-make-install.png)
+*Figura 2: Gcc pass 2 make install*
+
+
+
 
 
 
