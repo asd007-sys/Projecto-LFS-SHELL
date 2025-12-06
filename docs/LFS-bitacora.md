@@ -1516,6 +1516,142 @@ Ningún problema significante.
 *Figura 2: Gcc pass 2 make install*
 
 
+----
+
+
+# Sesión 10: 6 de Diciembre - Entrando Chroot y Construyendo Herramientas Temporales
+
+## Objetivo: Preparar el entorno Chroot, configurar el sistema básico e instalar parte del Gettext final.
+
+## Tareas Realizadas
+
+(10:49 - 12:30 )
+- 7.2 Cambiar el Ownership 
+- 7.3 Preparar el sistema de archivos del Virtual Kernel
+- 7.4 Entrar al entorno Chroot
+- 7.5 Cear Directórios
+- 7.6 Crear archivos esenciales y symbolic links
+
+
+(12:30 - 13:17 )
+- 7.7 Gettext-0.26 (Construcción e instalación)
+
+
+## Comandos principales ejecutados:
+
+
+#### 7.2 Cambiar de Owner, de lfs a root (como usuario root, fuera de $LFS)
+
+chown --from lfs -R root:root $LFS/{usr,var,etc,tools}
+case $(uname -m) in
+  x86_64) chown --from lfs -R root:root $LFS/lib64 ;;
+esac
+
+#### 7.3 Preparar Sistemas de Archivos (como usuario root, fuera de $LFS)
+
+mkdir -pv $LFS/{dev,proc,sys,run}
+mount -v --bind /dev $LFS/dev
+mount -vt devpts devpts -o gid=5,mode=0620 $LFS/dev/pts
+mount -vt proc proc $LFS/proc
+mount -vt sysfs sysfs $LFS/sys
+mount -vt tmpfs tmpfs $LFS/run
+if [ -h $LFS/dev/shm ]; then
+  install -v -d -m 1777 $LFS$(realpath /dev/shm)
+else
+  mount -vt tmpfs -o nosuid,nodev tmpfs $LFS/dev/shm
+fi
+
+#### 7.4 Entrar al entorno Chroot con variables de entorno
+chroot "$LFS" /usr/bin/env -i   \
+   ….
+
+
+#### 7.5 Creación de Directorios 
+mkdir -pv /{boot,home,mnt,opt,srv}
+... (comandos de mkdir -pv y install -dv)
+
+##### 7.6 Archivos esenciales y symbolic links
+ln -sv /proc/self/mounts /etc/mtab
+cat > /etc/hosts << EOF ... (creación de hosts)
+cat > /etc/passwd << "EOF" ... (creación de passwd)
+cat > /etc/group << "EOF" ... (creación de group)
+echo "tester:x:101:101::/home/tester:/bin/bash" >> /etc/passwd
+echo "tester:x:101:" >> /etc/group
+install -o tester -d /home/tester
+
+#### Comenzar nueva shell para aplicar /etc/passwd
+exec /usr/bin/bash --login
+
+#### Inicializar logs
+touch /var/log/{btmp,lastlog,faillog,wtmp}
+chgrp -v utmp /var/log/lastlog
+chmod -v 664  /var/log/lastlog
+chmod -v 600  /var/log/btmp
+
+#### 7.7 Gettext-0.26 
+
+
+#### Dentro del directorio extraído
+
+./configure --disable-shared
+
+### Compilar
+
+Make
+
+#### Instalar lo necesario (mediante la función cp)
+
+cp -v gettext-tools/src/{msgfmt,msgmerge,xgettext} /usr/bin
+
+
+## Resultados Obtenidos
+
+Entorno Chroot inicializado exitosamente, con el prompt mostrando root en lugar de "I have no name!".
+
+Estructura de directorios FHS creada.
+
+Archivos esenciales /etc/hosts, /etc/passwd y /etc/group creados.
+
+Gettext-0.26 compilado y sus binarios esenciales  instalados 
+
+Permite que los programas muestren mensajes en el idioma nativo del usuario mediante archivos de traducción separados del código fuente.
+
+## Problemas Encontrados
+
+
+Problema: Al comenzar el capítulo 7, se cambia el owner de lfs, del usuario lfs a root, pero en $LFS/sources yo cree una carpeta llamada tee donde guardo todos los make y make install de los paquetes compilados e instalados, y el usuario lfs es owner de esto. 
+
+Causa: La carpeta fue creada mientras estaba en sesion con el usuario lfs
+
+Solución: se usó el mismo comando que se usan para los directorios y archivos,pero adaptado para tee: chown --from lfs -R root:root $LFS/sources/tee
+
+
+Problema: Por razón alguna, el sistema que en que se trabajaba se colgó.
+
+Solución: Gracias a los snapshot, se pudo volver a comenzar desde la sesión anterior, perdiendo asi solo el trabajo del dia.
+
+
+## Reflexiones Técnicas
+
+
+Ahora se comienza el Capitulo 7 donde preparamos el sistema para entrar al Chroot, aislandonos completamente. Se crea un kernel virtual porque las aplicaciones de usuario las usan. Al entrar el chroot configuramos también las variables de entorno necesarias, este mismo se utiliza para instalar el sistema final. Después, se crea toda la estructura de directorios manualmente mediante comandos,Seguimos el Filesystem Hierarchy Standard, los directorios por predeterminado tienen el permiso modo 755, pero cambiamos estos permisos por seguridad a root (para que ningún usuario normal pueda entrar) y a dos directorios de archivos temporales(para que cualquiera puede escribir en dichos directorios ).
+Se crean los archivos esenciales como hosts, passwd,group : de los cuales los dos últimos tienen lineas para que root pueda loguearse y que el nombre “root” sea reconocido.
+
+
+
+## Evidencia
+
+![LFS-sources-tee-ownert](../imagenes/LFS/sesion10/LFS-sources-tee-owner.png)
+*Figura 1: Root owner de tee*
+
+![LFS-owner-root](../imagenes/LFS/sesion10/LFS-owner-root.png)
+*Figura 2: Owner de directorios de LFS*
+
+![LFS-owner-root-2t](../imagenes/LFS/sesion10/LFS-owner-root-2.png)
+*Figura 3: Owner de directorios de LFS 2*
+
+![gettext-make](../imagenes/LFS/sesion10/gettext-make.png)
+*Figura 4: Gettext make*
 
 
 
