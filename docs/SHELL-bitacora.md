@@ -186,7 +186,7 @@ Solucion:Gracias a la inteligencia artificial se usa:
 
 En el archivo de prueba_parseador_1 para indicar la ruta relativa entre los archivos. Y también usar archivos __init__.py para que python reconozca los directorios.
 
-Problema: La implementación de mi parseados hace que se le asigne el token elemento del array, a comando , que sería el comando principal, pero si estaba vacio, crasheaba el programa.
+Problema: La implementación de mi parseador hace que se le asigne el primer token del array, a la variable comando , que sería el comando principal, pero si estaba vacio, crasheaba el programa.
 
 Solución: Se le detecta si partes tiene al menos 1 elemento con if not partes, y si no tiene simplemente continua al próximo loop.
 
