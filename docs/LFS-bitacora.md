@@ -1637,6 +1637,8 @@ Solución: Gracias a los snapshot, se pudo volver a comenzar desde la sesión an
 Ahora se comienza el Capitulo 7 donde preparamos el sistema para entrar al Chroot, aislandonos completamente. Se crea un kernel virtual porque las aplicaciones de usuario las usan. Al entrar el chroot configuramos también las variables de entorno necesarias, este mismo se utiliza para instalar el sistema final. Después, se crea toda la estructura de directorios manualmente mediante comandos,Seguimos el Filesystem Hierarchy Standard, los directorios por predeterminado tienen el permiso modo 755, pero cambiamos estos permisos por seguridad a root (para que ningún usuario normal pueda entrar) y a dos directorios de archivos temporales(para que cualquiera puede escribir en dichos directorios ).
 Se crean los archivos esenciales como hosts, passwd,group : de los cuales los dos últimos tienen lineas para que root pueda loguearse y que el nombre “root” sea reconocido.
 
+Nota Despues del commit: No se crea el kernel virtual, se monta el kernel del build system en chroot para la comunicacion entre estos dos
+
 
 
 ## Evidencia
@@ -1653,6 +1655,198 @@ Se crean los archivos esenciales como hosts, passwd,group : de los cuales los do
 ![gettext-make](../imagenes/LFS/sesion10/gettext-make.png)
 *Figura 4: Gettext make*
 
+
+---
+
+# Sesión 11: 7 de Diciembre - Instalacion de Paquetes - se subió a github un dia despues
+
+## Objetivo: Continuar instalando los paquetes restantes del Capítulo 7 (Bison,Perl,Python,TexInfo,Util-Linux)
+
+## Tareas Realizadas
+
+(11:13 - 11:37 )
+- Bison-3.8.2
+
+(11:37 - 12:00 )
+- Perl-5.42.0
+
+(12:00 - 12:19 )
+- Python-3.13.7
+
+(12:19 - 12:33 )
+- Texinfo-7.2
+
+(12:33 - 12:57 )
+- Util-linux-:2.41.1 
+
+
+
+## Comandos principales ejecutados:
+
+
+#### Bison-3.8.2
+
+#Configuración para compilación
+
+./configure --prefix=/usr \
+            --docdir=/usr/share/doc/bison-3.8.2
+
+#Compilar
+
+make
+
+
+#Instalar
+
+make install
+
+#### Perl-5.42.0
+
+#Configuración para compilar
+
+sh Configure -des     
+                                    
+#Compilar
+
+make
+
+
+#Instalar
+
+make install
+
+
+#### Python-3.13.7
+
+#Configuración para compilar 
+
+./configure --prefix=/usr       \
+….
+#Se prohíbe la instalación de librerías estáticas
+#Se deshabilita el instalador de paquetes de Python
+#También se prohíbe la librería estática libpython, que ocupa mucho espacio.
+
+
+#Compilar
+
+make
+
+
+#Instalar
+
+make install
+
+
+
+#### Texinfo-7.2
+
+
+
+#Configuración para compilar 
+
+./configure --prefix=/usr
+
+#Compilar
+
+make
+
+
+#Instalar
+
+make install
+
+
+#### Util-linux-2.41.1 
+
+#### Segun FHS, se recomienda crear el directorio hwclock
+
+mkdir -pv /var/lib/hwclock
+
+#Configuración para compilar 
+
+./configure --libdir=/usr/lib     \
+…….
+
+#/var/lib/hwclock/adjtime se crea aca por recomendacion del FHS (Jerarquía de archivos de sistema) y para que mas adelante no se cree en otro lugar
+#Se previene warnings por paquetes no existentes o en LFS
+#Deshabilita Python
+ 
+
+#Compilar
+make
+
+#Instalar
+
+make install
+
+
+## Resultados Obtenidos
+
+#### Bison-3.8.2 
+
+Es un generador de parseadores de uso general.
+
+#### Perl-5.42.0
+
+Lenguaje de programación.
+
+#### Python-3.13.7
+
+Lenguaje de programación.
+
+#### Texinfo-7.2
+
+Es un sistema de documentación,permite crear documentación en múltiples formatos a partir de un archivo fuente.
+
+#### Util-linux-2.41.1 
+
+Contiene herramientas fundamentales para la administración del sistema, manejo de archivos, procesos, usuarios y dispositivos.
+
+
+
+## Reflexiones Técnicas
+
+
+En esta parte de la construcción usamos los paquetes instalados como parte de los temporary tools para construir lfs, y también los paquetes ya se instalan en sus directorios de destino final, donde van a estar implementados en lfs. Este es el capítulo final donde se comienza a dejar de depender del build system o del Rocky Linux, en este caso sería para la compilación de los próximos paquetes. Ya no se usa LFS_TGT (en realidad no tenemos más la variable de entorno asignada al entrar a chroot) porque ya no hace falta especificar para que system o sistema estamos construyendo, porque es sí mismo.
+En el Capítulo 7 dejamos de hacer cross-compilation porque tenemos las herramientas básicas compiladas para el sistema final. Pero, se sigue dependiendo temporalmente del kernel de Rocky Linux para: la ejecución de todos los procesos (make, gcc, bash),la gestión de memoria y procesos,los drivers de hardware, el sistema de archivos en ejecución.
+Más específico,se montan los virtual kernel filesystems del Rocky Linux dentro del chroot para que los programas en el chroot puedan comunicarse con el kernel de Rocky Linux que está en ejecución.
+Esta dependencia del kernel de Rocky Linux es temporal y eventualmente se dejará de usar el kernel del build system.
+
+
+
+
+
+## Evidencia
+
+![bison-make](../imagenes/LFS/sesion11/bison-make.png)
+*Figura 1: bison make*
+
+![bison-make-install](../imagenes/LFS/sesion11/bison-make-install.png)
+*Figura 2: bison make install*
+
+![perl-make](../imagenes/LFS/sesion11/perl-make.png)
+*Figura 3: perl make*
+
+![perl-make-install](../imagenes/LFS/sesion11/perl-make-install.png)
+*Figura 4: perl make install*
+
+![python-make](../imagenes/LFS/sesion11/python-make.png)
+*Figura 5: python make*
+
+![python-make-install](../imagenes/LFS/sesion11/python-make-install.png)
+*Figura 6: python make install*
+
+![texinfo-make](../imagenes/LFS/sesion11/texinfo-make.png)
+*Figura 7: texinfo make*
+
+![texinfo-make](../imagenes/LFS/sesion11/texinfo-make-install.png)
+*Figura 8: texinfo make install*
+
+![util-linux-make](../imagenes/LFS/sesion11/util-linux-make.png)
+*Figura 9: util-linux-make*
+
+![util-linux-make-install](../imagenes/LFS/sesion11/util-linux-make-install.png)
+*Figura 10: util linux make install*
 
 
 
