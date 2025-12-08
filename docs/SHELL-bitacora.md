@@ -131,3 +131,69 @@ Solución: usar la condicional if __name__ == “main”, si el archivo se ejecu
 *Prueba de pwd, exit, comando no existente y Control+C*
 
 
+
+---
+
+
+# Fecha:8 de Diciembre del 2025
+# Integrante: Marcelo Avalos
+# Objetivo del día: Crear un parseador básico para el shell
+
+## Tareas realizadas:
+
+(15:20 - 15:47 )
+
+- Crear las variables del parseador y leer caracter por caracter el comando ingresado por el usuario.
+
+(16:47 -  17:01)
+- Implementación de separación de tokens y almacenar los tokens en la variable de array tokens
+
+( 17:01- 17:39 )
+- Implementación de lógica de los caracteres de escape y entrecomillas.
+
+
+## Comandos probados:
+
+pwd hola
+\”hola\”
+“hola”
+\\
+echo "hola mundo"
+
+Desde cmd:
+C:\Users\a\Projecto-LFS-SHELL>python test/prueba_parsedor_1.py
+
+Para ejecutar el script de prueba.
+
+
+
+
+## Problemas encontrados:
+
+Problema: Al separar los tokens por espacio, se crea el problema de ingresar strings, que si el string tiene espacio, entonces se consideran como varios tokens
+
+Solución:Implementar la función de entrecomillado para que el usuario ingrese un string, y ese string se convierta en un solo token con los caracteres espacios parte del token
+
+Problema: Después de implementar la función de entrecomillas, el problema ahora es que no se puede usar comilla de forma literal sin que se considere un flag."
+
+Solución:Implementar la función de carácter de escape (‘\’), al usar este,automáticamente agregamos el próximo carácter,así dejándonos usar comillas de forma literal.
+
+Problema: Para los test de prueba quería correr las pruebas desde root/test, pero el shell está en root/src
+
+Solucion:Gracias a la inteligencia artificial se usa:  
+
+ sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
+
+En el archivo de prueba_parseador_1 para indicar la ruta relativa entre los archivos. Y también usar archivos __init__.py para que python reconozca los directorios.
+
+Problema: La implementación de mi parseados hace que se le asigne el token elemento del array, a comando , que sería el comando principal, pero si estaba vacio, crasheaba el programa.
+
+Solución: Se le detecta si partes tiene al menos 1 elemento con if not partes, y si no tiene simplemente continua al próximo loop.
+
+
+
+## Evidencias 
+
+![Pruebas](../imagenes/SHELL/sesion2/output-de-prueba_parseador_1.png)
+*El output del script de prueba (prueba_parseador_1)*
+

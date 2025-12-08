@@ -2,6 +2,50 @@
 import os
 
 
+"""
+    Parseador Basico:
+
+    - Segmentar el input recibido en tokens,y retornalos todos separados en un array.
+    - Manejo de comillas
+    - Manejo del caracter de escape
+  
+"""
+
+
+
+def parseador(linea_comando):
+
+
+    tokens = [] # Array final del tokens parseados
+    token_actual = "" # Acumilador del token de construcción
+    entre_comillas = False # Estado dentro de comillas dobles, true adentro, false afuera
+    proximo_escape = False # True: siguiente caracter literal, False: normal
+
+
+    for caracter in linea_comando: # Leer caracter por caracter
+        if proximo_escape:
+            # Agregar literalmente independientemente del contexto
+            token_actual += caracter # Se agrega el caracter a token_actual
+            proximo_escape = False # Se resetea el flag
+        elif caracter == '\\':
+            proximo_escape = True # Se setea el flag
+        elif caracter == '"':
+            # Estado de comillas
+            entre_comillas = not entre_comillas # Se le da el valor booleano opuesto del valor actual del flag
+        elif caracter.isspace() and not entre_comillas:
+            # Fin de token por espacio, solo si no estamos entre comillas
+            if token_actual:
+                tokens.append(token_actual) # Se terminó el token, se agrega al arrays de tokens
+                token_actual = "" # Comenzamos un nuevo token
+        else:
+            # Caracter normal - agregar al token actual
+            token_actual += caracter
+    # Agregar el último token si queda alguno, por las dudas.
+    if token_actual:
+            tokens.append(token_actual)
+
+    return tokens # Se retorna el array con los tokens
+
 
 
 
@@ -33,19 +77,29 @@ def main():
             if not comando:
                 continue
 
+            #Parsear comando usando el parseador propio,recibimos el array
+            partes = parseador(comando)
+
+            if not partes:
+                continue  # Ignorar si el parseador no devolvió tokens (ej: solo un '\' o espacios)
+
+
+            comando_principal = partes[0] # El primer elemento del array es el comando principal
+            argumentos = partes[1:] #Los siguientes se asumen como argumentos
+
 
             # Ejecutar comandos built-in
-            if comando == "exit":
+            if comando_principal == "exit":
                 print("¡Hasta luego!")
                 break
 
-            elif comando == "pwd":
+            elif comando_principal == "pwd":
                 # Implementación manual del comando pwd
                 print(os.getcwd())
 
             else:
                 #Si no existe el commando
-                print(f"Comando no implementado: {comando}")
+                print(f"Comando no implementado: {comando_principal}")
 
         except KeyboardInterrupt:
             # Manejo de Ctrl+C - Termina de forma alterna
@@ -53,5 +107,7 @@ def main():
             break
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":    # Si se abre el archivo, se corre main automaticamente, si se importa se puede usar parseador por si solo
     main()
+
+
