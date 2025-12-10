@@ -2022,7 +2022,7 @@ El manual también indica que promueve a no instalar librerias estaticas, ya que
 ![iana-etc-install](../imagenes/LFS/sesion12/iana-etc-install.png)
 *Figura 2: iana-etc install*
 
-![glibc-make.log](../imagenes/LFS/sesion12/glibc-make.png)
+![glibc-pass-make](../imagenes/LFS/sesion12/glibc-pass-make.png)
 *Figura 3: glibc make*
 
 ![glibc-pass-makecheck](../imagenes/LFS/sesion12/glibc-pass-makecheck.png)
