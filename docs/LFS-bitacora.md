@@ -1849,4 +1849,188 @@ Esta dependencia del kernel de Rocky Linux es temporal y eventualmente se dejar�
 *Figura 10: util linux make install*
 
 
+---
+
+# Sesión 12: 9 de Diciembre - Transición a Sistema Final y Glibc
+
+## Objetivo: Comenzando el Capítulo 8
+
+## Tareas Realizadas
+
+(20:03 - 20:19 )
+- Limpiar archivos no necesarios y realizar el Backup
+
+(20:19 - 20:25 )
+- Man-pages-6.15 
+
+(20:25 - 20:28 )
+- Iana-Etc-20250807 
+
+(20:28 - 23:46 )
+- Glibc-2.42 
+
+
+
+## Comandos principales ejecutados:
+#### Borrar archivos de documentación y archivos libtool
+rm -rf /usr/share/{info,man,doc}/*
+find /usr/{lib,libexec} -name \*.la -delete
+
+#Remover tools 
+rm -rf /tools
+
+exit
+
+#Desmontar todos los puntos
+
+mountpoint -q $LFS/dev/shm && umount $LFS/dev/shm
+umount $LFS/dev/pts
+umount $LFS/{sys,proc,run,dev}
+
+#### Hacer el Backup
+cd $LFS
+tar -cJpf $HOME/lfs-temp-tools-12.4-systemd.tar.xz .
+
+####  Man-pages-6.15 
+
+#Remover man-pages sobre hashing de contraseñas 
+
+rm -v man3/crypt*
+
+#Instalar
+
+make -R GIT=false prefix=/usr install
+
+#### Iana-Etc-20250807 
+
+#Instalar copiando archivos a /etc
+
+cp services protocols /etc
+
+
+#### Glibc-2.42 
+
+#Aplicar parche
+
+patch -Np1 -i ../glibc-2.42-fhs-1.patch
+
+#Segun el manual para BLFS
+sed -e '/unistd.h/i #include <string.h>' 
+    
+mkdir -v build
+cd       build
+
+#utilidades ldconfig y sln instalados en /usr/sbin
+
+echo "rootsbindir=/usr/sbin" > configparms
+
+#Configuración para compilar
+
+../configure --prefix=/usr                   
+
+#Deshabilitar que warning paren la compilación
+#Prevenir buffer overflow
+#Deshabilitar cache daemon
+#Usar la libreria correcta , no usar lib64,solo lib
+
+#Compilar
+time make
+
+#Confirmar la compilación
+
+
+time make check
+
+#Para prevenir un warning
+
+touch /etc/ld.so.conf
+
+#Saltar sanity check viejo.
+
+sed '/test-installation/s@$(PERL)@echo not running@' -i ../Makefile
+
+#Instalar
+
+make install
+
+#Arreglar dirección 
+
+sed '/RTLDLIST=/s@/usr@@g' -i /usr/bin/ldd
+
+#instalar locales
+
+localedef -i C -f UTF-8 C.UTF-8
+……
+
+
+
+#Cambia valores predeterminados del Glibc
+cat > /etc/nsswitch.conf << "EOF"
+…..
+
+#Añadir datos sobre time zones(zonas horarias)
+
+#Configurar dynamic loader para que busque librerías en varios directorios
+
+cat > /etc/ld.so.conf << "EOF"
+….
+
+
+## Resultados Obtenidos
+
+#### Man-pages-6.15 
+
+Páginas de manual del sistema Linux 
+
+#### Iana-Etc-20250807 
+
+Archivos de configuración de red 
+
+#### Glibc-2.42 
+
+Biblioteca C mínima. Hace que GCC pueda crear programas que corran en LFS.
+
+## Problemas Encontrados
+
+problema: Se colgo mi maquina virtual al terminar de instalar glibc porque la pc utilizo demasiada memoria.
+
+Solución: Se tuvo que comenzar de nuevo, y se aseguró de manejar mejor la memoria
+
+Problema: La hora y fecha estaban mal al hacer tzselect para la zona horaria.
+
+Solución: La decisión fue usar Asunción, aun con la hora incorrecta.
+
+Problema: Hubo algunos problemas encontrados por check-make
+
+Solución: Según el manual, están todos dentro del rango y algunos test fallan por varios motivos, timeout,cpu viejo, etc.
+
+## Reflexiones Técnicas
+
+
+Se comienza el capítulo 8, ahora se está construyendo ya los paquetes finales para el sistema.
+En este capítulo el manual dice que prioriza la estabilidad de instalación y ejecución de dichos paquetes sobre el rendimiento marginal de la optimizaciones, que pueden causar errores en las toolchain críticas.
+La compilación de Glibc es más rápida que la primera en el capítulo 5, sin embargo, al chequear con make check, tarda considerablemente más , pero se asegura de que glibc que es la biblioteca C principal del LFS. Cabe recalcar que el manual mismo dice que algunos tests fallen es normal ya que pueden ser por timeout, o simplemente librerias que tal vez no se necesiten.
+El manual también indica que promueve a no instalar librerias estaticas, ya que si por ejemplo hay que remover una libreria por algun error de seguridad, cada programa que usa esa libreria estatica va a tener que volver a linkearse(re-enlazarse) con la nueva
+
+## Evidencia
+
+
+
+![man-pages-install](../imagenes/LFS/sesion12/man-pages-install.png)
+*Figura 1: man-pages install*
+
+![iana-etc-install](../imagenes/LFS/sesion12/iana-etc-install.png)
+*Figura 2: iana-etc install*
+
+![glibc-make.log](../imagenes/LFS/sesion12/glibc-make.png)
+*Figura 3: glibc make*
+
+![glibc-pass-makecheck](../imagenes/LFS/sesion12/glibc-pass-makecheck.png)
+*Figura 4: glibc makecheck*
+
+![glibc-pass-make-install](../imagenes/LFS/sesion12/glibc-pass-make-install.png)
+*Figura 5: glibc make install*
+
+![fails-de-checkmake](../imagenes/LFS/sesion12/fails-de-checkmake.png)
+*Figura 5: fails de checkmake*
 
