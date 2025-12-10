@@ -2034,3 +2034,194 @@ El manual también indica que promueve a no instalar librerias estaticas, ya que
 ![fails-de-checkmake](../imagenes/LFS/sesion12/fails-de-checkmake.png)
 *Figura 5: fails de checkmake*
 
+
+---
+
+# Sesión 13: 10 de Diciembre - Instalación de Zlib,Bzip2,Xz,Lz4
+
+## Objetivo: Instalar paquetes 
+
+## Tareas Realizadas
+
+(12:26 - 12:35 )
+- Zlib-1.3.1
+
+(12:35 - 12:51 )
+- Bzip2-1.0.8
+
+(12:51 - 13:07 )
+- Xz-5.8.1
+
+(13:07- 13:25 )
+- Lz4-1.10.0
+
+
+
+## Comandos principales ejecutados:
+
+####
+Para todos los make y make install se le añade  | tee -a nombre.log.
+
+#### Zlib
+
+#Configuración de compilacion
+
+./configure --prefix=/usr
+#Instalar en /usr
+
+#Compilar
+make
+
+#Verificar que funciona
+make check
+
+#Los tests del make check dieron ok, por lo tanto se procede con la instalación
+
+#Instalar
+
+make install
+
+#Remover librería estática
+
+rm -fv /usr/lib/libz.a
+
+
+
+####  Bzip2-1.0.8 
+
+
+ #Aplicar parche
+
+patch -Np1 -i ../bzip2-1.0.8-install_docs-1.patch
+
+#Man pages en directorio correcto
+
+sed -i "s@(PREFIX)/man@(PREFIX)/share/man@g" Makefile
+
+#Configuración de compilación
+
+make -f Makefile-libbz2_so
+make clean
+#Usar makefile específico Makefile-libbz2_so
+
+#Compilar
+
+make
+
+#Instalar
+
+make PREFIX=/usr install
+
+#Instalar librerias compartidas
+
+cp -av libbz2.so.* /usr/lib
+ln -sv libbz2.so.1.0.8 /usr/lib/libbz2.so
+
+#Instalar el binario compartido en el directorio /usr/bin, y las copas de bzip2 se linkea con symbolic links.
+
+cp -v bzip2-shared /usr/bin/bzip2
+for i in /usr/bin/{bzcat,bunzip2}; do
+  ln -sfv bzip2 $i
+done
+
+#Remover librería estática
+
+rm -fv /usr/lib/libbz2.a
+
+#### Xz-5.8.1
+
+#Configurar la compilación
+
+./configure --prefix=/usr    \
+            --disable-static \
+            --docdir=/usr/share/doc/xz-5.8.1
+#Instalar en /usr
+#Deshabilitar librerías estáticas
+#documentación en /usr/share/doc/xz-5.8.1
+
+
+#Compilar
+
+make
+
+#Verificar instalación
+
+make check
+
+#Instalar
+
+make install
+
+#### Lz4-1.10.0 
+
+#Compilar
+
+make BUILD_STATIC=no PREFIX=/usr
+
+#Verificar compilación
+
+make -j1 check
+
+#Instalación
+
+make BUILD_STATIC=no PREFIX=/usr install
+
+
+## Resultados Obtenidos
+
+#### Zlib-1.3.1 - instalado
+Librería de compresión usada por muchos programas y formatos.
+
+#### Bzip2-1.0.8  - instalado
+
+Programa para comprimir que usa el algoritmo Burrows-Wheeler, más rápido de xz.
+
+#### Xz-5.8.1  - instalado
+
+Programa para comprimir que usa el algoritmo LZMA2 para una compresión muy alta, generando archivos .xz. más lento que Bzip2
+
+#### Lz4-1.10.0  - instalado
+
+Programa para comprimir, sin pérdida alguna extremadamente rápido, particularmente bueno para aplicaciones en tiempo real.
+
+
+## Reflexiones Técnicas
+Instalación de pequeños paquetes, el make heck de Lz4 no es particularmente descriptivo entonces se chequeo con lz4 –version, si funciona, y con [ echo “hola” | lz4 > test.lz4 ], para comprimir un archivo y[ lz4 -d test.lz4 ], descomprimir y verificar test que efectivamente dice hola.Esta pequeña prueba fue hecha junto a inteligencia artificial.
+Se deshabilitan varias librerías estáticas.
+Se instalaron varios programas de compresión, demostrando que cada uno tiene una especialización o particularidad , xz alta compresión, bzip2 más equilibrado en compresión y velocidad, lz4 velocidad muy rápida.
+
+## Evidencia
+
+
+![zlib-make](../imagenes/LFS/sesion13/zlib-make.png)
+*Figura 1: zlib make*
+
+![zlib-make-check](../imagenes/LFS/sesion13/zlib-make-check.png)
+*Figura 1: zlib make check*
+
+![zlib-make-install](../imagenes/LFS/sesion13/zlib-make-install.png)
+*Figura 1: zlib make install*
+
+![bzip2-make](../imagenes/LFS/sesion13/bzip2-make.png)
+*Figura 1:bzip2-make*
+
+![bzip2-make-install](../imagenes/LFS/sesion13bzip2-make-install.png)
+*Figura 1: bzip2-make install*
+
+![bzip2-make-install-libreria-compartida-binario-en-usr-bin](../imagenes/LFS/sesion13/bzip2-make-install-libreria-compartida-binario-en-usr-bin.png)
+*Figura 1: bzip2 make install libreria compartida binario en usr bin*
+
+![xz-make](../imagenes/LFS/sesion13/xz-make.png)
+*Figura 1: xz-make*
+
+![xz-make-check](../imagenes/LFS/sesion13/xz-make-check.png)
+*Figura 1: xz make check*
+
+![zlib-make-install](../imagenes/LFS/sesion13/xz-make-install.png)
+*Figura 1: xz make install*
+
+![lz4-make-install](../imagenes/LFS/sesion13/lz4-make-install.png)
+*Figura 1: lz4-make-install*
+
+![lz4-checkeo-rapido](../imagenes/LFS/sesion13/lz4-lz4-checkeo-rapido.png)
+*Figura 1: lz4-checkeo-rapido*
