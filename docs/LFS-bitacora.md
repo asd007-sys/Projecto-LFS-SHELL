@@ -2205,7 +2205,7 @@ Se instalaron varios programas de compresión, demostrando que cada uno tiene un
 ![bzip2-make](../imagenes/LFS/sesion13/bzip2-make.png)
 *Figura 1:bzip2-make*
 
-![bzip2-make-install](../imagenes/LFS/sesion13bzip2-make-install.png)
+![bzip2-make-install](../imagenes/LFS/sesion13/bzip2-make-install.png)
 *Figura 1: bzip2-make install*
 
 ![bzip2-make-install-libreria-compartida-binario-en-usr-bin](../imagenes/LFS/sesion13/bzip2-make-install-libreria-compartida-binario-en-usr-bin.png)
@@ -2223,5 +2223,5 @@ Se instalaron varios programas de compresión, demostrando que cada uno tiene un
 ![lz4-make-install](../imagenes/LFS/sesion13/lz4-make-install.png)
 *Figura 1: lz4-make-install*
 
-![lz4-checkeo-rapido](../imagenes/LFS/sesion13/lz4-lz4-checkeo-rapido.png)
+![lz4-checkeo-rapido](../imagenes/LFS/sesion13/lz4-checkeo-rapido.png)
 *Figura 1: lz4-checkeo-rapido*
