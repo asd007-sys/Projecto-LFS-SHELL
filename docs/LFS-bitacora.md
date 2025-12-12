@@ -2225,3 +2225,183 @@ Se instalaron varios programas de compresión, demostrando que cada uno tiene un
 
 ![lz4-checkeo-rapido](../imagenes/LFS/sesion13/lz4-checkeo-rapido.png)
 *Figura 1: lz4-checkeo-rapido*
+
+
+---
+
+
+# Sesión 14: 11 de Diciembre - Instalación de Zstd,File,Readline,M4 - Subido un dia despues en github
+
+## Objetivo: Instalar paquetes 
+
+## Tareas Realizadas
+
+(16:11 - 16:25 )
+- Zstd-1.5.7 
+
+(16:27 -  16:34 )
+- File-5.46 
+
+(16:34 - 16:51 )
+- Readline-8.3 
+
+(16:51- 17:01 )
+- M4-1.4.20 
+
+
+
+## Comandos principales ejecutados:
+
+#### Generalmente al make se le agregar time, y a make, make install se les agrega | tee -a “nombre-del.log”
+
+
+#### Zstd-1.5.7 
+
+#Compilar 
+
+make prefix=/usr
+
+#Revisar si funciona correctamente
+
+make check
+
+#Instalar paquete
+
+make prefix=/usr install
+
+#Eliminar librería estática
+
+rm -v /usr/lib/libzstd.a
+
+
+####  File-5.46 
+
+#Configurar para compilar
+
+./configure --prefix=/usr
+
+#Compilar
+
+make
+
+#Revisar resultado
+
+make check
+
+#Instalar
+
+make install
+ 
+####  Readline-8.3 
+
+#Configurar la compilación
+
+#Evitar problemas al reinstalar Readline
+
+sed -i '/MV.*old/d' Makefile.in
+sed -i '/{OLDSUFF}/c:' support/shlib-install
+
+#Prevenir rpath en las librerias compartidas
+
+sed -i 's/-Wl,-rpath,[^ ]*//' support/shobj-conf
+
+
+#Configuración para compilar
+
+./configure --prefix=/usr    \
+….
+#Deshabilita librerías estáticas
+#Explícitamente establece dirección de la documentación
+#Establecer que las funciones de librerías termcap puede encontrarse en las librerías de curses
+
+#Compilar 
+
+make SHLIB_LIBS="-lncursesw"
+#Opcion que obliga a Readline enlazarse con la libreria libncursesw
+
+#Instalar
+
+make install
+
+#Instalar documentación
+
+install -v -m644 doc/*.{ps,pdf,html,dvi} /usr/share/doc/readline-8.3
+
+
+#### M4-1.4.20 
+
+#Configuración para compilar
+
+./configure --prefix=/usr
+
+
+#Compilar
+
+make 
+
+#Verificar compilación
+
+make check
+
+#Instalación
+
+make install
+
+
+## Resultados Obtenidos
+
+####  Zstd-1.5.7  - instalado
+Programa para comprimir,concibe alta compresión.
+
+#### File-5.46   - instalado
+
+Contiene utilidad que permite identificar el tipo de archivos, o de múltiples archivos
+
+#### Readline-8.3  - instalado
+
+Es una librería que tiene capacidades de edición y manejo de líneas de comandos para programas interactivos.
+
+#### M4-1.4.20   - instalado
+
+Procesador de macros. 
+
+## Reflexión Técnica
+
+Se noto un paquete (Zstd) que se compila con “make prefix=/usr” e instala con “make prefix=/usr install”, por lo que se entiende, al compilar, en vez de usar configure, durante la compilación se le dice al programa que va a ser instalado en /usr. Durante la instalación se le instala en la dirección /usr con el mismo comando prefix, si el comando sólo está durante la instalación y no compilacion , entonces al compilar puede tener otro destino que /usr, haciendo que al instalar no encuentre los archivos en /usr donde queremos instalar. En otras palabras, puede haber una disparidad de lo que el compilador piensa dónde se va a instalar, y en donde se quiere realmente instalar, por eso no es redundante usar prefix=/usr para la compilación e instalación en este caso.
+
+
+## Evidencia
+
+
+![zstd-make](../imagenes/LFS/sesion14/zstd-make.png)
+*Figura 1: file-make*
+
+![zstd-make-check](../imagenes/LFS/sesion14/zstd-make-check.png)
+*Figura 2: file-make check*
+
+![zstd-make-install](../imagenes/LFS/sesion14/zstd-make-install.png)
+*Figura 3: zstd make install*
+
+![file-make](../imagenes/LFS/sesion14/file-make.png)
+*Figura 4: file-make*
+
+![file-make-check](../imagenes/LFS/sesion14/file-make-check.png)
+*Figura 5: file-make check*
+
+![file-make-install](../imagenes/LFS/sesion14/file-make-install.png)
+*Figura 6: file-make install*
+
+![readline-make](../imagenes/LFS/sesion14/readline-make.png)
+*Figura 7:bzip2-make*
+
+![readline-make-install](../imagenes/LFS/sesion14/readline-make-install.png)
+*Figura 8: readline-make install*
+
+![m4-make](../imagenes/LFS/sesion14/m4-make.png)
+*Figura 9: file-make*
+
+![m4-make-check](../imagenes/LFS/sesion14/m4-make-check.png)
+*Figura 10: file-make check*
+
+![m4-make-install](../imagenes/LFS/sesion14/m4-make-install.png)
+*Figura 11: zstd make install*
