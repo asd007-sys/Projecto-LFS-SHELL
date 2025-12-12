@@ -1,6 +1,6 @@
 
 import os
-
+import sys
 
 """
     Parseador Basico:
@@ -46,7 +46,52 @@ def parseador(linea_comando):
 
     return tokens # Se retorna el array con los tokens
 
+"""
+    Ejecutador de programas externo:
+    
+    -Clona el shell,asigna pid correcto a cada instancia
+    -La memoria donde esta el codigo es remplazado por el comando a ejectuar
+    -El padre espera a que el hijo se termine de ejecutar, para evitar procesos zombie
+    
+"""
 
+
+
+def ejecutar_externo(comando, argumentos):   #Permite al ejecutar programas externo,mediante clonacion y remplazo de codigo,datos en la memoria del proceso hijo
+   
+    try:
+        
+        pid = os.fork()    # Clona el Shell , el hijo recibe 0 en pid(el clon), y el Padre un numero positivo(Pid del hijo)
+    except OSError as e:
+        print(f"Error al crear proceso (fork): {e}")  # Error al clonar
+        return
+
+    if pid == 0:   # Si se ejecuta actualmente el hijo
+        
+        try:
+            
+            argv = [comando] + argumentos # Llenamos un array con el comando primero, seguido por los argumentos
+            
+           
+            os.execvp(comando, argv) # Reemplazamos el codigo en el espacio de memoria del hijo, por el proceso externo que se quiere ejecutar
+            
+        except FileNotFoundError:
+            print(f"Error: El comando '{comando}' no fue encontrado en el sistema.")
+            sys.exit(127) # Código estándar linux para "Command not found"
+        except Exception as e:
+            print(f"Error al ejecutar: {e}")
+            sys.exit(1) # Salir con error genérico
+
+    else: # Se ejecuta actualmente el proceso Padre
+        
+        try:
+            _, status = os.waitpid(pid, 0) # El padre se bloquea , y espera a que el hijo termine de correr.
+            
+            
+        except KeyboardInterrupt:
+            # Si el usuario hace Ctrl+C mientras corre el programa externo,
+            # Se atrapa el error para que no se cierre el shell, solo deje de esperar.
+            print("\nPrograma interrumpido.")
 
 
 def main():
@@ -99,7 +144,7 @@ def main():
 
             else:
                 #Si no existe el commando
-                print(f"Comando no implementado: {comando_principal}")
+                ejecutar_externo(comando_principal, argumentos) #Funcion nueva
 
         except KeyboardInterrupt:
             # Manejo de Ctrl+C - Termina de forma alterna

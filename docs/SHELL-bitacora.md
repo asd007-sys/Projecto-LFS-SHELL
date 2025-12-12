@@ -197,3 +197,57 @@ Solución: Se le detecta si partes tiene al menos 1 elemento con if not partes, 
 ![Pruebas](../imagenes/SHELL/sesion2/output-de-prueba_parseador_1.png)
 *El output del script de prueba (prueba_parseador_1)*
 
+
+---
+
+# Fecha:10 de Diciembre del 2025 - Subido un dia despues a Github
+# Objetivo del día: Crear una función que permite ejecutar programas externos con os.fork(),execvp()
+
+## Tareas realizadas:
+
+(16:27 -17:15)
+
+- Aprender sobre os.fork()
+- Crear la función y ejecutar os.fork() correctamente.
+
+(17:15-  17:56)
+- Aprender sobre execvp(),waitpid()
+- Completar la función con execvp() y waitpid()
+
+
+
+## Comandos probados:
+
+echo ¡Funciona! Perfecto #Imprime ¡Funciona! Perfecto
+
+cat prueba_ejecutar_externo.py #Imprime el script de prueba en terminal
+
+Comando_falso_123 #Error no exite tal comando
+
+## Comando para ejecutar en linux
+
+python prueba_ejecutar_externo.py 
+#Se utilizo inteligencia artifical para ayudar a crear el script de prueba
+
+## Problemas encontrados:
+
+Problema: No se sabía cómo comenzar entonces se le preguntó a la inteligencia artificial cuál serían las mejores funciones existentes no prohibidas para usar?
+
+Solución: Sin usar funciones prohibidas, fork(), execvp() y waitpid() fueron las más convincentes
+
+Problema: Varias formas de usar exec  ,y no sabia cual era mejor.
+
+Solucion: Al considerar,cómo se construye en linux, asumimos que muchas de las funciones que queremos usar ya tienen variable de entorno, y como ya guardamos en el formato: comando , argumentos, se decidió usar execvp()
+
+Problema: cuando el programa no encuentra el archivo,OSError emite errno2 No such file, pero no se sabía cómo cambiar el diálogo de error
+
+Solución: Al preguntar a la inteligencia artificial, esto es ENOENT 2, que vendría a ser FileNotFoundError,junto a sys.exit(127) para el comando no encontrado. El resto de los errores posibles lanzan Exception.
+
+
+
+
+
+## Evidencias 
+
+![prueba_ejecutar_externo](../imagenes/SHELL/sesion3/prueba_ejecutar_externo.png)
+*El output del script de prueba (prueba ejecutar externo)*
