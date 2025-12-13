@@ -2405,3 +2405,184 @@ Se noto un paquete (Zstd) que se compila con “make prefix=/usr” e instala co
 
 ![m4-make-install](../imagenes/LFS/sesion14/m4-make-install.png)
 *Figura 11: zstd make install*
+
+---
+
+# Sesión 15: 13 de Diciembre - Instalación de Bc,Flex,Tcl 
+
+## Objetivo: Instalar paquetes 
+
+## Tareas Realizadas
+
+(10:19 - 10:30 )
+- Bc-7.0.3 
+
+(10:30 -  10:43)
+- Flex-2.6.4 
+
+(10:43 - 11:25 )
+- Tcl-8.6.16  
+
+
+
+
+
+## Comandos principales ejecutados:
+
+#### Generalmente al make se le agregar time, y a make, make install se les agrega | tee -a “nombre-del.log”
+
+
+#### Bc-7.0.3 
+
+#Configurar para compilar
+
+CC='gcc -std=c99' ./configure --prefix=/usr -G -O3 -r
+
+#Se especifica el compilador y 
+#Omitir partes del test suite hasta que se instalen
+#Habilitar opción de optimización
+#Habilitar Readline para mejorar edición de líneas
+
+
+
+#Compilar
+
+make
+
+#Ejecutar test o prueba
+
+make test
+
+#Instalar
+
+make install
+
+
+####  Flex-2.6.4 
+
+#Configurar para compilar
+
+./configure --prefix=/usr \
+
+#Instalar en /usr
+#Deshabilitar librerías estáticas
+#Establecer dirección absoluta de documentación
+
+#Compilar
+
+make
+
+#Revisar resultado
+
+make check
+
+#Instalar
+
+make install
+
+#Symbolic links para que programas no usen el predecesor de flex (lex)
+
+ln -sv flex   /usr/bin/lex
+ln -sv flex.1 /usr/share/man/man1/lex.1
+
+ 
+####  Tcl-8.6.16  
+
+#Configuración para compilar
+
+SRCDIR=$(pwd)
+cd unix
+./configure --prefix=/usr           \
+….
+#Instalar en /usr
+#Establecer dirección para los man-pages
+#Deshabilitar-path,puede causar problemas
+
+#Compilar 
+
+make
+
+-sed ….
+
+-sed …..
+
+-sed …..
+unset SRCDIR
+
+Los comandos sed previous,remueven referencias al directorio que usamos para crear el archivo de configuración y los reemplaza por el directorio de instalación (/usr)
+
+#Testear la compilación
+make test
+
+#Instalar
+
+make install 
+chmod 644 /usr/lib/libtclstub8.6.a
+
+#Permiso para poder escribir en la librería
+
+chmod -v u+w /usr/lib/libtcl8.6.so
+
+#Instalar Headers
+
+make install-private-headers
+
+#Symbolic link necesario y renombrar un man-page
+
+ln -sfv tclsh8.6 /usr/bin/tclsh
+mv /usr/share/man/man3/{Thread,Tcl_Thread}.3
+
+
+
+## Resultados Obtenidos
+
+####  Bc-7.0.3  - instalado
+Contiene un lenguaje de procesador numérico
+
+#### Flex-2.6.4    - instalado
+
+Contiene utilidad para crear programas que reconozcan patrones de texto.
+
+#### Tcl-8.6.16   - instalado
+
+Tool Command Language, es un lenguaje de scripting de propósito general.útil para automatización y pruebas de aplicaciones.
+
+
+
+## Reflexión Técnica
+
+En tcl , por si algún paquete que se instale despues, se usa comandos sed, para reemplazar la referencia de el directorio donde se construyó, a el directorio de instalación. Esto se hace por si un paquete necesita usar tcl en el futuro.
+El uso principal de Tcl es para ejecutar el test suite de Binutils,Gcc y otros paquetes para probar que la funcionalidad estos es correcta.
+
+
+
+## Evidencia
+
+
+![bc-make](../imagenes/LFS/sesion15/bc-make.png)
+*Figura 1: bc-make*
+
+![bc-make](../imagenes/LFS/sesion15/bc-make-test.png)
+*Figura 2: bc-make test*
+
+![bc-make](../imagenes/LFS/sesion15/bc-make-install.png)
+*Figura 3: bc-make install*
+
+![flex-make](../imagenes/LFS/sesion15/flex-make.png)
+*Figura 4: flex-make*
+
+![flex-make](../imagenes/LFS/sesion15/flex-make-check.png)
+*Figura 5: flex-make check*
+
+![flex-make](../imagenes/LFS/sesion15/flex-make-install.png)
+*Figura 6: flex-make install*
+
+![tcl-make](../imagenes/LFS/sesion15/tcl-make.png)
+*Figura 7: tcl-make*
+
+![tcl-make](../imagenes/LFS/sesion15/tcl-make-test.png)
+*Figura 8: tcl-make test*
+
+![tcl-make](../imagenes/LFS/sesion15/tcl-make-install.png)
+*Figura 9: tcl-make install*
+
