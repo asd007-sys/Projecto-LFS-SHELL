@@ -2532,6 +2532,12 @@ make install-private-headers
 ln -sfv tclsh8.6 /usr/bin/tclsh
 mv /usr/share/man/man3/{Thread,Tcl_Thread}.3
 
+## Problemas Encontrados
+
+Problema: El make test de tcl dio una falla de async.test
+
+Solución: Al investigar.Se decidió ignorar la falla ya que no es usado por LFS, Expect o DejaGNU. 
+
 
 
 ## Resultados Obtenidos
