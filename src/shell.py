@@ -158,7 +158,8 @@ def main():
     Comandos implementados hasta ahora:
     - pwd: Muestra el directorio de trabajo actual
     - exit: Termina el shell
-
+    - ls: Listar archivos y directorios en un directorio, permite argumento para la ruta a listar.
+    - cd: Cambiar de directorio actual
 
     """
     print("Bienvenido a EduShell - Shell Educativo Universitario")
