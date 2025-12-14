@@ -308,3 +308,64 @@ Solución: Al hacer una búsqueda por una función existente, por recomendación
 
 ![Pruebas](../imagenes/SHELL/sesion4/prueba_ls.png)
 *El output del script de prueba (prueba_ls)*
+
+
+---
+
+# Fecha:14 de Diciembre del 2025
+# Objetivo del día: Crear la función de cd
+
+## Tareas realizadas:
+
+(18:03 -18:27)
+
+- Aprender sobre os.chdir() y usarlo (Por recomendación de las especificaciones del TP)
+- Cambiar de directorio recibido por argumento a la función cd.
+
+(18:27-  18:48)
+- Atrapar errores 
+- Asegurar que cumpla con los requisitos mínimos exigidos 
+
+(18:48:19:20)
+- Crear script de prueba 
+
+
+## Comandos probados:
+
+- cd /usr  #Accede a /usr
+- cd .. #Utiliza ruta relativa
+- cd /pokemon #Accede a directorio no existente
+- cd /etc #Accede a /etc
+- cd  #Permanece en directorio actual
+- exit 
+
+## Comando para ejecutar en linux
+
+python prueba_cmd.py #Se utilizó inteligencia artificial para ayudar a pensar como disenhar el script de prueba, tambien shell.py tiene que existir en el mismo directorio para que funcione
+
+
+## Problemas encontrados:
+
+Problema 1: Si se ingresa solo el comando cd,se recibe la lista de argumentos vacía en la función cd, lanza un error que dice no se puede acceder a args[0],obviamente por que no existen elementos en args y se intenta a acceder a args[0].
+
+Solución: Si la lista no está vacía, se le asigna a nuevo_dir = args[0], si la lista de argumentos esta vacia, se le avisa al usuario en qué directorio reside actualmente y se asigna nuevo_dir = “.”, ruta relativa del directorio actual.
+
+Problema 2:Saltaba el error de que nuevo_dir(el directorio a cambiar) debía ser un string.
+
+Solución: Sin querer,se estaba pasando el argumento completo, y no el primer elemento del argumento a nuevo_dir, al pasarle args[0] se resolvió el problema.
+
+Problema 3: La prueba de ls , corre con parseador y con el comando ls, pero la función main() del shell no se importa en la prueba, esta solución demuestra funcionamiento de ls, pero no es la óptima.
+
+Solución: Con ayuda de inteligencia artificial, está apuntó al camino correcto que es  importar builtins, que permite modificar input() de python por mi función de prueba para ingresar los comandos automáticamente,usando asi tambien la funcion main() del shell.py
+
+
+
+## Evidencias 
+
+![error_string](../imagenes/SHELL/sesion5/error_string.png)
+*El output del error de Problema 2 (error string)*
+
+![pruebas](../imagenes/SHELL/sesion5/pruebas.png)
+*El output de pruebas
+
+
