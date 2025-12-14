@@ -2592,3 +2592,246 @@ El uso principal de Tcl es para ejecutar el test suite de Binutils,Gcc y otros p
 ![tcl-make](../imagenes/LFS/sesion15/tcl-make-install.png)
 *Figura 9: tcl-make install*
 
+---
+
+# Sesión 16: 14 de Diciembre - Instalación de Expect,DejaGNU,Pkgconf,Binutils
+
+## Objetivo: Instalar paquetes 
+
+## Tareas Realizadas
+
+(11:33 - 10:47 )
+- Expect-5.45.4
+
+(11:47 -  12:08)
+- DejaGNU-1.6.3 
+
+(12:08 - 12:18 )
+-  Pkgconf-2.5.1  
+
+(12:18 - 13:15 )
+-  Binutils-2.45
+
+
+
+
+## Comandos principales ejecutados:
+
+#### Generalmente al make se le agregar time, y a make, make install se les agrega | tee -a “nombre-del.log”
+
+### Se extrae con tar -xf nombre-paquete, y elimina el directorio al terminar con rm -rf nombre-paquete
+
+
+### Expect-5.45.4
+
+#Verificar que dependencia que funcione
+
+python3 -c 'from pty import spawn; spawn(["echo", "ok"])'
+
+#Aplicar parche
+
+patch -Np1 -i ../expect-5.45.4-gcc15-1.patch
+
+#Configuracion para compilar
+
+./configure --prefix=/usr           \
+……
+
+#Instalar en /usr 
+
+#Avisa al compilador en que directorio esta tclConfig.sh
+
+#Avisa al compilador dónde encontrar los headers de Tcl
+
+#Deshabilitar-path
+
+#Habilitar construction de librerías compartidas
+
+#Específica directorio de man-pages
+
+
+#Compilar
+
+make
+
+#Ejecutar test o prueba
+
+make test
+
+#Instalar
+
+make install
+ln -svf expect5.45.4/libexpect5.45.4.so /usr/lib
+
+
+###  DejaGNU-1.6.3 
+
+#Crear directorio para construir
+
+mkdir -v build
+cd       build
+
+
+#Configurar para compilar
+
+../configure --prefix=/usr
+makeinfo --html --no-split -o doc/dejagnu.html ../doc/dejagnu.texi
+makeinfo --plaintext       -o doc/dejagnu.txt  ../doc/dejagnu.texi
+
+
+#Revisar resultado
+
+make check
+
+#Instalar
+
+make install
+install -v -dm755  /usr/share/doc/dejagnu-1.6.3
+install -v -m644   doc/dejagnu.{html,txt} /usr/share/doc/dejagnu-1.6.3
+
+
+ 
+###  Pkgconf-2.5.1 
+
+#Configuración para compilar
+
+./configure --prefix=/usr    \
+….
+
+#Instalar en /usr
+#Deshabilitar librerías estáticas
+#Establecer directorio para documentación
+
+#Compilar 
+
+make
+
+#Instalar
+
+make install 
+
+#Symbolic links para mantener compatibilidad
+
+ln -sv pkgconf   /usr/bin/pkg-config
+ln -sv pkgconf.1 /usr/share/man/man1/pkg-config.1
+
+
+###  Binutils-2.45
+
+
+#Crear directorio para construir
+
+mkdir -v build
+cd       build
+
+#Configuracions para compilar
+
+../configure --prefix=/usr       \
+……
+
+#Instalar en /usr
+
+#Habilitar soporte de plugins para linker
+
+#Archivos de configuracion instalados en /etc
+
+#Habilitar librerias compartidas
+
+
+#Habilitar soporte para 64 bit
+
+#Establece el hash predeterminado como GNU
+
+#Compilar
+
+make tooldir=/usr
+
+#Verificar compilación
+
+make -k check
+grep '^FAIL:' $(find -name '*.log')
+
+#Instalar
+
+make tooldir=/usr install
+
+#Remover librerías estáticas y archivos innecesarios
+
+rm -rfv /usr/lib/lib{bfd,ctf,ctf-nobfd,gprofng,opcodes,sframe}.a \
+        /usr/share/doc/gprofng/
+
+
+
+
+## Resultados Obtenidos
+
+####  Expect-5.45.4  - instalado
+
+Contiene herramientas de automatizacion, se usa tambien para probar test suites criticos
+
+#### DejaGNU-1.6.3     - instalado
+
+Contiene framework para ejecutar test suites en GNU tools.
+
+#### Pkgconf-2.5.1   - instalado
+
+Para gestionar flags de compilación y enlace de bibliotecas.
+
+#### Binutils-2.45  - instalado
+
+Un conjunto de herramientas esenciales para crear, manipular y analizar archivos binarios, incluyendo el ensamblador y el enlazador.
+
+## Problemas encontrados
+
+Problema:Binutils make-check terminó con un error 2 ,esto se volvió preocupante
+
+Solución: Se investigó con ayuda de la inteligencia artificial,que informa que si existe algún untested test este make check termina con error. También el comando del manual grep '^FAIL:' $(find -name '*.log'), que no imprime nada en absoluto, se dedujo que todo funciona correctamente
+
+Problema: Al escribir el config del Pkgconf , se escribió mal , se puso enabled-static que es exactamente lo opuesto que se espera, como no se llegó a compilar, se retorno al directorio /sources y se ejecuto el comando rm -rf pkgconf-2.5.1, y se comenzo de vuelta a instalar este paquete.
+
+
+## Reflexión Técnica
+
+Muchos warnings al compilar Expect , sin embargo en el make test pasaron todos los tests.
+Algunos make check , como el de dejagnu , son algo difíciles de interpretar porque dice # of expected passes 300, que se interpreta como la cantidad de tests que se esperan que pasen, pero al parecer , esto está reportando que efectivamente pasaron las 300 pruebas, al investigar con inteligencia artificial el porqué puede pasar esto , explica que como dejagnu es relativamente antiguo (de 1990), los contadores se expresan en base al resultado de categoria,no la intención.
+El make check de binutils es crítico para garantizar la estabilidad y funcionamiento del sistema final, el manual prácticamente obliga al usuario hacer este paso.
+En este último paquete instalado comenzamos a usar expect ,dejagnu y tcl para las pruebas del make-check de binutils, confirmando tanto binutils como los paquetes para pruebas.
+
+
+
+## Evidencia
+
+
+![expect-make](../imagenes/LFS/sesion16/expect-make.png)
+*Figura 1: expect make*
+
+![expect-make](../imagenes/LFS/sesion16/expect-make-test.png)
+*Figura 2: expect make test*
+
+![expect-makeexpect-make](../imagenes/LFS/sesion16/expect-make-install.png)
+*Figura 3: expect make install*
+
+![dejagnu-make-check](../imagenes/LFS/sesion16/dejagnu-make-check.png)
+*Figura 4: dejagnu make check*
+
+![dejagnu-make-install](../imagenes/LFS/sesion16/dejagnu-make-install.png)
+*Figura 5: dejagnu make install*
+
+![pkgconf-make](../imagenes/LFS/sesion16/pkgconf-make.png)
+*Figura 6: pkgconf make*
+
+![pkgconf-make](../imagenes/LFS/sesion16/pkgconf-make-install.png)
+*Figura 7: pkgconf make install*
+
+![binutils-make](../imagenes/LFS/sesion16/binutils-make.png)
+*Figura 8: binutils-make*
+
+![binutils-make](../imagenes/LFS/sesion16/binutils-make-check.png)
+*Figura 9: binutils make check*
+
+![binutils-make](../imagenes/LFS/sesion16/binutils-make-check2.png)
+*Figura 10: binutils make check 2*
+
+![binutils-makee](../imagenes/LFS/sesion16/binutils-make-install.png)
+*Figura 11: binutils-make install*
+
