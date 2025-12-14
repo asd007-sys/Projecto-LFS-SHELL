@@ -2787,7 +2787,9 @@ Problema:Binutils make-check terminó con un error 2 ,esto se volvió preocupant
 
 Solución: Se investigó con ayuda de la inteligencia artificial,que informa que si existe algún untested test este make check termina con error. También el comando del manual grep '^FAIL:' $(find -name '*.log'), que no imprime nada en absoluto, se dedujo que todo funciona correctamente
 
-Problema: Al escribir el config del Pkgconf , se escribió mal , se puso enabled-static que es exactamente lo opuesto que se espera, como no se llegó a compilar, se retorno al directorio /sources y se ejecuto el comando rm -rf pkgconf-2.5.1, y se comenzo de vuelta a instalar este paquete.
+Problema: Al escribir el config del Pkgconf , se escribió mal , se puso enabled-static que es exactamente lo opuesto que se espera.
+
+Solución: Como no se llegó a compilar, se retorno al directorio /sources y se ejecuto el comando rm -rf pkgconf-2.5.1, y se comenzo de vuelta a instalar este paquete.
 
 
 ## Reflexión Técnica
@@ -2829,7 +2831,7 @@ En este último paquete instalado comenzamos a usar expect ,dejagnu y tcl para l
 ![binutils-make](../imagenes/LFS/sesion16/binutils-make-check.png)
 *Figura 9: binutils make check*
 
-![binutils-make](../imagenes/LFS/sesion16/binutils-make-check2.png)
+![binutils-make](../imagenes/LFS/sesion16/binutils-make-check-2.png)
 *Figura 10: binutils make check 2*
 
 ![binutils-makee](../imagenes/LFS/sesion16/binutils-make-install.png)
