@@ -3,6 +3,45 @@ import os
 import sys
 
 """
+
+    Función built-in ls
+
+    - Muestra los archivos y directorios y los discierne
+    - Permite mostrar los archivos en el directorio actual o en el directorio recibido por argumento.
+    - Informa al usuario si el directorio no existe o si esta vacio
+    
+"""
+
+def ls(args):
+    ruta = "."
+    if args:
+        ruta = args[0] #Determina la ruta a listar. Si args tiene elementos (if args),elige el primer elemento (args[0]) como la ruta, osino , usa el directorio actual .  
+
+    try:  #Para atrapar errores si los hay
+        elementos = os.listdir(ruta) #Listar todos los archivos y directorios en la direccion ruta   
+        if ruta == '.':
+            print(f"Contenido de '{os.getcwd()}':")
+        else:
+            print(f"Contenido de '{ruta}':")
+        if elementos: #Si elementos contiene al menos un archivo o directorio
+            for elem in elementos: #Loop para determinar directorios  
+                if os.path.isdir(os.path.join(ruta,elem)): #Se verifica si el archivo actual es o no un directorio , se arma la ruta(Direccion) + archivo, y checkea si es un directorio
+                    print(f"  [Dir]  {elem}")
+                else:   #Si no es un directorio el archivo actual
+                    print(f"  [Arc] {elem}")
+            return 
+        else: #Si elemento esta vacio
+            print("El directorio esta vacio!")
+    except FileNotFoundError as e: #Si no existe o no se encuentra el archivo
+        print(f" El directorio {ruta} no existe o no se puede acceder ")
+    except OSError as e: #Si hay algun error,se ejecuta esto
+        return "ERROR", str(e)
+    
+
+
+
+
+"""
     Parseador Basico:
 
     - Segmentar el input recibido en tokens,y retornalos todos separados en un array.
@@ -10,7 +49,6 @@ import sys
     - Manejo del caracter de escape
   
 """
-
 
 
 def parseador(linea_comando):
@@ -59,35 +97,25 @@ def parseador(linea_comando):
 
 def ejecutar_externo(comando, argumentos):   #Permite al ejecutar programas externo,mediante clonacion y remplazo de codigo,datos en la memoria del proceso hijo
    
-    try:
-        
+    try: 
         pid = os.fork()    # Clona el Shell , el hijo recibe 0 en pid(el clon), y el Padre un numero positivo(Pid del hijo)
     except OSError as e:
         print(f"Error al crear proceso (fork): {e}")  # Error al clonar
         return
-
     if pid == 0:   # Si se ejecuta actualmente el hijo
-        
-        try:
-            
+        try: 
             argv = [comando] + argumentos # Llenamos un array con el comando primero, seguido por los argumentos
-            
-           
-            os.execvp(comando, argv) # Reemplazamos el codigo en el espacio de memoria del hijo, por el proceso externo que se quiere ejecutar
-            
+            os.execvp(comando, argv) # Reemplazamos el codigo en el espacio de memoria del hijo, por el proceso externo que se quiere ejecutar 
         except FileNotFoundError:
             print(f"Error: El comando '{comando}' no fue encontrado en el sistema.")
             sys.exit(127) # Código estándar linux para "Command not found"
         except Exception as e:
             print(f"Error al ejecutar: {e}")
             sys.exit(1) # Salir con error genérico
-
     else: # Se ejecuta actualmente el proceso Padre
-        
+ 
         try:
-            _, status = os.waitpid(pid, 0) # El padre se bloquea , y espera a que el hijo termine de correr.
-            
-            
+            _, status = os.waitpid(pid, 0) # El padre se bloquea , y espera a que el hijo termine de correr.  
         except KeyboardInterrupt:
             # Si el usuario hace Ctrl+C mientras corre el programa externo,
             # Se atrapa el error para que no se cierre el shell, solo deje de esperar.
@@ -137,6 +165,9 @@ def main():
             if comando_principal == "exit":
                 print("¡Hasta luego!")
                 break
+            elif comando_principal == "ls":
+                ls(argumentos)
+                
 
             elif comando_principal == "pwd":
                 # Implementación manual del comando pwd
@@ -154,5 +185,3 @@ def main():
 
 if __name__ == "__main__":    # Si se abre el archivo, se corre main automaticamente, si se importa se puede usar parseador por si solo
     main()
-
-

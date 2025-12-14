@@ -251,3 +251,60 @@ Solución: Al preguntar a la inteligencia artificial, esto es ENOENT 2, que vend
 
 ![prueba_ejecutar_externo](../imagenes/SHELL/sesion3/prueba_ejecutar_externo.png)
 *El output del script de prueba (prueba ejecutar externo)*
+
+
+
+
+
+---
+
+
+
+# Fecha:13 de Diciembre del 2025
+# Objetivo del día: Crear el comando ls para shell.py
+
+## Tareas realizadas:
+
+(20:27 - 20:49 )
+
+Utilizar os.listdir para listar todo en el directorio actual(archivos y directorios)
+
+(20:49 - 21:12)
+
+Utilizar os.path.isdir junto a os.path.join para discernir si el elemento iterado actual es un directorio o archivo
+
+(21:12 - 21:27)
+Script y terminaciones finales para cumplir con requisitos minimos
+
+
+## Comandos probados:
+
+ls                  #Directorio actual
+ls /                #Root
+ls /pokemon #Directorio inexistente
+ls /vacío       #Directorio vacío que imprime que está vacío
+
+Deste terminal:
+
+python pruebas_ls.py
+
+ #Para el script de prueba utilice ayuda de la inteligencia artificial,que termino sugiriendo utilizar mi codigo original para implementar comandos automáticos.
+
+
+
+## Problemas encontrados:
+
+Problema: Al recibir los argumentos, si no existe alguno en la variable recibida args, entonces se pasa una lista vacía
+
+Solución: Se inicializa la variable ruta con en el directorio actual (“.”),y si la lista de argumentos no es nula, se le asigna la ruta recibida por args. 
+
+Problema:Originalmente se usaba rutaStr = ruta + “/” + elem y if os.path.isdir(rutaStr) para detectar si es archivo o directorio,sin embargo, esto obviamente puede crear problemas o bugs difíciles de diagnosticar al ingresar el caracter / de más.
+
+Solución: Al hacer una búsqueda por una función existente, por recomendación de la inteligencia artificial se consideró usar os.path.join(ruta,elem). Esto asegura que no existan edge cases que no son fáciles de ver o detectar
+
+
+
+## Evidencias 
+
+![Pruebas](../imagenes/SHELL/sesion4/prueba_ls.png)
+*El output del script de prueba (prueba_ls)*
