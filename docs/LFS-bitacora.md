@@ -3027,10 +3027,12 @@ Solución: Con ayuda de inteligencia artificial se uso este codigo para confirma
 
 echo "test" > testfile.txt
 
-# Intentar establecer un atributo extendido
+#Intentar establecer un atributo extendido
+
 setfattr -n user.comment -v "Este es un comentario" testfile.txt
 
-# Leer el atributo
+#Leer el atributo
+
 getfattr -n user.comment testfile.txt
 
 output:#file: testfile.txt user.commet="Este es un comentario"
