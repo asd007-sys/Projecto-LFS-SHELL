@@ -2837,3 +2837,250 @@ En este último paquete instalado comenzamos a usar expect ,dejagnu y tcl para l
 ![binutils-makee](../imagenes/LFS/sesion16/binutils-make-install.png)
 *Figura 11: binutils-make install*
 
+
+---
+
+
+# Sesión 17: 15 de Diciembre - Instalación de Gmp,MPFR,MPC y Attr
+
+## Objetivo: Instalar paquetes 
+
+## Tareas Realizadas
+
+(10:48 - 11:04 )
+- GMP-6.3.0 
+
+(11:04 -  11:25)
+- MPFR-4.2.2  
+
+(11:25 - 11:36 )
+-  MPC-1.3.1  
+
+(11:36 - 12:05 )
+-  Attr-2.5.2 
+
+
+
+
+## Comandos principales ejecutados:
+
+#### Generalmente al make se le agregar time, y a make, make install se les agrega 2>&1 | tee -a “nombre-del.log”
+
+### Se empezó a agregar 2>&1,  para redirigir stderr a stdout y que escriba en los archivos creados por tee.
+
+### Se extrae con tar -xf nombre-paquete, y elimina el directorio al terminar con rm -rf nombre-paquete
+
+
+### GMP-6.3.0 
+
+#Compatibilidad para gcc 
+
+sed -i '/long long t1;/,+1s/()/(...)/' configure
+
+#Configuración para compilar
+
+./configure --prefix=/usr    \
+
+#Instalar en /usr
+
+#Habilitar C++
+
+#Deshabilitar librerías estáticas
+
+#Establecer directorio para documentación
+
+#Compilar
+
+make
+make html
+
+#Verificar compilacion correcta
+
+make check 2>&1 | tee gmp-check-log
+awk '/# PASS:/{total+=$3} ; END{print total}' gmp-check-log
+
+#Instalar 
+
+make install
+make install-html
+
+
+###  MPFR-4.2.2 
+
+
+
+#Configurar para compilar
+
+../configure --prefix=/usr
+…
+#Instalar en /usr
+
+#Habilitar soporte multi-hilos para que las librerías o funciones no se corrompan
+
+#Deshabilitar librerías estáticas
+
+#Establecer directorio para documentación
+
+#Compilar
+
+make
+make html
+
+
+#Revisar compilacion
+
+make check
+
+#Instalar
+
+make install
+make install-html
+
+ 
+###  MPC-1.3.1
+
+#Configuración para compilar
+
+./configure --prefix=/usr    \
+….
+
+#Instalar en /usr
+
+#Deshabilitar librerías estáticas
+
+#Establecer directorio para documentación
+
+#Compilar
+
+make
+make html
+
+#Revisar compilación
+
+make check
+
+#Instalar
+
+make install
+make install-html
+
+
+###  Attr-2.5.2 
+
+
+#Configuraciones para compilar
+
+../configure --prefix=/usr       \
+……
+
+#Instalar en /usr
+
+#Establecer /etc para archivos de configuraciones
+
+#Deshabilitar librerías estáticas
+
+#Establecer directorio para documentación
+
+#Compilar
+
+make
+
+#Verificar compilación correcta
+
+make check
+
+#Instalar
+
+make install
+
+
+
+## Resultados Obtenidos
+
+####  GMP-6.3.0   - instalado
+
+Librería matemática de precisión arbitraria para cálculos con enteros, racionales y números de punto flotante grandes.
+
+#### MPFR-4.2.2 - instalado
+
+Librería para cálculos en coma flotante con precisión arbitraria y redondeo correcto, basada en GMP.
+
+#### MPC-1.3.1   - instalado
+
+Librería para aritmética de números complejos con precisión arbitraria, basada en MPFR y GMP.
+
+####  Attr-2.5.2   - instalado
+
+Contiene utilidades para manejar atributos extendidos (metadatos) en sistemas de archivos.
+
+
+
+## Problemas encontrados
+
+Problema:En la instalacion del paquete MPFR, Se ejecuto el comando make install-html antes del make check.
+
+Solución: Por suerte, esto es solo la documentacion en un archivo html y no complica o influye en el funcionamiento del programa,entonces, se decidió seguir adelante
+
+Problema: Attr make-check devolvió un fail para getfattr.test
+
+Solución: Con ayuda de inteligencia artificial se uso este codigo para confirmar que funciona correctamente:
+
+echo "test" > testfile.txt
+
+# Intentar establecer un atributo extendido
+setfattr -n user.comment -v "Este es un comentario" testfile.txt
+
+# Leer el atributo
+getfattr -n user.comment testfile.txt
+
+output:#file: testfile.txt user.commet="Este es un comentario"
+
+## Reflexión Técnica
+
+Varios tests de varios paquetes se esperan que falle, si el manual no dice explícitamente que el paquete es crítico y que necesita si o si un número mínimo de passes, lo más probable es que algún test falle o se salte.
+En el paquete gmp nos pide ejecutar el codigo ABI=32 ./configure …, si el sistema es de arquitectura 32 bit, como es de 64-bit , este comando se ignoró.
+LLamo la atencion varios paquetes con documentacion html, despues de investigar un poco con ayuda de la inteligencia artificial, esto tiene sentido, ya que es altamente portable, ligero, soporta links internos dentro del archivo mismo,no requiere muchos recursos,buen formateado (Si el creador del .html lo desea), puede abrirse en cualquier navegador en cualquier sistema.
+
+
+
+## Evidencia
+
+
+![gmp-make](../imagenes/LFS/sesion17/gmp-make.png)
+*Figura 1: gmp-make*
+
+![gmp-make](../imagenes/LFS/sesion17/gmp-make-check.png)
+*Figura 2: gmp make install*
+
+![gmp-make](../imagenes/LFS/sesion17/gmp-make-install.png)
+*Figura 3: gmp make install*
+
+![mpfr-make](../imagenes/LFS/sesion17/mpfr-make.png)
+*Figura 4: mpfr-make*
+
+![mpfr-make](../imagenes/LFS/sesion17/mpfr-make-check.png)
+*Figura 5: mpfr make check*
+
+![mpfr-make](../imagenes/LFS/sesion17/mpfr-make-install.png)
+*Figura 6: mpfr make install*
+
+![mpc-make](../imagenes/LFS/sesion17/mpc-make.png)
+*Figura 7: mpc-make*
+
+![mpc-make](../imagenes/LFS/sesion17/mpc-make-check.png)
+*Figura 8: mpc make check*
+
+![mpc-make](../imagenes/LFS/sesion17/mpc-make-install.png)
+*Figura 9: mpc make install*
+
+![attr-make](../imagenes/LFS/sesion17/attr-make.png)
+*Figura 10: attr make *
+
+![attr-makeattr-make](../imagenes/LFS/sesion17/attr-make-check.png)
+*Figura 11: attr make check*
+
+![attr-make](../imagenes/LFS/sesion17/attr-make-install.png)
+*Figura 12: attr make install*
+
+![attr-make](../imagenes/LFS/sesion17/attr-solucion.png)
+*Figura 13: attr solucion*
