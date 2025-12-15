@@ -1,11 +1,63 @@
 import os
 import sys
 
+"""
+   Función built-in cp
+
+        - Copia archivos
+        - Precisa de exactamente dos argumentos, el primero a copiar, el segundo donde crear el archivo copiado
+        - Permite uso de rutas relativas
+        - Bloque de 1 Megabyte , permite copiar archivos grandes
+       
+    
+   
+"""
+
+
+def cp(args):
+
+    if (len(args) != 2):  #Si la cantidad de argumentos recibidos es diferente a 2, se abandona la funcion
+        print("Esta funcion precisa de dos argumentos,primero: la ruta del archivo a copiar, segundo: la ruta del archivo a ser creado")
+        return #Abandonamos
+    else:
+
+        origen = os.path.abspath(args[0])    #Argumento recibido como direccion y nombre del archivo a copiar
+        destino = os.path.abspath(args[1])   #Argumento recibido como direccion y nombre del archivo creado
+
+        try:
+
+            with open(origen, "rb") as a_origen: #Abrir en lectura, para copiar archivo
+                with open(destino, "wb") as a_destino:  #Abrir en modo escritura, para el archivo
+
+                    Bloque_grande = 1000000  #Tamaño asignado del bloque a leer y escribir
+
+                    while True:  #Loop de i/o
+
+                        datos = a_origen.read(Bloque_grande)   #Leer un bloque del archivo en origen
+
+                        if not datos: #Si llegamos al fin del archivo origen, datos va a estar vacio,condicion de salida
+                            break #Escapamos del bucle
+
+
+                        a_destino.write(datos)  #Se escribe al archivo destino el bloque leido
+
+            print(f"Copia exitosa de '{origen}' a '{destino}'")
+
+        except FileNotFoundError:  #Si no se encuentra el archivo a copiar
+            print(f"Error: El archivo de origen '{origen}' no fue encontrado.")
+        except PermissionError: #Si no se puede acceder  por falta de privilegio el archivo a copiar
+            print(f"Error: No tiene los privilegios suficientes para copiar en {destino}' ")
+        except OSError as e:  #Error generico
+            print(f"Ocurrió un error durante la copia: {e}")
+
+
+
+
 
 """
 
      Función built-in cd
-    
+
         - Cambia de directorio al ingresar en el shell: cd Directorio-a-cambiar
         - Al ingresar solo el comando cd, se permanece en el directorio actual y se le avisa al usuario.
         - Informa al usuario si el directorio al que quiere cambiar, no existe o esta vacio.
@@ -13,21 +65,23 @@ import sys
 
 """
 
-def cd(args):
 
-    if args: #Si la lista no esta vacia
-        nuevo_dir = (args[0])   #El directorio ingresado por el usuario por argumento
-    else: #Si la lista esta vacia
+def cd(args):
+    if args:  # Si la lista no esta vacia
+        nuevo_dir = (args[0])  # El directorio ingresado por el usuario por argumento
+    else:  # Si la lista esta vacia
         print(f"Usted reside en el directorio {os.getcwd()}")
-        nuevo_dir = "."  #La variable es asignada el directorio actual.
+        nuevo_dir = "."  # La variable es asignada el directorio actual.
 
     try:
-        os.chdir(nuevo_dir) #Cambiar de directorio a la que se paso como argumento
-        print(f"EXITO Cambio a {os.getcwd()}")  #Imprimir exito para debug
-    except FileNotFoundError: # Atrapar error si no encuentra o existe el directorio
+        os.chdir(nuevo_dir)  # Cambiar de directorio a la que se paso como argumento
+        print(f"EXITO Cambio a {os.getcwd()}")  # Imprimir exito para debug
+    except FileNotFoundError:  # Atrapar error si no encuentra o existe el directorio
         print(f"ERROR Directorio no encontrado: {nuevo_dir}")
-    except OSError:
-        print("Error en el sistema!")
+    except OSError as e:  # Error generico
+        print(f"Ocurrió un error durante la copia: {e}")
+
+
 """
 
     Función built-in ls
@@ -42,7 +96,8 @@ def cd(args):
 def ls(args):
     ruta = "."
     if args:
-        ruta = args[0]  # Determina la ruta a listar. Si args tiene elementos (if args),elige el primer elemento (args[0]) como la ruta, osino , usa el directorio actual .
+        ruta = args[
+            0]  # Determina la ruta a listar. Si args tiene elementos (if args),elige el primer elemento (args[0]) como la ruta, osino , usa el directorio actual .
 
     try:  # Para atrapar errores si los hay
         elementos = os.listdir(ruta)  # Listar todos los archivos y directorios en la direccion ruta
@@ -62,8 +117,8 @@ def ls(args):
             print("El directorio esta vacio!")
     except FileNotFoundError as e:  # Si no existe o no se encuentra el archivo
         print(f" El directorio {ruta} no existe o no se puede acceder ")
-    except OSError:
-        print("Error en el sistema!")
+    except OSError as e:  # Error generico
+        print(f"Ocurrió un error durante la copia: {e}")
 
 
 """
@@ -158,8 +213,7 @@ def main():
     Comandos implementados hasta ahora:
     - pwd: Muestra el directorio de trabajo actual
     - exit: Termina el shell
-    - ls: Listar archivos y directorios en un directorio, permite argumento para la ruta a listar.
-    - cd: Cambiar de directorio actual
+
 
     """
     print("Bienvenido a EduShell - Shell Educativo Universitario")
@@ -195,6 +249,8 @@ def main():
             elif comando_principal == "cd":
                 cd(argumentos)
 
+            elif comando_principal == "cp":
+                cp(argumentos)
 
             elif comando_principal == "pwd":
                 # Implementación manual del comando pwd

@@ -368,4 +368,75 @@ Solución: Con ayuda de inteligencia artificial, está apuntó al camino correct
 ![pruebas](../imagenes/SHELL/sesion5/pruebas.png)
 *El output de pruebas
 
+---
+
+# Fecha:15 de Diciembre del 2025
+# Objetivo del día: Crear la función de cp
+
+## Tareas realizadas:
+
+(15:03 -15:57)
+
+- Aprender sobre open() para manipular archivos (como abrir, syntaxis,info sobre bloque, read, write)
+- Aceptar argumentos
+- Funcion basica que lee archivo y lo copia
+
+
+(15:57-  16:12)
+- Capturar errores correctamente
+- Confirmar cumplir con requisitos mínimos
+- Utilizar os.path.abspath() para rutas relativas
+
+(16:12 - 16:30 )
+- Crear script de prueba 
+
+
+## Comandos probados:
+
+#Desde un usuario creado
+
+- cp ./shell.py /home/asd/shell3.py  #Copia desde el usb a directorio home del usuario
+- ls /home/asd/  #Verificar directorio usuario
+- cp /home/asd/shell3.py /shell.py #Copiar desde directorio usuario a root, no tiene permiso
+- cp /home/asd/pokemon /home/asd/pokemon2 #Desde directorio usuario al mismo directorio, no existe el archivo pokemon
+- exit
+
+
+python pruebas_cp.py #Ejecutar Script de prueba
+
+#El script de prueba fue reutilizado, es basado en el script de prueba de cd. 
+
+
+## Problemas encontrados:
+
+Problema: No se sabía cómo usar open() apropiadamente
+
+Solución: Se buscó en la web la documentación de python, junto a este y preguntas a la inteligencia artificial, para dudas de sintaxis, se resolvio este problema.
+
+Problema: No se comprende que tan grande debía ser el bloque y porque
+
+Solución: Para que soporte copiar archivos grandes, no tiene que ser muy chico el bloque o se saturan los recursos, la recomendación encontrada online es entre 64 Kilobytes a 1 Megabyte para mantener balance entre memoria utilizada y rendimiento. Se decidió usar 1 MB.
+
+Problema:El uso de rutas relativas es muy conveniente, pero no se sabía cómo implementarlas
+
+Solución:Entre las funciones del módulo de os, existe os.path.abspath(), que permite escribir la ruta relativa e interpretarla como absoluta en la función, esto permite a la función cp soportar origen y destinos con rutas relativas!.
+
+Problema: No se verificaba si se recibían el número de argumentos correctos,se asume que siempre son dos.
+
+Solución: La función cp solo ejecuta su lógica de copia,si y sólo si hay a lo más y mínimo 2 argumentos pasado por parámetro, si no hay exactamente dos argumentos, la función retorna la forma correcta de utilizarlo y retorna al shell.
+
+Problema:Previamente solo se usaban FileNotFoundError si no se encontraba el archivo y OSError para los demás, pero ahora se quiere capturar error por faltas de permiso.
+
+Solución: Se implementó PermissionError, para poder avisar al usuario que no puede copiar el archivo en el directorio destino ingresado. 
+
+
+
+## Evidencias 
+
+![pruebas_cp](../imagenes/SHELL/sesion6/pruebas_cp.png)
+*El output de pruebas cp*
+
+
+
+
 
