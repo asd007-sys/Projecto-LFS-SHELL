@@ -2,56 +2,90 @@ import os
 import sys
 
 """
+
+   Función built-in rm
+
+        - Borra archivo
+        - Obliga al usuario a confirmar la eliminacion del archivo
+        - Manejo de errores
+
+"""
+
+
+def rm(args):
+    if not args:  # El primer argumento es la direccion del archivo a borrar,si no existe, avisar al usuario
+        print("Le falto ingresar la ruta absoluta o relativa del archivo a borrar ")
+        return #Retorna al shell
+
+    archivo = args[0]  # Obtener la direccion y nombre del archivo a borrar
+
+    if os.path.isdir(archivo): #Verificar antes de confirmar si es un directorio, y avisar al usuario que solo puede borrar archivos
+        print("El comando solo soporta eliminar archivos, por favor solo ingresar archivos")
+        return
+
+    # Prompt de confirmacion a borrar el archivo
+    confirmacion = input(f" ¿Esta seguro que desea borrar '{archivo}'? [s/n]: ").lower().strip()
+
+    if confirmacion != 's':  # Si el usuario confirma que quiere borar el archivo
+        print(" Operacion cancelada por el usuario.")
+        return  # Retornar al shell, evitar continuar con la eliminacio
+    try:
+        os.unlink(archivo)  # Llamada al sistema para borar el archivo
+        print(f"Archivo eliminado: {archivo}")
+
+    except FileNotFoundError:  # Archivo no existe
+        print(f"El Archivo ingresado no existe: {archivo}")
+    except PermissionError:  # El usuario no tiene los privilegios necesario para borrar
+        print("Usted carece de privilegios para borrar el archivo")
+
+
+
+"""
    Función built-in cp
 
         - Copia archivos
         - Precisa de exactamente dos argumentos, el primero a copiar, el segundo donde crear el archivo copiado
-        - Permite uso de rutas relativas
+        - Permite uso de direcciones relativas
         - Bloque de 1 Megabyte , permite copiar archivos grandes
-       
-    
-   
+
+
 """
 
 
 def cp(args):
-
-    if (len(args) != 2):  #Si la cantidad de argumentos recibidos es diferente a 2, se abandona la funcion
-        print("Esta funcion precisa de dos argumentos,primero: la ruta del archivo a copiar, segundo: la ruta del archivo a ser creado")
-        return #Abandonamos
+    if (len(args) != 2):  # Si la cantidad de argumentos recibidos es diferente a 2, se abandona la funcion
+        print(
+            "Esta funcion precisa de dos argumentos,primero: la ruta del archivo a copiar, segundo: la ruta del archivo a ser creado")
+        return  # Abandonamos
     else:
 
-        origen = os.path.abspath(args[0])    #Argumento recibido como direccion y nombre del archivo a copiar
-        destino = os.path.abspath(args[1])   #Argumento recibido como direccion y nombre del archivo creado
+        origen = os.path.abspath(args[0])  # Argumento recibido como direccion y nombre del archivo a copiar
+        destino = os.path.abspath(args[1])  # Argumento recibido como direccion y nombre del archivo creado
 
         try:
 
-            with open(origen, "rb") as a_origen: #Abrir en lectura, para copiar archivo
-                with open(destino, "wb") as a_destino:  #Abrir en modo escritura, para el archivo
+            with open(origen, "rb") as a_origen:  # Abrir en lectura, para copiar archivo
+                with open(destino, "wb") as a_destino:  # Abrir en modo escritura, para el archivo
 
-                    Bloque_grande = 1000000  #Tamaño asignado del bloque a leer y escribir
+                    Bloque_grande = 1000000  # Tamaño asignado del bloque a leer y escribir
 
-                    while True:  #Loop de i/o
+                    while True:  # Loop de i/o
 
-                        datos = a_origen.read(Bloque_grande)   #Leer un bloque del archivo en origen
+                        datos = a_origen.read(Bloque_grande)  # Leer un bloque del archivo en origen
 
-                        if not datos: #Si llegamos al fin del archivo origen, datos va a estar vacio,condicion de salida
-                            break #Escapamos del bucle
+                        if not datos:  # Si llegamos al fin del archivo origen, datos va a estar vacio,condicion de salida
+                            break  # Escapamos del bucle
 
-
-                        a_destino.write(datos)  #Se escribe al archivo destino el bloque leido
+                        a_destino.write(datos)  # Se escribe al archivo destino el bloque leido
 
             print(f"Copia exitosa de '{origen}' a '{destino}'")
 
-        except FileNotFoundError:  #Si no se encuentra el archivo a copiar
+        except FileNotFoundError:  # Si no se encuentra el archivo a copiar
             print(f"Error: El archivo de origen '{origen}' no fue encontrado.")
-        except PermissionError: #Si no se puede acceder  por falta de privilegio el archivo a copiar
+        except PermissionError:  # Si no se puede acceder  por falta de privilegio el archivo a copiar
             print(f"Error: No tiene los privilegios suficientes para copiar en {destino}' ")
-        except OSError as e:  #Error generico
+        except OSError as e:  # Error generico
             print(f"Ocurrió un error durante la copia: {e}")
-
-
-
 
 
 """
@@ -251,6 +285,9 @@ def main():
 
             elif comando_principal == "cp":
                 cp(argumentos)
+
+            elif comando_principal == "rm":
+                rm(argumentos)
 
             elif comando_principal == "pwd":
                 # Implementación manual del comando pwd

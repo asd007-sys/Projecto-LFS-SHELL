@@ -436,6 +436,68 @@ Solución: Se implementó PermissionError, para poder avisar al usuario que no p
 ![pruebas_cp](../imagenes/SHELL/sesion6/pruebas_cp.png)
 *El output de pruebas cp*
 
+---
+
+
+# Fecha:16 de Diciembre del 2025
+# Objetivo del día: Crear la función rm
+
+## Tareas realizadas:
+
+(16:16 -16:45)
+
+- Informarse sobre el comando a utilizar os.unlink()
+- Aceptar Argumentos correctamente
+- Funcion basica que elimina archivo
+
+
+(16:45-  14:03)
+- Capturar errores correctamente(incluyendo si es directorio)
+- Confirmar cumplir con requisitos mínimos
+
+
+(17:03 - 17:21 )
+- Crear script de prueba 
+
+
+## Comandos probados:
+
+
+#Desde un usuario creado
+
+- touch /home/asd/textoNuevo  #Crear archivo a borrar
+- rm /home/asd/textoNuevo  #Borrar el archivo creado 
+- s #Confirmación de la eliminación
+- ls / #Listar root (con comando built-in previamente hecho)
+- rm /asd.txt #Eliminar archivo en directorio root(sin privilegio para hacerlo)
+- rm /home/asd/Pokemon #Eliminar archivo no existente
+- exit
+
+
+
+python prueba_rm.py #Ejecutar Script de prueba
+
+#El script de prueba fue reutilizado de pruebas previas, y adaptado para rm. 
+
+
+## Problemas encontrados:
+
+Problema: El usuario al ingresar la confirmación de borrar, si se ingresa S mayúscula, cuenta como cancelación
+
+Solución:como anteriormente se utilizo el método de string para ignorar espacios al comienzo y al final del string( .strip() ), ahora, junto a este se utiliza .lower(), para convertir todo el string en minúscula, y hacer la comparación del input.
+
+Problema: El usuario al confirmar la cancelación de la eliminación del archivo, el archivo se elimina igualmente.
+
+Solución: Falto poner un return después de el print de cancelación para que vuelva al shell, en vez de seguir corriendo el código de eliminación.
+
+Problema: Al tratar de atrapar el error IsADirectoryError, siempre atrapaba PermissionError,sin importar que except estuviese primero.
+
+Solución:Entonces, se decidió verificar manualmente si el archivo a borrar es un directorio, con la función os.path.isdir(archivo). Así, evitando complicarse.
+
+## Evidencias 
+
+![prueba_rm](../imagenes/SHELL/sesion7/prueba_rm.png)
+*El output de prueba rm*
 
 
 
