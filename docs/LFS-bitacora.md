@@ -3170,6 +3170,35 @@ make test
 
 make prefix=/usr lib=lib install
 
+### Libxcrypt-4.4.38 
+
+#Configuracion para compilar
+
+./configure --prefix=/usr \
+....
+
+#Instalar en /usr
+
+#Deshabilitar librerías estáticas
+
+#Deshabilitar API obsoleto
+
+#Contruir algoritmos de hash robustos(seguros)
+
+#Compilar
+
+make 
+
+
+#Revisar compilación
+
+make check
+
+
+#Instalar
+
+make  install
+
 
  
 ### Shadow-4.18.0 
@@ -3236,7 +3265,7 @@ mkdir -p /etc/default
 
 useradd -D --gid 999
 
-# -D afecta los valores predeterminados
+#-D afecta los valores predeterminados
 
 #Nuevos usuarios obtienen el group ID 999 , a menos de que se especifique lo contrario
 
@@ -3286,7 +3315,7 @@ En libxcrypt se ignoró la nota que permite habilitar el api obsoleto, ya que se
 ![acl-make](../imagenes/LFS/sesion18/acl-make.png)
 *Figura 1: acl-make*
 
-!acl-make](../imagenes/LFS/sesion18/acl-make-check.png)
+![acl-make](../imagenes/LFS/sesion18/acl-make-check.png)
 *Figura 2: acl make check*
 
 ![acl-make](../imagenes/LFS/sesion18/acl-make-install.png)
