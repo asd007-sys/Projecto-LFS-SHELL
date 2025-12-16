@@ -3086,3 +3086,235 @@ LLamo la atencion varios paquetes con documentacion html, despues de investigar 
 
 ![attr-make](../imagenes/LFS/sesion17/attr-solucion.png)
 *Figura 13: attr solucion*
+
+
+---
+
+
+# Sesión 18: 16 de Diciembre - Instalación de Acl,Libcap,Libxcrypt,Shadow
+
+## Objetivo: Instalar paquetes 
+
+## Tareas Realizadas
+
+(10:23 - 10:37 )
+- Acl-2.3.2 
+
+(10:37 -  10:45)
+- Libcap-2.76   
+
+(10:45 - 10:58 )
+-  Libxcrypt-4.4.38   
+
+(10:58 - 11:20 )
+-  Shadow-4.18.0  
+
+
+
+
+## Comandos principales ejecutados:
+
+#### Generalmente al make se le agregar time, y a make, make install se les agrega 2>&1 | tee -a “nombre-del.log”
+
+### Se empezó a agregar 2>&1,  para redirigir stderr a stdout y que escriba en los archivos creados por tee.
+
+### Se extrae con tar -xf nombre-paquete, y elimina el directorio al terminar con rm -rf nombre-paquete
+
+
+### Acl-2.3.2  
+
+
+#Configuración para compilar
+
+./configure --prefix=/usr    \
+
+#Instalar en /usr
+
+#Deshabilitar librerías estáticas
+
+#Establecer directorio para documentación
+
+
+#Compilar
+
+make
+
+#Verificar compilación correcta
+
+make check 
+
+#Instalar 
+
+make install
+
+
+
+###  Libcap-2.76 
+
+#Evitar que librerias estaticas sean instaladas
+
+sed -i '/install -m.*STA/d' libcap/Makefile
+
+
+#Compilar
+
+make prefix=/usr lib=lib
+
+
+#Revisar compilación
+
+make test
+
+
+#Instalar
+
+make prefix=/usr lib=lib install
+
+
+ 
+### Shadow-4.18.0 
+
+#Deshabilitar la instalación del programa groups y sus man pages respectivos
+
+sed -i 's/groups$(EXEEXT) //' src/Makefile.in
+find man -name Makefile.in -exec sed -i 's/groups\.1 / /'   {} \;
+find man -name Makefile.in -exec sed -i 's/getspnam\.3 / /' {} \;
+find man -name Makefile.in -exec sed -i 's/passwd\.5 / /'   {} \;
+
+#Cambiar metodo de encryption de crypt a Yescrypt, es mas seguro
+
+sed -e 's:#ENCRYPT_METHOD DES:ENCRYPT_METHOD YESCRYPT:' \
+…….
+……..
+
+
+
+#Configuración para compilar
+
+touch /usr/bin/passwd    #Archivo necesita existir previo a instalacion, o puede instalarse en ruta incorrecta
+
+./configure --sysconfdir=/etc   \
+…..
+….
+
+#Instalar en /usr
+
+#Deshabilitar librerías estáticas
+
+#Habilitar bcrypt y Yescrypt
+
+#Establecer máximo número de caracteres para contraseña (32)
+
+#Deshabilitar libbsd,LFS no lo tiene
+
+#Compilar
+
+make
+
+
+#Revisar compilación
+
+make check
+
+#Instalar
+
+make exec_prefix=/usr install
+make -C man install-man
+
+### Configuración de Shadow
+
+#Habilitar encubrimiento de contraseñas (también de group contraseña)
+
+pwconv   
+grpconv
+
+#Directorio para configuración de la función useradd
+
+mkdir -p /etc/default
+
+#Configuración del comportamiento de usueradd
+
+useradd -D --gid 999
+
+# -D afecta los valores predeterminados
+
+#Nuevos usuarios obtienen el group ID 999 , a menos de que se especifique lo contrario
+
+
+
+
+## Resultados Obtenidos
+
+####  Acl-2.3.2    - instalado
+
+Permite dar acceso específico a usuarios o grupos, además de los permisos normales.
+
+#### Libcap-2.76 - instalado
+
+Permite dar privilegios específicos de root a programas sin darles acceso total.
+
+#### Libxcrypt-4.4.38    - instalado
+
+Librería con métodos de encriptación modernos (como Yescrypt) para hacer contraseñas seguras.
+
+####  Shadow-4.18.0   - instalado
+
+Maneja las contraseñas de usuarios en archivos ocultos separados de la información pública de los usuarios.
+
+
+## Problemas encontrados
+
+Problema:Acl make-check obtuvo XFAIL = 2, no se sabía si era bueno o malo
+
+Solución:XFAIL significa que está anticipado a que falle, entonces se puede ignorar, y el fallo obtenido como FAIL, el manual lo espera, entonces se siguió adelante.
+
+Problema: Al final de la configuración de shadow se ejecuta :passwd root, se ingresó una contraseña innecesariamente larga y se quería reemplazar.
+
+Solución: Por suerte ,con ayuda de la inteligencia artificial se llego a la conclusión de que , ejecutando de nuevo el comando, e ingresando la nueva contraseña, esta se sobreescribe.
+Confirmando con grep ‘^root’ /etc/shadow muestran hash diferentes.
+
+
+## Reflexión Técnica
+
+El paquete shadow que se encarga de manejar contraseñas, reemplaza el método de encriptación predeterminado por Yescrypt , que es más seguro, soporta mas de 8 caracteres,en ataques de brute-force crypt is mucho posible de desencriptar, en cambio, Yescrypt, aunque posible, tardaria multiple años , sino multiple décadas.
+En el manual , el comando,useradd -D --gid 999, no se explico en profundidad, pero al investigar junto a la inteligencia artificial, esto es conveniente para que los usuarios puedan fácilmente compartir archivos, y para manipular en masa , muchos privilegios de multiples usuarios facilmente en un archivo o directorio.
+En libxcrypt se ignoró la nota que permite habilitar el api obsoleto, ya que se sigue el manual y no existe paquete que lo necesite.
+
+## Evidencia
+
+
+![acl-make](../imagenes/LFS/sesion18/acl-make.png)
+*Figura 1: acl-make*
+
+!acl-make](../imagenes/LFS/sesion18/acl-make-check.png)
+*Figura 2: acl make check*
+
+![acl-make](../imagenes/LFS/sesion18/acl-make-install.png)
+*Figura 3: acl make install*
+
+![libcap-make](../imagenes/LFS/sesion18/libcap-make.png)
+*Figura 4: libcap-make*
+
+![libcap-make](../imagenes/LFS/sesion18/libcap-make-test.png)
+*Figura 5: libcap make test*
+
+![glibcap-make](../imagenes/LFS/sesion18/libcap-make-install.png)
+*Figura 6: libcap make install*
+
+![libxcrypt-make](../imagenes/LFS/sesion18/libxcrypt-make.png)
+*Figura 7: libxcrypt-make*
+
+![libxcrypt-make](../imagenes/LFS/sesion18/libxcrypt-make-check.png)
+*Figura 8: libxcrypt-make*
+
+![libxcrypt-make](../imagenes/LFS/sesion18/libxcrypt-make-install.png)
+*Figura 9: libxcrypt-makelibxcrypt-make*
+
+![shadow-make](../imagenes/LFS/sesion18/shadow-make.png)
+*Figura 10: shadow-make*
+
+![shadow-make](../imagenes/LFS/sesion18/shadow-make-install.png)
+*Figura 11: shadow-make*
+
+![shadow-make](../imagenes/LFS/sesion18/passwd_prueba_hash.png)
+*Figura 12: passwd_prueba_hash*
