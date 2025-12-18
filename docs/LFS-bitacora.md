@@ -3347,3 +3347,176 @@ En libxcrypt se ignoró la nota que permite habilitar el api obsoleto, ya que se
 
 ![shadow-make](../imagenes/LFS/sesion18/passwd_prueba_hash.png)
 *Figura 12: passwd_prueba_hash*
+
+
+
+---
+
+
+# Sesión 19: 17 y 18 de Diciembre - Instalación de GCC
+
+## Objetivo: Instalar paquete 
+
+## Tareas Realizadas
+
+
+(11:33 - 19:55) 17 de Diciembre
+- GCC make y make check
+
+(11:49 - 12:10)18 de Diciembre
+- GCC make install hasta sanity checks
+
+
+## Comandos principales ejecutados:
+
+#### Generalmente al make se le agregar time, y a make, make install se les agrega 2>&1 | tee -a “nombre-del.log”
+
+### Se empezó a agregar 2>&1,  para redirigir stderr a stdout y que escriba en los archivos creados por tee.
+
+### Se extrae con tar -xf nombre-paquete, y elimina el directorio al terminar con rm -rf nombre-paquete
+
+
+### GCC-15.2.0 
+
+#Adaptar lib para la arquitectura, en vez de lib64, solo lib
+
+case $(uname -m) in
+  x86_64)
+…..
+
+#Crear directorio para la construcción
+
+mkdir -v build
+cd       build
+
+
+#Configuración para compilar
+
+../configure --prefix=/usr            \
+……
+
+#Instalar en /usr
+
+#Utilizar el linker ld que se instaló previamente con el paquete BinUtils
+
+#Deshabilitar disable-fixincludes, puede corromper archivos instalados, no es necesario para linux modernos.
+
+#Habilita Los lenguajes C y C++ en GCC
+
+#Deshabilita soporte para múltiples arquitecturas de librerías
+
+#Usar libreria zlib instalada previamente
+
+#Deshabilita bootstrap, triple compilación para confirmar funcionamiento correcto,pero toma más tiempo.
+
+#Medidas de seguridad como, evitar y detectar, desbordamiento de pila,mover las direcciones de los programas ejecutables y herramientas de compilador, cada vez que se corre uno de los programas
+
+#Compilar
+
+make
+
+#Para evitar limitación del tamaño de la pila (stack)
+
+ulimit -s -H unlimited
+
+#Remover test que si o si fallan
+
+sed -e '/cpython/d' -i ../gcc/testsuite/gcc.dg/plugin/plugin.exp
+
+#Verificar compilacion correcta
+
+chown -R tester .
+su tester -c "PATH=$PATH make -k check"
+
+#Leer el resultado de los tests de make check
+
+../contrib/test_summary
+
+#Instalar 
+
+make install
+
+#Cambiar owner de testar a root
+
+chown -v -R root:root \
+    /usr/lib/gcc/$(gcc -dumpmachine)/15.2.0/include{,-fixed}
+
+#Symbolic links necesarios
+
+ln -svr /usr/bin/cpp /usr/lib
+ln -sv gcc.1 /usr/share/man/man1/cc.1
+ln -sfv ../../libexec/gcc/$(gcc -dumpmachine)/15.2.0/liblto_plugin.so \
+        /usr/lib/bfd-plugins/
+
+### Sanity check
+
+#Verificar funcionamiento correcto de la compilación y el linker
+
+echo 'int main(){}' | cc -x c - -v -Wl,--verbose &> dummy.log
+readelf -l a.out | grep ': /lib'
+
+#Verificar los 3 archivos crt*.o existen en /usr/lib
+
+grep -E -o '/usr/lib.*/S?crt[1in].*succeeded' dummy.log
+
+#Compilador detecta archivos de header correctos
+
+grep -B4 '^ /usr/include' dummy.log
+
+#Uso correcto del linker con las direcciones de busquedas correctas
+
+grep 'SEARCH.*/usr/lib' dummy.log |sed 's|; |\n|g'
+
+#Utilizar libc correcto
+
+grep "/lib.*/libc.so.6 " dummy.log
+
+#Utilizar dynamic linker correcto
+
+grep found dummy.log
+
+#Borrar archivos para los sanity check
+
+rm -v a.out dummy.log
+
+#Mover archivo a dirección correcta
+
+mkdir -pv /usr/share/gdb/auto-load/usr/lib
+mv -v /usr/lib/*gdb.py /usr/share/gdb/auto-load/usr/lib
+
+### Problema Encontrado
+
+Problema: El make check dio fallas que no eran partes de las esperadas, se decidio revisar.
+
+Solución: Gracias a la inteligencia artificial, se ayudó a deducir que los fails no son completamente inesperados. Usando los comandos : 
+grep -B 5 "^FAIL:" gcc/testsuite/gcc/gcc.log | head -50
+grep -B 5 "^FAIL:" x86_64-pc-linux-gnu/libstdc++-v3/testsuite/libstdc++.log | head -50,
+y se confirmó que no eran errores graves o críticos.
+
+## Resultados Obtenidos
+
+####  GCC - Instalado
+
+
+## Reflexión Técnica
+
+La compilación del Gcc tomo 52 minutos, lo cual es uno de los paquetes más lentos  de instalar, sin embargo, el make check tomó más de 7 horas (8 y media aprox), esto asegura de que no haya ni una falla inesperada en lo absoluto cuanto a Gcc resulta.
+Se inspeccionaron los tests que fallaron y según el manual los tests relacionados con pr90579,suelen fallan,entonces se decidió ignorarlos y seguir adelante.
+Todos los sanity checks cumplieron como se esperaba.
+
+
+
+## Evidencia
+
+
+![gcc-make](../imagenes/LFS/sesion19/gcc-make.png)
+*Figura 1: gcc-make*
+
+![gcc-make](../imagenes/LFS/sesion19/gcc-make-check-errores.png)
+*Figura 2: gcc-make*
+
+![gcc-make-install](../imagenes/LFS/sesion19/gcc-make-install.png)
+*Figura 3: gcc-make-install*
+
+![sanity-checks](../imagenes/LFS/sesion19/sanity-checks.png)
+*Figura 4: sanity-checks*
