@@ -3585,8 +3585,8 @@ ln …
 
 #Truco de linkear wide-characters con non-wide-characters
 
-    ln -sfv lib${lib}w.so /usr/lib/lib${lib}.so
-    ln -sfv ${lib}w.pc    /usr/lib/pkgconfig/${lib}.pc
+ln -sfv lib${lib}w.so /usr/lib/lib${lib}.so
+ln -sfv ${lib}w.pc    /usr/lib/pkgconfig/${lib}.pc
 
 #Symbolic link para aplicaciones que busquen -lcurses
 

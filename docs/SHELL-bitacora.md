@@ -500,5 +500,55 @@ Solución:Entonces, se decidió verificar manualmente si el archivo a borrar es 
 *El output de prueba rm*
 
 
+---
+
+# Fecha:19 de Diciembre del 2025
+# Objetivo del día: Crear la función mkdir
+
+## Tareas realizadas:
+
+(18:11 -18:27)
+
+- Aprender a usar mkdir()
+- Función que crea directorios
+
+
+(18:27-  18:35)
+- Capturar errores correctamente
+- Confirmar cumplir con requisitos mínimos
+
+
+(18:35- 18:51 )
+- Crear script de prueba 
+
+
+## Comandos probados:
+
+
+#Desde un usuario creado
+
+- mkdir  #Crear un directorio sin argumento de nombre,Error esperado
+- cd /  #Moverse al root
+- mkdir PokemonNoExiste #Error de privilegio insuficiente
+- cd /home/asd #Moverse al directorio home del usuario, (tiene privilegio)
+- ls #Listar archivos y directorios
+- mkdir pokemon #Crear el directorio pokemon
+- mkdir pokemon #Intentar de crear el mismo directorio, error de directorio ya existente
+- exit
+
+
+
+python prueba_mkdir.py #Ejecutar Script de prueba
+
+#El script de prueba fue reutilizado 
+
+## Evidencias 
+
+![prueba_mkdir](../imagenes/SHELL/sesion8/pruebas_mkdir.png)
+*El output de prueba mkdir*
+
+
+
+
 
 

@@ -3,12 +3,41 @@ import sys
 
 """
 
-   Función built-in rm
+    Función built-in mdkir
+               
+         - Crea directorio con nombre ingresado
+         - Maneja errores, directorio existentes o falta de privilegio
+         
+         
+"""
 
-        - Borra archivo
-        - Obliga al usuario a confirmar la eliminacion del archivo
-        - Manejo de errores
 
+
+def mkdir(args):
+
+    if not args: #Si no se ingreso un argumento para el nombre del directorio
+        print( "Falta ingresar el nombre del directorio a crear")
+        return #Volver al shell
+
+    directorio = args[0] #Nombre del directorio a crear
+
+    try:
+        os.mkdir(directorio)   #Crear el directorio con el nombre pasado por argumento
+        print(f"Directorio creado: {directorio}")
+    except FileExistsError:  #Error de que ya existe el directorio
+        print( f"ERROR, Directorio ya existe: {directorio}, ingresar un nombre no existente")
+    except PermissionError: #Error de que no tiene los privilegios para crearlo
+        print( "ERROR, Permiso denegado, no tiene suficientes privilegios")
+
+
+"""
+               
+    Función built-in rm
+               
+         - Borra archivo
+         - Obliga al usuario a confirmar la eliminacion del archivo
+         - Manejo de errores
+               
 """
 
 
@@ -276,6 +305,8 @@ def main():
             if comando_principal == "exit":
                 print("¡Hasta luego!")
                 break
+            elif comando_principal == "mkdir":
+                mkdir(argumentos)
 
             elif comando_principal == "ls":
                 ls(argumentos)
