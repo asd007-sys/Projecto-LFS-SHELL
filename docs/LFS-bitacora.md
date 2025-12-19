@@ -3520,3 +3520,193 @@ Todos los sanity checks cumplieron como se esperaba.
 
 ![sanity-checks](../imagenes/LFS/sesion19/sanity-checks.png)
 *Figura 4: sanity-checks*
+
+
+---
+
+
+# Sesión 20: 19 de Diciembre - Instalación de Ncurses,Sed,Psmisc,Gettext
+
+## Objetivo: Instalar paquetes 
+
+## Tareas Realizadas
+
+(10:41 - 11:09) 
+- Ncurses-6.5-20250809 
+
+(11:09 - 11:21) 
+- Sed-4.9 
+
+(11:21 - 11:27) 
+- Psmisc-23.7 
+
+(11:27- 12:21) 
+- Gettext-0.26 
+
+## Comandos principales ejecutados:
+
+### Generalmente al make se le agregar time, y a make, make install se les agrega 2>&1 | tee -a “nombre-del.log”
+
+### Se empezó a agregar 2>&1,  para redirigir stderr a stdout y que escriba en los archivos creados por tee.
+
+### Se extrae con tar -xf nombre-paquete, y elimina el directorio al terminar con rm -rf nombre-paquete
+
+
+###  Ncurses-6.5-20250809 
+
+#Configuración para compilar
+
+../configure --prefix=/usr   \
+……
+
+#Instalar en /usr
+
+#Instalar librerías compartidas de C,prevenir instalación de librerías estáticas de C
+
+#Prevenir instalar librerías para debug,Instalar librerías compartidas de C++
+
+#Instalar pkg-config en directorio designado,instalar archivos .pc para pkg-config
+
+
+#Compilar
+
+make
+
+#Instalar 
+
+make DESTDIR=$PWD/dest install
+
+#Lidiar con sobre-escritura de libncursesw.so.6.5 
+
+install..
+rm …
+sed …
+ln …
+
+#Truco de linkear wide-characters con non-wide-characters
+
+    ln -sfv lib${lib}w.so /usr/lib/lib${lib}.so
+    ln -sfv ${lib}w.pc    /usr/lib/pkgconfig/${lib}.pc
+
+#Symbolic link para aplicaciones que busquen -lcurses
+
+ln -sfv libncursesw.so /usr/lib/libcurses.so
+
+###  Sed-4.9 
+
+#Configuración para compilar
+
+./configure --prefix=/usr
+
+#Compilar, y generar archivos html
+
+make
+make html
+
+#Verificar el funcionamiento mediante make check
+
+chown -R tester .
+su tester -c "PATH=$PATH make check"
+
+#Instalar paquete y documentación
+
+make install
+install -d -m755           /usr/share/doc/sed-4.9
+install -m644 doc/sed.html /usr/share/doc/sed-4.9
+
+### Psmisc-23.7 
+
+#Configuración para compilar
+
+./configure --prefix=/usr
+
+#Compilar
+
+make
+
+#Verificar que se haya compilado correctamente
+
+make check
+
+#Instalar
+
+make install
+
+### Gettext-0.26 
+
+#Configuración para compilar
+
+./configure --prefix=/usr  \
+            --disable-static \
+            --docdir=/usr/share/doc/gettext-0.26
+
+#Compilar
+
+make
+
+#Verificar que se haya compilado correctamente
+
+make check
+
+#Instalar
+
+make install
+chmod -v 0755 /usr/lib/preloadable_libintl.so
+
+
+## Resultados Obtenidos
+
+####  Ncurses-6.5-20250809 - Instalado
+
+Librerías para manejo independiente de terminales de pantalla de caracteres.
+
+#### Sed-4.9 - Instalado
+
+Procesador de texto por líneas que usa un lenguaje de scripting para transformar datos de entrada.
+
+#### Psmisc-23.7 - Instalado
+
+Utilidades para monitoreo de procesos.
+
+#### Gettext-0.26 - Instalado
+
+Herramientas para internacionalización y localización de software.
+
+
+## Reflexión Técnica
+
+Ncurses no tiene make check dedicado, sino que los tests que se hacen para verificar su funcionamiento están en el directorio /test dentro del paquete extraído, y este se hace después de instalación, ya que es un paquete crítico pero muy estable al compilar.
+El sed, como varios paquetes, utiliza el usuario tester para los tests, al investigar, esto se debe a que, si hay algún bug como root, esto puede alterar algo crítico o importante y afectar toda la instalación. También sirve para verificar y testear privilegios sobre archivos que no tenga autoridad.
+
+
+## Evidencia
+
+![ncurses-make](../imagenes/LFS/sesion20/ncurses-make.png)
+*Figura 1: ncurses make install*
+
+![ncurses-make-install](../imagenes/LFS/sesion20/ncurses-make-install.png)
+*Figura 2: ncurses make install*
+
+![sed-make](../imagenes/LFS/sesion20/sed-make.png)
+*Figura 3: sed-make*
+
+![sed-make-check](../imagenes/LFS/sesion20/sed-make-check.png)
+*Figura 4: sed make check*
+
+![sed-make-install](../imagenes/LFS/sesion20/sed-make-install.png)
+*Figura 5: sed make install*
+
+![psmisc-make](../imagenes/LFS/sesion20/psmisc-make.png)
+*Figura 6: psmisc make*
+
+![psmisc-make](../imagenes/LFS/sesion20/psmisc-make-install.png)
+*Figura 7: psmisc make install*
+
+![gettext-make](../imagenes/LFS/sesion20/gettext-make.png)
+*Figura 8: gettext-make*
+
+![gettext-make-check](../imagenes/LFS/sesion20/gettext-make-check.png)
+*Figura 9: gettext make check*
+
+![gettext-make-install](../imagenes/LFS/sesion20/gettext-make-install.png)
+*Figura 10: gettext make install*
