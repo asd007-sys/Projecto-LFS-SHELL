@@ -3710,3 +3710,225 @@ El sed, como varios paquetes, utiliza el usuario tester para los tests, al inves
 
 ![gettext-make-install](../imagenes/LFS/sesion20/gettext-make-install.png)
 *Figura 10: gettext make install*
+
+
+
+---
+
+
+# Sesión 21: 20 de Diciembre - Instalación de Bison,Grep,Bash,Libtools
+
+## Objetivo: Instalar paquetes 
+
+## Tareas Realizadas
+
+(09:41 - 10:25) 
+- Bison-3.8.2 
+
+(10:25 - 10:39) 
+- Grep-3.12 
+
+(10:39 - 11:01) 
+- Bash-5.3  
+
+(11:01- 11:39) 
+- Libtool-2.5.4 
+
+## Comandos principales ejecutados:
+
+#### Generalmente al make se le agregar time, y a make, make install se les agrega 2>&1 | tee -a “nombre-del.log”
+
+### Se empezó a agregar 2>&1,  para redirigir stderr a stdout y que escriba en los archivos creados por tee.
+
+### Se extrae con tar -xf nombre-paquete, y elimina el directorio al terminar con rm -rf nombre-paquete
+
+
+###  Bison-3.8.2  
+
+#Configuración para compilar
+
+./configure --prefix=/usr --docdir=/usr/share/doc/bison-3.8.2
+
+#Instalar en /usr
+
+#Instalar documentacion en dirección establecida
+
+
+#Compilar
+
+make
+
+#Verificar compilacion
+
+make check
+
+#Instalar
+
+make install
+
+
+###  Grep-3.12  
+
+#Remover warnings de egrep y fgrep que pueden hacer que la compilación falle
+
+sed -i "s/echo/#echo/" src/egrep.sh
+
+
+#Configuración para compilar
+
+./configure --prefix=/usr
+
+#Instalar en /usr
+
+
+#Compilar
+
+make
+
+#Verificar compilación
+
+make check
+
+#Instalar
+
+make install
+
+
+### Bash-5.3  
+
+#Configuración para compilar
+
+./configure --prefix=/usr 
+…….
+
+#Instalar en /usr
+
+#Deshabilitar malloc como en capitulo 6, usar el de Glibc
+
+#Utilizar librería readline ya instalada, no usar con la que viene el paquete.
+
+#Establecer dirección para documentación
+
+#Compilar
+
+make
+
+#Verificar que se haya compilado correctamente
+
+#El owner se vuelve el usuario tester
+
+chown -R tester .
+
+#Crear nueva terminal, y proceder con el testeo
+
+LC_ALL=C.UTF-8 su -s /usr/bin/expect tester << "EOF"
+…..
+
+
+#Instalar
+
+make install
+
+#Reemplazar y usar el nuevo bash
+
+exec /usr/bin/bash --login
+
+
+### Libtool-2.5.4 
+
+
+#Configuración para compilar
+
+./configure --prefix=/usr
+
+#Instalar en /usr
+
+
+#Compilar
+
+make
+
+#Verificar compilación
+
+make check
+
+#Instalar
+
+make install
+
+#Remover librería estática 
+
+rm -fv /usr/lib/libltdl.a
+
+
+## Resultados Obtenidos
+
+####  Bison-3.8.2  - Instalado
+
+Generador de analizadores sintácticos para compiladores e intérpretes.
+
+#### Grep-3.12  - Instalado
+
+Herramienta de búsqueda de patrones de texto en archivos mediante expresiones regulares.
+
+#### Bash-5.3   - Instalado
+
+El intérprete de línea de comandos principal del sistema.
+
+#### Libtool-2.5.4  - Instalado
+
+Utilidad para simplificar la compilación de bibliotecas compartidas en diferentes plataformas Unix.
+
+
+## Reflexión Técnica
+
+Al compilar el bash y hacer los tests , dejó en duda si efectivamente funcionó, también al ejecutar el nuevo bash, como no señala de alguna forma que se cambió.
+La mayoría de los paquetes instalados en esta sesión son muy similares, por lo que no cabe recalcar mucho, aparte de que ninguno dio un fallo.
+Al hacer el test del bash se usa de nuevo el user tester, pero ahora usamos como el manual dice una pseudo terminal,es hasta ahora el único paquete que implementa esta clase de testeo. Al investigar sobre esto, se encontró que la razón de la pseudo-terminal se debe a que muchos tests necesitan ser el proceso líder de su propio terminal(primer proceso al correr la terminal),y como el usuario tester no es dueño de la terminal, sino root, se crea una nueva terminal para que este usuario tenga el control de la misma.
+
+
+## Problemas encontrados
+
+Problema: En Bison, el primer configure se escribió mal la versión de documentación.
+
+Solución: Se espera a que se termine de ejecutar el comando de configuración para compilación, se borro todo el directorio con: rm -rf bison-3.8.2 , y se volvió a extraer con tar -xf bison-3.8.2.
+
+Problema: Al instalar bash, el testeo no convenció del todo que estaba correctamente instalado.
+
+Solución: Se ejecutó tanto como bash –versión ,para verificar que es la misma versión que la del lfs, y también gracias a la inteligencia artificial ldd /usr/bin/bash, y este escribio en la terminal los symbolic links del bash. Esto asegura más que usamos el bash correcto, los symbolic links están configurados.
+
+## Evidencia
+
+
+![bison-make](../imagenes/LFS/sesion21/bison-make.png)
+*Figura 1: bison make*
+
+![bison-make-check](../imagenes/LFS/sesion21/bison-make-check.png)
+*Figura 2: bison make check*
+
+![bison-make-install](../imagenes/LFS/sesion21/bison-make-install.png)
+*Figura 3: bison make install*
+
+![grep-make](../imagenes/LFS/sesion21/grep-make.png)
+*Figura 4: grep make*
+
+![grep-make-check](../imagenes/LFS/sesion21/grep-make-check.png)
+*Figura 5: grep make check*
+
+![grep-make-install](../imagenes/LFS/sesion21/grep-make-install.png)
+*Figura 6: grep make install*
+
+![bash-make](../imagenes/LFS/sesion21/bash-make.png)
+*Figura 7: bash make*
+
+![bash-make-check](../imagenes/LFS/sesion21/bash-make-check.png)
+*Figura 8: bash make check*
+
+![bash-make-install](../imagenes/LFS/sesion21/bash-make-install.png)
+*Figura 9: bash make install*
+
+![libtool-make](../imagenes/LFS/sesion21/libtool-make.png)
+*Figura 10: libtool make*
+
+![libtool-make-install](../imagenes/LFS/sesion21/libtool-make-install.png)
+*Figura 11: libtool make install*
