@@ -4088,7 +4088,7 @@ Librería para el parseo de XML, usada para leer y procesar documentos XML.
 ![gperf-make-check](../imagenes/LFS/sesion22/gperf-make-check.png)
 *Figura 8: gperf make check*
 
-![gperf-make-install](../imagenes/LFS/sesion22/gperf-make install.png)
+![gperf-make-install](../imagenes/LFS/sesion22/gperf-make-install.png)
 *Figura 9: gperf make install*
 
 
