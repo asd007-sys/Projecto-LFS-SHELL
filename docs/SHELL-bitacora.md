@@ -548,7 +548,108 @@ python prueba_mkdir.py #Ejecutar Script de prueba
 *El output de prueba mkdir*
 
 
+---
 
+# Fecha: 20 y 21 de Diciembre del 2025
+# Objetivo del día: Crear las funciones del Logger
+
+## Tareas realizadas:
+20 de Diciembre
+
+(14:37 -14:54)
+
+- Función básica que crea directorio de logging si no existe e initializa variables (iniciar_logs)
+
+(14:54:16:14)
+- Función que registra acciones en el logger
+- Registra con timestamp,nombre,comando,mensaje
+- Formateo y escritura de acciones
+
+
+(16:03 -  16:21)
+- Función que registra errores
+- Formatea y escribe errores al logger
+
+Pausa (16:21 - 16:43)
+
+(16:43 - 17:29)
+- Función que muestra logs
+- Muestra log de errores o log de acciones
+- Modificación de mkdir para aceptar logging(agregar la función creada para verificar funcionamiento)
+
+(17:29 - 17:56)
+- Verificar y manejar errores(PermissionError en iniciar_logs())
+- Asegurar cumplimiento mínimo del logger
+
+21 de Diciembre
+
+(15:18 - 15:51)
+ - Script de prueba (solo con mkdir) y terminaciones finales
+
+## Comandos probados:
+
+
+ - mkdir                 #Crear directorio sin argumentos, error
+ - mkdir 1234                #Crear directorio
+ - mkdir 1234		#Crear directorio ya existente
+ - cd /      		 #Cambiar de directorio actual al root
+ - mkdir 12345		#Crear directorio en root, sin privilegios necesarios.
+ - cd /home/asd		#Cambiar directorio al home
+ - ver_logs		#Mostrar todos los comandos hechos
+ - ver_errores                  #Mostrar sólo los comandos que dieron errores
+ - exit
+
+
+Deste terminal:
+
+python prueba_logger_con_mkdir.py
+
+ #Se reutilizó el script de prueba anterior, ya que solo necesita ingresar comandos.
+
+
+
+## Problemas encontrados:
+
+Problema:Las variables de acciones y errores no tiene scope dentro de registrar acciones
+
+Solución: Para futuras funciones, las variables Logger_Acciones y Logger_Errores ahora son globales para que las funciones que las necesiten puedan modificar, si esto es necesario.
+
+Problema: Si se crea la dirección completa en la variable del archivo logger acciones o errores,al tener PermissionError. se complica al tener errores como PermissionError o verificar si existe el directorio.
+
+Solución: Es más fácil separar la dirección en una variable,Logger_Direccion, y el nombre de los archivos en otras dos variables, ya que están en el mismo directorio.
+
+Problema: Al abrir un archivo en modo write, sobre escribía el archivo,se quiere agregar al final.
+
+Solución: Utilizar el modo append, para agregar al final del archivo lo que se va a ingresar, como funciona un registro cualquiera.
+
+Problema:Al ingresar la hora en los logs, no se sabía que comando utilizar.
+
+Solución:Despues de buscar en la web.Se decidió usar datetime.now() de la librería datetime, ya que tiene la función strftime() que permite formatear la hora para el string fácilmente
+
+Problema: Si ocurre una falla durante el log, se interrumpe.
+
+Solución:en registrar_accion se atrapan los errores y se le permite continuar con pass a la función por más de que se tenga un error.
+
+Problema:Se creó el logger después de crear varias funciones
+
+Solución:Hay que adaptar y cambiar todas las funciones existentes para que registren los comandos(Para referencia en futuros commits)
+
+Problema:El formateo queda doloroso a la vista cuando el usuario no ingresa argumentos (Ej: ls)formateado = f"[{timestamp}] {usuario} | {comando | {arg} | {resultado}" 
+
+Solución: Se utilizó una condicional dentro del formateo, para que en cada caso quede correctamente formateado = f"[{timestamp}] {usuario} | {comando + (' ' + ' '.join(args) if args else '')} | {resultado}" 
+
+Problema:Al obtener PermissionError en /var/log/shell no se puede continuar loggeando.
+
+Solución:Si salta el PermissionError , se imprime al usuario que se creó, en su carpeta de usuario /home/user, dos directorios más /log/shell, donde allí residen ahora los shell.log y sistema errores.log. Esto es posible gracias a la función makedirs(), que crea la ruta completa recursivamente (si el padre no existe, esta función lo crea), y modificamos las variables de dirección y de archivos del logger.
+
+
+
+
+
+## Evidencias 
+
+![Pruebas](../imagenes/SHELL/sesion9/prueba_logger_con_mkdir.png)
+*El output del script de prueba del logger, se utiliza solo mkdir para este script actual*
 
 
 
