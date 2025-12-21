@@ -3932,3 +3932,163 @@ Solución: Se ejecutó tanto como bash –versión ,para verificar que es la mis
 
 ![libtool-make-install](../imagenes/LFS/sesion21/libtool-make-install.png)
 *Figura 11: libtool make install*
+
+
+---
+
+# Sesión 22: 21 de Diciembre - Instalación de GDBM,Gperf, Expat
+
+## Objetivo: Instalar paquetes 
+
+## Tareas Realizadas
+
+(12:00 - 12:15) 
+- GDBM-1.26  
+
+(12:15 - 12:24) 
+- Gperf-3.3  
+
+(12:24 - 12:31) 
+- Expat-2.7.1   
+
+
+## Comandos principales ejecutados:
+
+#### Generalmente al make se le agregar time, y a make, make install se les agrega 2>&1 | tee -a “nombre-del.log”
+
+### Se empezó a agregar 2>&1,  para redirigir stderr a stdout y que escriba en los archivos creados por tee.
+
+### Se extrae con tar -xf nombre-paquete, y elimina el directorio al terminar con rm -rf nombre-paquete
+
+
+###  GDBM-1.26   
+
+#Configuración para compilar
+
+./configure --prefix=/usr    \
+            --disable-static \
+            --enable-libgdbm-compat
+
+#Instalar en /usr
+
+#Deshabilitar librerías estáticas
+
+#Habilitar librería de compatibilidad libgdbm 
+
+#Compilar
+
+make
+
+#Verificar compilación
+
+make check
+
+#Instalar
+
+make install
+
+
+###  Gperf-3.3 
+
+#Configuración para compilar
+
+./configure --prefix=/usr --docdir=/usr/share/doc/gperf-3.3
+
+
+#Instalar en /usr
+
+#Instalar documentacion en dirección establecida
+
+#Compilar
+
+make
+
+#Verificar compilación
+
+make check
+
+#Instalar
+
+make install
+
+
+
+
+### Expat-2.7.1 
+
+#Configuración para compilar
+
+./configure --prefix=/usr    \
+            --disable-static \
+            --docdir=/usr/share/doc/expat-2.7.1
+
+#Instalar en /usr
+
+#Deshabilitar librerías estáticas
+
+#Establecer dirección para documentación
+
+#Compilar
+
+make
+
+#Verificar compilación
+
+make check
+
+#Instalar
+
+make install
+
+#Instalar documentación 
+
+install -v -m644 doc/*.{html,css} /usr/share/doc/expat-2.7.1
+
+
+## Resultados Obtenidos
+
+####  GDBM-1.26     - Instalado
+
+Librería que proporciona una base de datos simple tipo key–value, usada para almacenar y recuperar datos.
+
+#### Gperf-3.3    - Instalado
+
+Herramienta que genera funciones de hashing, utilizada para crear búsquedas muy rápidas
+
+#### Expat-2.7.1   - Instalado
+
+Librería para el parseo de XML, usada para leer y procesar documentos XML.
+
+
+
+## Evidencia
+
+
+![expat-make](../imagenes/LFS/sesion22/expat-make.png)
+*Figura 1: expat make*
+
+![expat-make-check](../imagenes/LFS/sesion22/expat-make-check.png)
+*Figura 2: expat make check*
+
+![expat-make-install](../imagenes/LFS/sesion22/expat-make-install.png)
+*Figura 3: expat make install*
+
+![gdbm-make](../imagenes/LFS/sesion22/gdbm-make.png)
+*Figura 4: gdbm make*
+
+![gdbm-make-check](../imagenes/LFS/sesion22/gdbm-make-check.png)
+*Figura 5: gdbm make check*
+
+![gdbm-make-install](../imagenes/LFS/sesion22/gdbm-make-install.png)
+*Figura 6: gdbm make install*
+
+![gperf-make](../imagenes/LFS/sesion22/gperf-make.png)
+*Figura 7: gperf make*
+
+![gperf-make-check](../imagenes/LFS/sesion22/gperf-make-check.png)
+*Figura 8: gperf make check*
+
+![gperf-make-install](../imagenes/LFS/sesion22/gperf-make install.png)
+*Figura 9: gperf make install*
+
+
