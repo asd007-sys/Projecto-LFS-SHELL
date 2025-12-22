@@ -2,14 +2,13 @@ import os
 import sys
 from datetime import datetime
 
-
 """
     SISTEMA DE LOGGER
 
     - Registra acciones en /var/log/shell/shell.log
     - Registra errores en /var/log/shell/sistema_error.log
     - Incluye timestamp, usuario, comando, resultado y mensaje
-    
+
 """
 
 """
@@ -17,96 +16,127 @@ from datetime import datetime
    Si no tiene permisos, trata de crear en el directorio actual.
 """
 
-Logger_Direccion= "/var/log/shell/" #Direccion de los archivos de logger
+Logger_Direccion = "/var/log/shell/"  # Direccion de los archivos de logger
 Logger_Acciones = os.path.join(Logger_Direccion, "shell.log")  # ruta completa del archivo de logger para acciones
 Logger_Errores = os.path.join(Logger_Direccion, "sistema_error.log")  # ruta completa del rchivo de logger para errores
 
 
 def iniciar_logs():
-    global Logger_Direccion,Logger_Acciones,Logger_Errores
+    global Logger_Direccion, Logger_Acciones, Logger_Errores
 
     try:
 
         if not os.path.exists(Logger_Direccion):  # Si no existe el diretorio
-            os.makedirs(Logger_Direccion)  # Crearlo,funcion que crea todos los directorios necesarios, a diferencia de mkdir que solo crea 1 a la vez
+            os.makedirs(
+                Logger_Direccion)  # Crearlo,funcion que crea todos los directorios necesarios, a diferencia de mkdir que solo crea 1 a la vez
 
-        with open(Logger_Acciones, "a") as f: #Verificar tener permiso suficiente para poder escribir
+        with open(Logger_Acciones, "a") as f:  # Verificar tener permiso suficiente para poder escribir
             pass
 
-    except PermissionError: #Si el usuario no tiene los privilegios necesarios
+    except PermissionError:  # Si el usuario no tiene los privilegios necesarios
 
         print("\nNo tiene privilegios para acceder a /var/log/shell \n")
         print("Los logs se guardaran en home/user/log/shell\n")
 
-        Logger_Direccion = f"/home/{os.getenv('USER')}/log/shell"  #Direccion nueva del directorio de los logs
-        Logger_Acciones = os.path.join(Logger_Direccion, "shell.log") #Direccion del archivo logger de acciones
-        Logger_Errores = os.path.join(Logger_Direccion, "sistema_error.log") #Direccion del archivo logger de errores
+        Logger_Direccion = f"/home/{os.getenv('USER')}/log/shell"  # Direccion nueva del directorio de los logs
+        Logger_Acciones = os.path.join(Logger_Direccion, "shell.log")  # Direccion del archivo logger de acciones
+        Logger_Errores = os.path.join(Logger_Direccion, "sistema_error.log")  # Direccion del archivo logger de errores
 
-        if not os.path.exists(Logger_Direccion): #Si el directorio logs no existe en el directorio actual
-            os.makedirs(Logger_Direccion) #Crear directorio logs
+        if not os.path.exists(Logger_Direccion):  # Si el directorio logs no existe en el directorio actual
+            os.makedirs(Logger_Direccion)  # Crear directorio logs
 
 
-def registrar_accion(comando,args,exito,mensaje):  # Recibe el comando y lo registra
+def registrar_accion(comando, args, exito, mensaje):  # Recibe el comando y lo registra
     try:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Crear timestamp con formato ano/mes/dia hora:minutos:segundos
-        usuario = os.getenv("USER") or os.getenv("USERNAME") or "Estudiante" #Nombre del usuario para registrar
-        if exito: #Si el comando a registrar funciono correctamente
+        usuario = os.getenv("USER") or os.getenv("USERNAME") or "Estudiante"  # Nombre del usuario para registrar
+        if exito:  # Si el comando a registrar funciono correctamente
             resultado = "EXITO"
-        else:#Si el resultado del comando es un error
+        else:  # Si el resultado del comando es un error
             resultado = "FRACASO"
 
         formateado = f"[{timestamp}] {usuario} | {comando + (' ' + ' '.join(args) if args else '')} | {resultado}"  # Formateo de la linea a registrar, Timestamp , Nombre ususario , comando y argumentos, Exito o Fracaso
-                                                #condicional, si args esta vacio es '',string vacio, si no ,entonces ' '.join(args) agrega los argumentos separado por espacio
-        if mensaje: #Si existe mensaje de error para agregar
-            formateado += f" | {mensaje}" #Se le concatena al final el mensaje
-        formateado += "\n" #Siempre la variable formateado termina con caracter de nueva linea
+        # condicional, si args esta vacio es '',string vacio, si no ,entonces ' '.join(args) agrega los argumentos separado por espacio
+        if mensaje:  # Si existe mensaje de error para agregar
+            formateado += f" | {mensaje}"  # Se le concatena al final el mensaje
+        formateado += "\n"  # Siempre la variable formateado termina con caracter de nueva linea
 
-        with open(Logger_Acciones, "a") as f: #Abrir el archivo de logs de acciones como append, agregar al final
-            f.write(formateado)  #Escribir la formateado en log
+        with open(Logger_Acciones, "a") as f:  # Abrir el archivo de logs de acciones como append, agregar al final
+            f.write(formateado)  # Escribir la formateado en log
     except Exception as e:
         # Si falla el log, no interrumpir el shell
         pass
 
+
 def mostrar_logs(tipo):
     try:
-        if tipo == "acciones" :
-            archivo = Logger_Acciones #Si el usuario ingresa ver logs,tipo = acciones
+        if tipo == "acciones":
+            archivo = Logger_Acciones  # Si el usuario ingresa ver logs,tipo = acciones
             nombre = "ACCIONES"
         else:
-            archivo = Logger_Errores  #Si ingresa ver_erroes, tipo=errores
+            archivo = Logger_Errores  # Si ingresa ver_erroes, tipo=errores
             nombre = "ERRORES"
 
-
-        if not os.path.exists(archivo): #Verificar si el archivo esta vacio
+        if not os.path.exists(archivo):  # Verificar si el archivo esta vacio
             print(f"No hay log de {nombre.lower()} todavia")
-            return #Se retorna al menu principal
+            return  # Se retorna al menu principal
 
-        with open(archivo, "r") as f: #Se abre el archivo en modo lectura
-            lineas = f.readlines() #Se lee por lineas
+        with open(archivo, "r") as f:  # Se abre el archivo en modo lectura
+            lineas = f.readlines()  # Se guarda todo el archivo en un array, cada elemento es una linea
 
         print(f"\n=== LOG DE {nombre} ({len(lineas)} entradas) ===\n")
-
 
         for linea in lineas[-30:]:  # Mostrar ultimas 30 líneas,para no tener demasiadas lineas
             print(linea.strip())
 
         print(f"\nArchivo completo: {archivo}")
-    except Exception as e: #En caso de error
+    except Exception as e:  # En caso de error
         print(f"ERROR al leer logs: {e}")
 
 
-def registrar_error(comando,args,tipo_error,mensaje_error):
-
+def registrar_error(comando, args, tipo_error, mensaje_error):
     try:
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S") # Crear timestamp con formato ano/mes/dia hora:minutos:segundos
-        usuario = os.getenv("USER") or os.getenv("USERNAME") or "Estudiante" #Nombre del usuario para registrar
+        timestamp = datetime.now().strftime(
+            "%Y-%m-%d %H:%M:%S")  # Crear timestamp con formato ano/mes/dia hora:minutos:segundos
+        usuario = os.getenv("USER") or os.getenv("USERNAME") or "Estudiante"  # Nombre del usuario para registrar
 
-        formateado = f"[{timestamp}] {usuario} | {comando + (' ' + ' '.join(args) if args else '')} | {tipo_error} | {mensaje_error}\n" #Formateo de linea a ingresar en Logger_Errores
+        formateado = f"[{timestamp}] {usuario} | {comando + (' ' + ' '.join(args) if args else '')} | {tipo_error} | {mensaje_error}\n"  # Formateo de linea a ingresar en Logger_Errores
 
-        with open(Logger_Errores, "a") as f: #Abrir el archivo para agregar al final del archivo la linea
+        with open(Logger_Errores, "a") as f:  # Abrir el archivo para agregar al final del archivo la linea
             f.write(formateado)
     except Exception as e:  # Si falla el log, no interrumpir el shell
         pass
+
+    """
+
+        Función built-in cat
+
+             - Abre archivo y lo imprime
+             - Maneja archivos grandes eficientemente
+
+
+    """
+
+
+def cat(args):
+    if not args:  #Si no hay argumento (archivo a leer) recibido en la funcion
+        print("Falta ingresar el archivo a leer!") #Advertir al usuario
+        return #Volver a menu principal
+
+    archivo = args[0]  #El primer argumento es el archivo
+    try:
+
+        with open(archivo, 'r') as zeta:  # Abrir el archivo a leer en modo lectura
+              for linea in zeta:  #Loopear sobre el archivo por linea
+                print(linea.strip())
+        print( f"Contenido de {archivo} mostrado")
+        return
+    except FileNotFoundError: #Error de archivo no encontrado
+        print(f"Archivo no existe: {archivo}")
+        return
+    except PermissionError:#Permisos insuficientes
+        print("Permiso denegado,no tiene los privilegios necesarios")
+        return
 
 """
 
@@ -122,8 +152,10 @@ def registrar_error(comando,args,tipo_error,mensaje_error):
 def mkdir(args):
     if not args:  # Si no se ingreso un argumento para el nombre del directorio
         print("Falta ingresar el nombre del directorio a crear")
-        registrar_accion("mkdir", args, False, "Falta argumento para el nombre del directorio a crear") #Funcion para registrar accion fallida
-        registrar_error("mkdir", args, "FaltaNombre", "Falta argumento para el nombre del directorio a crear")#Funcion para regisrar error
+        registrar_accion("mkdir", args, False,
+                         "Falta argumento para el nombre del directorio a crear")  # Funcion para registrar accion fallida
+        registrar_error("mkdir", args, "FaltaNombre",
+                        "Falta argumento para el nombre del directorio a crear")  # Funcion para regisrar error
         return  # Volver al shell
 
     directorio = args[0]  # Nombre del directorio a crear
@@ -131,15 +163,18 @@ def mkdir(args):
     try:
         os.mkdir(directorio)  # Crear el directorio con el nombre pasado por argumento
         print(f"Directorio creado: {directorio}")
-        registrar_accion("mkdir", args, True, "Creado") #Funcion para registrar accion exitosa
+        registrar_accion("mkdir", args, True, "Creado")  # Funcion para registrar accion exitosa
     except FileExistsError:  # Error de que ya existe el directorio
         print(f"ERROR, Directorio ya existe: {directorio}, ingresar un nombre no existente")
-        registrar_accion("mkdir", args, False, "El archivo no existe/no fue encontrado") #Funcion para registrar accion fallida
-        registrar_error("mkdir",args, "FileExistsError", f"Directorio ya existe") #Funcion para regisrar error
+        registrar_accion("mkdir", args, False,
+                         "El archivo no existe/no fue encontrado")  # Funcion para registrar accion fallida
+        registrar_error("mkdir", args, "FileExistsError", f"Directorio ya existe")  # Funcion para regisrar error
     except PermissionError:  # Error de que no tiene los privilegios para crearlo
         print("ERROR, Permiso denegado, no tiene suficientes privilegios")
-        registrar_accion("mkdir", args, False, "No tiene los privilegios suficientes") #Funcion para registrar accion fallida
-        registrar_error("mkdir",args, "PermissionError", "No tiene los privilegios suficientes") #Funcion para regisrar error
+        registrar_accion("mkdir", args, False,
+                         "No tiene los privilegios suficientes")  # Funcion para registrar accion fallida
+        registrar_error("mkdir", args, "PermissionError",
+                        "No tiene los privilegios suficientes")  # Funcion para regisrar error
 
 
 """
@@ -416,17 +451,20 @@ def main():
             argumentos = partes[1:]  # Los siguientes se asumen como argumentos
 
             if comando_principal == "ver_logs":
-                mostrar_logs("acciones")   #Acceder a la funcion con tipo=acciones para ver los logs
+                mostrar_logs("acciones")  # Acceder a la funcion con tipo=acciones para ver los logs
                 continue
 
-            if comando_principal == "ver_errores":  
-                mostrar_logs("errores")  #Acceder a la funcion con argumento tipo=errores para ver los errores
+            if comando_principal == "ver_errores":
+                mostrar_logs("errores")  # Acceder a la funcion con argumento tipo=errores para ver los errores
                 continue
 
             # Ejecutar comandos built-in
             if comando_principal == "exit":
                 print("¡Hasta luego!")
                 break
+            elif comando_principal == "cat":
+                cat(argumentos)
+
             elif comando_principal == "mkdir":
                 mkdir(argumentos)
 

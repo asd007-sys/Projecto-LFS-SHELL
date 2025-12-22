@@ -653,3 +653,83 @@ Solución:Si salta el PermissionError , se imprime al usuario que se creó, en s
 
 
 
+---
+
+
+# Fecha: 22 de Diciembre del 2025
+# Objetivo del día: Crear la función cat 
+
+## Tareas realizadas:
+
+(15:17-15:43)
+
+- Función que recibe argumento e imprime todo el archivo ingresado
+
+(15:43-15:48)
+
+- Manejo de errores
+
+PAUSA
+
+(16:49 -  15:24)
+- Scripts de pruebas
+
+
+## Comandos probados:
+
+
+
+antes de usar el script y entrar al shell
+
+cat > asd.txt << “EOF”
+1\n
+1\n
+1\n
+Terminado! 
+EOF
+
+Se utilizó, conseguido por inteligencia artificial, el comando head -c 1000M /dev/urandom | base64 > texto_aleatorio.txt, para generar un archivo de texto de un Gigabyte, la funcion built-in cat abre e imprime el archivo sin problemas, pero obviamente tarda mucho así que se recomienda cuidado al abrir.
+
+
+Para: prueba_cat.py 
+
+cat asd.txt           #Leer el archivo asd.txt en el directorio actual
+mkdir hola               #Crear directorio hola
+mv asd.txt ./hola/asd.txt		#Mover asd.txt al directorio hola
+cat ./hola/asd.txt     		 #Leer asd.txt en el directorio hola desde el directorio actual
+exit	
+
+Para:prueba_cat_texto_grande.py
+
+
+cat texto_aleatorio.txt #Leer un archivo de texto muy grande
+exit
+
+Deste terminal:
+
+python prueba_cat.py
+python prueba_cat_texto_grande.py
+
+ #Se reutilizó el script de prueba anterior, ya que solo necesita ingresar comandos.
+
+
+
+## Problemas encontrados:
+
+Problema: Cuando se utilizó readlines() en la función mostrar_logs, era conveniente porque ya tenemos un array de las líneas del archivo y no preocupaba (o pensaba) en la cantidad de memoria utilizada (o inclusive no preocupaba cómo funcionaba), pero ahora se quiere también poder manejar archivos más grandes.
+
+Solución: En vez de usar readlines(), que carga todo el archivo en un array, en memoria con todos los elementos siendo las líneas, es más eficiente usar loopear sobre el archivo, extrayendo linea por linea, ir imprimiendo, de esta forma, no cargamos TODO el archivo en memoria de una vez, si no que se lee linea por linea
+
+
+Problema:Se escriben doble líneas al leer un archivo con el carácter \n
+
+Solución:Como fue utilizado previamente, se le incluyó .strip() a cada línea leída a imprimir para evitar el carácter ‘\n’. Aunque también elimina los espacios al final y comienzo de cada línea, pero esto ya va a formar parte de la funcionalidad.
+
+
+Problema: Se quería crear el texto desde el script de prueba, pero esto mostró muchas dificultades.
+
+Solución: Simplemente se creó el archivo asd.txt con el texto 1\n1\n1\nTerminado! EOF manualmente antes de ejecutar el script de prueba
+
+
+![prueba_cat](../imagenes/SHELL/sesion10/prueba_cat.png)
+*El output del script de prueba cat*
