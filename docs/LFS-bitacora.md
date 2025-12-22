@@ -4092,3 +4092,224 @@ Librería para el parseo de XML, usada para leer y procesar documentos XML.
 *Figura 9: gperf make install*
 
 
+---
+
+
+# Sesión 23: 22 de Diciembre - Instalación de Inetutil,Less,Perl,XML::Parser
+
+## Objetivo: Instalar paquetes 
+
+## Tareas Realizadas
+
+(10:01 - 10:37) 
+- Inetutils-2.6 
+
+(10:37 - 10:45) 
+- Less-679   
+
+(10:45 - 12:15) 
+- Perl-5.42.0   
+
+(12:15 - 12:29) 
+-  XML::Parser-2.47   
+
+
+
+## Comandos principales ejecutados:
+
+#### Generalmente al make se le agregar time, y a make, make install se les agrega 2>&1 | tee -a “nombre-del.log”
+
+### Se empezó a agregar 2>&1,  para redirigir stderr a stdout y que escriba en los archivos creados por tee.
+
+### Se extrae con tar -xf nombre-paquete, y elimina el directorio al terminar con rm -rf nombre-paquete
+
+### Para ocupar menos espacio, se van a omitir los comandos repetidos. Se escriben primero los comandos compartidos por los paquetes, y después los comandos particulares separados por paquetes, se lamenta no haberlo hecho antes.
+
+### Comandos compartidos
+
+
+#Compilar
+
+make
+
+#Verificar la compilación
+
+make check
+
+#Instalar
+
+make install
+
+
+###  Inetutils-2.6   
+
+#Asegurar de usar una version de GCC mayor que 14
+
+sed -i 's/def HAVE_TERMCAP_TGETENT/ 1/' telnet/telnet.c
+
+#Configuración de compilación
+
+./configure --prefix=/usr        \
+…..
+
+#Instalar en /usr
+
+#Deshabilitar programas whois,versión anticuada, y logger, util-linux instala una versión más reciente
+
+#Deshabilitar programas obsoletos con problemas de seguridad
+
+#Deshabilitar instalacion de servidores, innecesario para este LFS
+
+#Mover programa al lugar indicado
+
+mv -v /usr/{,s}bin/ifconfig
+
+
+
+###  Less-679 
+
+#Configuración para compilar
+
+./configure --prefix=/usr --sysconfdir=/etc
+
+#Instalar en /usr
+
+#Buscar archivos de configuración en /etc
+
+
+
+### Perl-5.42.0 
+
+#Utilizar módulos Bzip2 y Zlib instalados en el sistema , no los que están en este paquete
+#Básicamente, no hacer build a estos modulos que vienen del paquete
+
+export BUILD_ZLIB=False
+export BUILD_BZIP2=0
+
+
+#Configuración para compilar
+
+sh Configure -des           
+….
+….
+
+#Designar directorios específicos para binarios,librerías,documentacion
+
+#Habilitar soporte para hilos
+
+#Instalar en /usr
+
+
+#El test para verificar correcta compilación
+
+TEST_JOBS=$(nproc) make test_harness
+
+#Después de instalar, asegurarse de borrar las variables
+
+unset BUILD_ZLIB BUILD_BZIP2
+
+
+### XML::Parser
+
+#Preparar para la compilación
+
+perl Makefile.PL
+
+## Resultados Obtenidos
+
+
+####  Inetutils-2.6       - Instalado
+
+Herramientas básicas de red para comunicación y diagnóstico en sistemas Unix.
+
+#### Less-679    - Instalado
+
+Lector interactivo que permite navegar archivos de forma eficiente.
+
+#### Perl-5.42.0    - Instalado
+
+Lenguaje de programación potente,usado ampliamente para scripting.
+
+#### XML::Parser   - Instalado
+
+Módulo de Perl que permite analizar documentos XML
+
+### Problemas Encontrados
+
+Problema: El disco ssd se quedó sin espacio para crear más snapshots de la virtual machine.Virtualbox no permite fácilmente crear otro directorio de snapshot para continuar (manteniendo los antiguos y continuando).
+
+Solución:Se clonó la vm en un disco duro con mucho espacio libre, esto automáticamente clona el disco virtual, junto a los snapshots, ayudando así a mantener los snapshots y pudiendo continuar el LFS
+
+Problema: Al escribir el .configure de Inetutils, se omitio el argumento –disable-logger,pero se ejecutó la configuración
+
+Solución: Como de costumbre, se retorno al directorio /sources , removio el directorio inetutils, con rm -rm , extrajo el paquete comprimido, y se volvió a compilar con los argumentos correctos
+
+Problema:Al compilar da error de declaración implicit function tgetent
+
+Solución: Al volver a comenzar a compilar desde la solución anterior, no se volvió a ingresar el primer comando “sed -i 's/def HAVE_TERMCAP_TGETENT/ 1/' telnet/telnet.c”, para compilar y testear con GCC version mayor que 14. Se volvió a comenzar de nuevo.
+
+Problema: Al hacer es test de Perl, el test alarm.t daba error, fallaban 6 de 10 tests.
+
+Solución: Al investigar con ayuda de  inteligencia artificial, se ejecutó el test por si solo con: make test TEST_FILES="../dist/Time-HiRes/t/alarm.t", y pasaron los 10 tests fallados, entonces se volvió a correr el comando original del test, pero con 1 en vez de nproc, TEST_JOBS=$(1) make test_harness, para ver si fallaba por ejecutar en paralelo o la carga de estar ejecutando en paralelo. Tardó considerablemente más tiempo
+
+Problema:No se encontró el paquete a descomprimir XML-PARSER
+
+Solución: Al buscar el paquete con TAB, mientras se hacía “tar -xf x”, el nombre del paquete comienza con mayúscula, entonces no aparecía, al poner X se encontró el paquete a descomprimir.
+
+
+
+### Reflexión Técnica
+
+En el paquete Inetutils se deshabilitan muchos programas debido a que son obsoletos o presentan problemas de seguridad. Esto se debe a que se trata de un paquete antiguo, diseñado para conectividad y de servidores que cambió significativamente con los años. LFS solo utiliza las herramientas básicas que son todavía relevantes.
+Al investigar, con ayuda de inteligencia artificial, el paquete Perl,tiende a instalar documentación,binarios y librerías en lugares inesperados cuando se deja la configuración predeterminada. Es justamente por esto, que la configuración es tan larga, para asegurarse de que todo se instale ordenadamente.
+El make test de perl fallo a causa de usar múltiples núcleos, al usar solo 1, aunque tardó más, pasaron todos los tests, así asegurando funcionamiento correcto. Esto puede ser porque al hacer pruebas en paralelo, la carga del sistema puede hacer que los tests fallen por milisegundos.
+
+
+## Evidencia
+
+
+![inetutils-make](../imagenes/LFS/sesion23/inetutils-make.png)
+*Figura 1: inetutils make*
+
+![inetutils-make-check](../imagenes/LFS/sesion23/inetutils-make-check.png)
+*Figura 2: inetutils make check*
+
+![inetutils-make-install](../imagenes/LFS/sesion23/inetutils-make-install.png)
+*Figura 3: inetutils make install*
+
+![inetutils-telnet-error](../imagenes/LFS/sesion23/inetutils-telnet-error.png)
+*Figura 4: inetutils telnet error*
+
+![less-make](../imagenes/LFS/sesion23/less-make.png)
+*Figura 5: less make*
+
+![less-make-check](../imagenes/LFS/sesion23/less-make-check.png)
+*Figura 6: less make check*
+
+![less-make-install](../imagenes/LFS/sesion23/less-make-install.png)
+*Figura 7: less make install*
+
+![perl-make](../imagenes/LFS/sesion23/perl-make.png)
+*Figura 8: perl make*
+
+![perl-make-check2](../imagenes/LFS/sesion23/perl-make-check2.png)
+*Figura 9: perl make check*
+
+![perl-make-check-error](../imagenes/LFS/sesion23/perl-make-check-error.png)
+*Figura 10: perl make check error*
+
+![perl-make-install](../imagenes/LFS/sesion23/perl-make-install.png)
+*Figura 11: perl make install*
+
+![xmlparser-make](../imagenes/LFS/sesion23/xmlparser-make.png)
+*Figura 12: xmlparser make*
+
+![xmlparser-make-test](../imagenes/LFS/sesion23/xmlparser-make-test.png)
+*Figura 13: xmlparser make test*
+
+![xmlparser-make-install](../imagenes/LFS/sesion23/xmlparser-make-install.png)
+*Figura 14: xmlparser make install*
+
+
+
+
