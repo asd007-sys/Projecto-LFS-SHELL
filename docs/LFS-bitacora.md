@@ -4311,5 +4311,142 @@ El make test de perl fallo a causa de usar múltiples núcleos, al usar solo 1, 
 *Figura 14: xmlparser make install*
 
 
+---
+
+
+# Sesión 24: 23 de Diciembre - Instalación de  Intltool,Autoconf,Automake
+
+## Objetivo: Instalar paquetes 
+
+## Tareas Realizadas
+
+(16:39 - 16:49) 
+- Intltool-0.51.0 
+
+(16:49 - 17:21 ) 
+- Autoconf-2.72   
+
+(17:21 - 12:15) 
+- Automake-1.18.1 
+
+  
+## Comandos principales ejecutados:
+
+#### Generalmente al make se le agregar time, y a make, make install se les agrega 2>&1 | tee -a “nombre-del.log”
+
+### Se empezó a agregar 2>&1,  para redirigir stderr a stdout y que escriba en los archivos creados por tee.
+
+### Se extrae con tar -xf nombre-paquete, y elimina el directorio al terminar con rm -rf nombre-paquete
+
+### Para ocupar menos espacio, se van a omitir los comandos repetidos. Se escriben primero los comandos compartidos por los paquetes, y después los comandos particulares separados por paquetes, se lamenta no haberlo hecho antes.
+
+### Comandos compartidos
+
+
+#Compilar
+
+make
+
+#Verificar la compilación
+
+make check
+
+#Instalar
+
+make install
+
+
+###  Intltool-0.51.0  
+
+#Arreglar warning causado por perl
+
+sed -i 's:\\\${:\\\$\\{:' intltool-update.in
+
+
+#Configuración de compilación
+
+./configure --prefix=/usr    
+
+#Instalar en /usr
+
+#Instalar documentacion
+
+install -v -Dm644 doc/I18N-HOWTO /usr/share/doc/intltool-0.51.0/I18N-HOWTO
+
+
+
+###  Autoconf-2.72    
+
+#Configuración de compilación
+
+./configure --prefix=/usr    
+
+#Instalar en /usr
+
+### Automake-1.18.1 
+
+#Configuración para compilar
+
+./configure --prefix=/usr --docdir=/usr/share/doc/automake-1.18.1
+
+#Instalar en /usr
+
+#Establecer directorio de documentación
+
+#Usar múltiples cores para realizar el make check
+
+make -j$(($(nproc)>4?$(nproc):4)) check
+
+
+
+## Resultados Obtenidos
+
+
+####  Intltool-0.51.0       - Instalado
+
+Herramienta que facilita la internacionalización
+
+#### Autoconf-2.72      - Instalado
+
+Genera scripts configure que detectan automáticamente las características del sistema antes de compilar un software.
+
+#### Automake-1.18.1   - Instalado
+
+Contiene programa para generar Makefiles para que Autoconf los pueda utilizar.
+
+
+
+
+
+## Evidencia
+
+
+![libltool-make](../imagenes/LFS/sesion24/libltool-make.png)
+*Figura 1:libltool-make*
+
+![libltool-make](../imagenes/LFS/sesion24/libltool-make-check.png)
+*Figura 2:libltool make check*
+
+![libltool-make](../imagenes/LFS/sesion24/libltool-make-install.png)
+*Figura 3: libltool make install*
+
+![autoconf-make](../imagenes/LFS/sesion24/autoconf-make.png)
+*Figura 4: autoconf make*
+
+![autoconf-make](../imagenes/LFS/sesion24/autoconf-make-check.png)
+*Figura 5:autoconf make check*
+
+![autoconf-make](../imagenes/LFS/sesion24/autoconf-make-install.png)
+*Figura 6: autoconf make install*
+
+![automake-make](../imagenes/LFS/sesion24/automake-make.png)
+*Figura 7: automake make*
+
+![automake-make](../imagenes/LFS/sesion24/automake-make-check.png)
+*Figura 8: automake make check*
+
+![automake-make](../imagenes/LFS/sesion24/automake-make-install.png)
+*Figura 9: automake make install*
+
 
 
