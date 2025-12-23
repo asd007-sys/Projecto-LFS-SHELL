@@ -733,3 +733,54 @@ Solución: Simplemente se creó el archivo asd.txt con el texto 1\n1\n1\nTermina
 
 ![prueba_cat](../imagenes/SHELL/sesion10/prueba_cat.png)
 *El output del script de prueba cat*
+
+
+
+---
+
+
+# Fecha: 23 de Diciembre del 2025
+# Objetivo del día: Crear la función echo
+
+## Tareas realizadas:
+
+(10:32 - 10:48)
+
+- Función que imprime argumentos recibidos
+- Manejo de error
+
+Pausa
+
+
+(11:21 -  11:35)
+- Scripts de pruebas
+
+
+## Comandos probados:
+
+
+echo           #Imprime una linea vacia,como el echo lo hace normalmente
+echo asd              #Imprime asd
+echo hola asd		#Imprime hola asd
+echo hola "asd   dasd" hola 		 #Imprime hola asd dasd hola
+exit	
+
+
+Deste terminal:
+
+python prueba_echo.py
+
+
+ #Se reutilizó el script de prueba anterior, ya que solo necesita ingresar comandos.
+
+
+
+![prueba_echo](../imagenes/SHELL/sesion11/prueba_echo.png)
+*El output del script de prueba echo*
+
+
+
+
+
+
+	

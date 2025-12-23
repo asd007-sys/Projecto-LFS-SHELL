@@ -106,16 +106,40 @@ def registrar_error(comando, args, tipo_error, mensaje_error):
             f.write(formateado)
     except Exception as e:  # Si falla el log, no interrumpir el shell
         pass
+"""
 
-    """
+    Función built-in echo
 
-        Función built-in cat
+         - Imprime los argumentos recibidos separados por un espacio
+         - Imprime linea vacia si no se ingresa argumentos, como lo hace echo normalmente
+         - Atrapa errores
 
-             - Abre archivo y lo imprime
-             - Maneja archivos grandes eficientemente
+
+"""
+
+def echo(args):
+    if not args:
+        print() #Imprimir linea vacia si no hay argumentos
+        return #Volver a menu principal
+
+    try:
+        #Si args no esta vacio
+        salida=" ".join(args)  #Agregar todos los argumentos separadados por espacio
+        print(salida) #imprimir el texto con los argumentos
+        return
+
+    except OSError: #Si salta algun error
+        print("Ha ocurrido un error")
+
+"""
+
+    Función built-in cat
+
+         - Abre archivo y lo imprime
+         - Maneja archivos grandes eficientemente
 
 
-    """
+"""
 
 
 def cat(args):
@@ -462,6 +486,10 @@ def main():
             if comando_principal == "exit":
                 print("¡Hasta luego!")
                 break
+
+            elif comando_principal == "echo":
+                echo(argumentos)
+
             elif comando_principal == "cat":
                 cat(argumentos)
 
