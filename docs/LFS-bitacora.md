@@ -4630,7 +4630,7 @@ En la instalación de libffi, se utilizó el argumento: --with-gcc-arch=native, 
 ![openssl-maketest-final](../imagenes/LFS/sesion25/openssl-maketest-final.png)
 *Figura 6: openssl-maketest-final*
 
-![openssl-make-install](../imagenes/LFS/sesion254/openssl-make-install.png)
+![openssl-make-install](../imagenes/LFS/sesion25/openssl-make-install.png)
 *Figura 7: openssl-make-install*
 
 ![libelf-make](../imagenes/LFS/sesion25/libelf-make.png)
