@@ -4450,3 +4450,203 @@ Contiene programa para generar Makefiles para que Autoconf los pueda utilizar.
 
 
 
+---
+
+
+# Sesión 25: 24 de Diciembre - Instalación de  OpenSSL,Libelff,Libffi
+
+## Objetivo: Instalar paquetes 
+
+## Tareas Realizadas
+
+(10:55 - 13:07 ) 
+- OpenSSL-3.5.2 
+
+(13:07 - 13:39 ) 
+- Libelf  
+
+(13:39  - 14:14) 
+- Libffi-3.5.2  
+
+  
+## Comandos principales ejecutados:
+
+#### Generalmente al make se le agregar time, y a make, make install se les agrega 2>&1 | tee -a “nombre-del.log”
+
+### Se empezó a agregar 2>&1,  para redirigir stderr a stdout y que escriba en los archivos creados por tee.
+
+### Se extrae con tar -xf nombre-paquete, y elimina el directorio al terminar con rm -rf nombre-paquete
+
+### Para ocupar menos espacio, se van a omitir los comandos repetidos. Se escriben primero los comandos compartidos por los paquetes, y después los comandos particulares separados por paquetes, se lamenta no haberlo hecho antes.
+
+### Comandos compartidos
+
+
+#Compilar
+
+make
+
+#Verificar la compilación
+
+make check
+
+#Instalar
+
+make install
+
+
+### OpenSSL-3.5.2 
+
+
+
+
+#Configuración de compilación
+
+./configure --prefix=/usr
+…..
+
+
+#Instalar en /usr
+
+#Archivos de configuracion en /etc/ssl
+
+#Verifica que la compilación corra correctamente
+
+#Establecer directorio de librerias en /usr/lib
+
+#Compilar librerias compartidas
+
+HARNESS_JOBS=$(nproc) make test
+
+
+#Instalar 
+
+sed -i '/INSTALL_LIBS/s/libcrypto.a libssl.a//' Makefile
+
+make MANSUFFIX=ssl install
+
+#Documentación
+
+mv -v /usr/share/doc/openssl /usr/share/doc/openssl-3.5.2
+
+cp -vfr doc/* /usr/share/doc/openssl-3.5.2
+
+
+
+###  Libelf    
+
+#Configuración de compilación
+
+./configure --prefix=/usr    
+…..
+
+#Instalar en /usr
+
+#Deshabilitar debuginfod
+
+#Habilitar función dummy de debuginfod, algunas herramientas esperan que exista, funciones vacías
+
+#Instalar solo libelf
+
+make -C libelf install
+install -vm644 config/libelf.pc /usr/lib/pkgconfig
+rm /usr/lib/libelf.a
+
+#Instalar en /usr
+
+### Libffi-3.5.2
+
+#Configuración para compilar
+
+./configure --prefix=/usr    
+……
+
+#Instalar en /usr
+
+#Deshabilitar librerías estáticas
+
+#Establecer directorio de documentación
+
+#Optimizar para computadora actual
+
+### Problemas Encontrados
+
+Problema: El test de openssl dio un error en 90_test_asn_time.t. 
+
+Solución Incorrecta: Se asumió, como en una sesión previa, un test verifica el funcionamiento por tiempo, entonces al usar múltiples núcleos, fallaba el timing del test, sin embargo, al cambiar el número de procesadores a 1, volvió a pasar el mismo error.
+
+2nds Solución incorrecta: Después de investigar, con ayuda de inteligencia artificial, este error se debe a que la hora y fecha del sistema estaban mal configuradas, efectivamente, después de manualmente configurar la hora con el comando date -s , se volvió a correr las pruebas, y resultando en solo passes y xfails.
+
+Solución correcta: Con ayuda de la inteligencia artificial, el problema es, que se configuró con la zona horaria de Asunción, el problema potencialmente puede ser que se removió el cambio de horario de Asunción (de Paraguay para ser más específicos). Entonces al parecer, devolvía una hora más de lo esperado causando este error, como el error no es crítico , se volvió a comenzar porque se borraron muchas variables de entorno y alteraron muchos archivos sin saber si va a afectar en el futuro. En síntesis, se puede ignorar el fallo, sabiendo por qué este falla.
+El proceso fue remover /etc/localtime, que tenía la zona horaria de Asunción configurada, y hacer el symbolic link ln -sf /usr/share/zoneinfo/UTC /etc/localtime, para que se ejecute el UTC -0, sin offset alguno, haciendo esto y corriendo el test de nuevo, funciono. 
+
+Problema: El make check de libelf solo corre 1 test que es uno de los que el manual espera que falle dwarf_srclang_check, se quiere confirmar de que funciona o instalo correctamente
+
+Solución: Con ayuda de inteligencia artificial,después de instalar, se ejecutó el comando pkg-config –modversion libelf, y dio 0.193,confirmando instalación. Al buscar los symbolic links en /usr/lib/libelf.so*, estos fueron encontrados (libelf.so, libelf.so.1).
+También se creó un pequeño script que incluye la librería libelf con inteligencia artificial para probar que libelf funcione.
+
+## Resultados Obtenidos
+
+
+####  OpenSSL-3.5.2     - Instalado
+
+Contiene un conjunto completo de herramientas criptográficas para comunicaciones seguras.
+
+####  Libelf     - Instalado
+
+Librería para gestionamiento de archivos .elf
+
+#### Libffi-3.5.2  - Instalado
+
+Librería que sirve para llamar a funciones entre diferentes lenguajes de programación
+
+### Reflexiones Técnicas
+
+El problema en el test fallado del make check del openssl, se debe a que, el sistema estaba configurado para la zona horaria de Asunción en /etc/localtime, al cambiar este a UTC -0, la prueba 90_test_asn_time.t no dio mas error, esto junto al hecho que la zona horaria de Asunción devuelve 1 hora mas de lo esperado, hace concluir que, la zona horaria de Asunción en linux, instalada en el capítulo 8.5 Glibc, esta errónea con el horario de Verano cambiado en el 2021.
+En la instalación de libelf, este solo se instala la librería para manejar archivos de tipo .elf.
+En la instalación de libffi, se utilizó el argumento: --with-gcc-arch=native, porque esta misma computadora es la que va a correr el LFS.
+
+
+
+
+## Evidencia
+
+
+![openssl-make](../imagenes/LFS/sesion25/openssl-make.png)
+*Figura 1: openssl-make*
+
+![openssl-maketest1](../imagenes/LFS/sesion25/openssl-maketest1.png)
+*Figura 2: openssl-maketest1*
+
+![openssl-maketest2](../imagenes/LFS/sesion25/openssl-maketest2.png)
+*Figura 3: openssl-maketest2*
+
+![openssl-maketest3](../imagenes/LFS/sesion25/openssl-maketest3.png)
+*Figura 4: openssl-maketest3*
+
+![openssl-make-final](../imagenes/LFS/sesion25/openssl-make-final.png)
+*Figura 5: openssl-make-final*
+
+![openssl-maketest-final](../imagenes/LFS/sesion25/openssl-maketest-final.png)
+*Figura 6: openssl-maketest-final*
+
+![openssl-make-install](../imagenes/LFS/sesion254/openssl-make-install.png)
+*Figura 7: openssl-make-install*
+
+![libelf-make](../imagenes/LFS/sesion25/libelf-make.png)
+*Figura 8: libelf-make*
+
+![libelf-install](../imagenes/LFS/sesion25/libelf-install.png)
+*Figura 9: libelf-install*
+
+![libelf-test-programaia](../imagenes/LFS/sesion25/libelf-test-programaia.png)
+*Figura 10: libelf-test-programaia*
+
+![libffi-make](../imagenes/LFS/sesion25/libffi-make.png)
+*Figura 11: libffi-make*
+
+![libffi-make-check](../imagenes/LFS/sesion25/libffi-make-check.png)
+*Figura 12: libffi-make-check*
+
+![libffi-make-install](../imagenes/LFS/sesion25/libffi-make-install.png)
+*Figura 13: libffi-make-install*
