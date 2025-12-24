@@ -4636,6 +4636,9 @@ En la instalación de libffi, se utilizó el argumento: --with-gcc-arch=native, 
 ![libelf-make](../imagenes/LFS/sesion25/libelf-make.png)
 *Figura 8: libelf-make*
 
+![libelf-make-check](../imagenes/LFS/sesion25/libelf-make-check.png)
+*Figura 8.5: libelf-make-check*
+
 ![libelf-install](../imagenes/LFS/sesion25/libelf-install.png)
 *Figura 9: libelf-install*
 
