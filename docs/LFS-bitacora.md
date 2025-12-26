@@ -4653,3 +4653,191 @@ En la instalación de libffi, se utilizó el argumento: --with-gcc-arch=native, 
 
 ![libffi-make-install](../imagenes/LFS/sesion25/libffi-make-install.png)
 *Figura 13: libffi-make-install*
+
+
+---
+
+# Sesión 26: 26 de Diciembre - Instalación de  Python,Flit-core,Packaging,Wheel
+
+## Objetivo: Instalar paquetes 
+
+## Tareas Realizadas
+
+(08:50 -09:42 ) 
+- Python-3.13.7 
+
+(09:42 - 09:48) 
+-  Flit-Core-3.12.0  
+
+(09:48 - 09:53) 
+- Packaging-25.0  
+
+(09:53 - 09:57) 
+- Wheel-0.46.1
+ 
+
+  
+## Comandos principales ejecutados:
+
+#### Generalmente al make se le agregar time, y a make, make install se les agrega 2>&1 | tee -a “nombre-del.log”
+
+### Se empezó a agregar 2>&1,  para redirigir stderr a stdout y que escriba en los archivos creados por tee.
+
+### Se extrae con tar -xf nombre-paquete, y elimina el directorio al terminar con rm -rf nombre-paquete
+
+### Para ocupar menos espacio, se van a omitir los comandos repetidos. Se escriben primero los comandos compartidos por los paquetes, y después los comandos particulares separados por paquetes, se lamenta no haberlo hecho antes.
+
+### Comandos compartidos
+
+
+#Construir
+
+pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps $PWD
+
+
+#Crear en directorio dist
+
+#Prevenir que pip copie al directorio cache
+
+#Prevenir que pip busque en el repositorio online
+
+
+### Python-3.13.7 
+
+
+#Configuración de compilación
+
+./configure --prefix=/usr     \
+            --enable-shared   \
+…..
+
+
+#Instalar en /usr
+
+#Habilitar librerías compartidas
+
+#Habilitar optimizaciones, tarda un poco más en terminar.
+
+#Linkear con la versión de Expat del sistema
+
+#Compilar
+
+make
+
+
+#Testear la compilación, tiempo máximo de 2 minutos por test
+
+make test TESTOPTS="--timeout 120"
+
+#Instalar
+
+make install
+
+
+#Deshabilitar Warnings 
+
+cat > /etc/pip.conf << EOF
+[global]
+root-user-action = ignore
+disable-pip-version-check = true
+EOF
+
+#Instalar documentación
+
+install -v -dm755 /usr/share/doc/python-3.13.7/html
+
+tar --strip-components=1  \
+…….
+
+
+###  Flit-Core-3.12.0
+
+
+
+#Instalar
+
+pip3 install --no-index --find-links dist flit_core
+
+
+#Indica a pip a buscar en el directorio dist los archivos de wheel
+
+
+### Packaging-25.0
+
+
+#Instalar
+
+pip3 install --no-index --find-links dist packaging
+
+#Indica a pip a buscar en el directorio dist los archivos de wheel
+
+
+### Wheel-0.46.1 
+
+
+#Instalar
+
+pip3 install --no-index --find-links dist wheel
+
+#Indica a pip a buscar en el directorio dist los archivos de wheel
+
+
+### Problemas Encontrados
+
+Problema:Al crear el archivo /etc/pip.conf, el EOF no terminaba el archivo
+
+Solución: Sin intención alguna, se le agrego un espacio al la línea del EOF, esto no permitía terminar el archivo,se volvió a ingresar todo el comando exitosamente al no poner espacio en el EOF
+
+Problema: Al compilar Python, fallo _tkinter 
+
+Solucion: En el manual, explícitamente dice “you must have installed Tk before Python, so that the Tkinter Python module is built.”. Por lo tanto, podemos obviar esto, ya que si el manual no nos dijo instalar anteriormente, no es una dependencia crítica
+
+## Resultados Obtenidos
+
+
+####  Python-3.13.7     - Instalado
+
+Lenguaje de programación. Útil para escribir scripts, programas, etc.
+
+####  Flit-Core-3.12.0       - Instalado
+
+Flit es una herramienta para crear y distribuir paquetes de python
+
+#### Packaging-25.0  - Instalado
+
+Es un paquete que provee herramientas para manejar versiones, dependencias y otros metadatos de paquetes python.
+
+#### Wheel-0.46.1 - Instalado
+
+Wheel es el formato estándar de distribución binaria para paquetes python
+
+### Reflexiones Técnicas
+
+Al instalar los paquetes de python, no se utiliza pip para descargar los paquetes del repositorio online porque esto va en contra de la filosofía de LFS, que busca consistencia. Al conseguirlos por Internet, pueden descargarse versiones diferentes, creando diferencias entre builds.
+Se utiliza pip, pero sin acceso a la red. Entonces, se utiliza junto a pip Wheel. Wheel es un formato de archivo de paquetes que se utiliza para instalar software. Se toma el código fuente del paquete a instalar y, con pip, se genera un archivo wheel local. Después, pip instala el paquete a partir de ese archivo wheel.
+Algo que llamó la atención es que wheel se instala después de Flit-core y Packaging, los cuales utilizan el comando wheel, al investigar con inteligencia artificial,se descubrió que el pip incluido con python tiene soporte suficiente para construir y usar archivos wheel a partir del código fuente. 
+En el paquete de python al hacer el test fallaron 10 tests que después pasaron. Acorde al manual, esto se considera un éxito así que se asume como tal.
+
+## Evidencia
+
+
+![Flit-core-install](../imagenes/LFS/sesion26/Flit-core-install.png)
+*Figura 2: Flit-core-install*
+
+![Flit-core-make](../imagenes/LFS/sesion26/Flit-core-make.png)
+*Figura 3: Flit-core-make*
+
+![packaging-contruir-e-instalar](../imagenes/LFS/sesion26/packaging-contruir-e-instalar.png)
+*Figura 4: packaging-contruir-e-instalar*
+
+![Python-make](../imagenes/LFS/sesion26/Python-make.png)
+*Figura 5: Python-make*
+
+![Python-make-install](../imagenes/LFS/sesion26/Python-make-install.png)
+*Figura 6: Python-make-install*
+
+![Python-make-test](../imagenes/LFS/sesion26/Python-make-test.png)
+*Figura 7: Python-make-test*
+
+![wheel-contruir-e-instalar](../imagenes/LFS/sesion26/wheel-contruir-e-instalar.png)
+*Figura 8: wheel-contruir-e-instalar*
