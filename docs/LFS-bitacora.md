@@ -4839,5 +4839,5 @@ En el paquete de python al hacer el test fallaron 10 tests que después pasaron.
 ![Python-make-test](../imagenes/LFS/sesion26/Python-make-test.png)
 *Figura 7: Python-make-test*
 
-![wheel-contruir-e-instalar](../imagenes/LFS/sesion26/wheel-contruir-e-instalar.png)
+![wheel-contruir-e-instalar](../imagenes/LFS/sesion26/wheel-construir-e-instalar.png)
 *Figura 8: wheel-contruir-e-instalar*
