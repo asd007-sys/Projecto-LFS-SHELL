@@ -26,12 +26,17 @@ def iniciar_logs():
 
     try:
 
-        if not os.path.exists(Logger_Direccion):  # Si no existe el diretorio
-            os.makedirs(
-                Logger_Direccion)  # Crearlo,funcion que crea todos los directorios necesarios, a diferencia de mkdir que solo crea 1 a la vez
+        if not os.path.exists("/var"):  # Si no existe el diretorio /var, seria peculiar en linux,pero para prevenir problemas
+            os.mkdir("/var") # Se crea el directorio /var
+
+        if not os.path.exists("/var/log"):  # Si no existe el diretorio /var/log, crearlo
+            os.mkdir("/var/log") # Se crea el directorio /var/log
+
+        if not os.path.exists(Logger_Direccion):  # Si no existe el diretorio final, crearlo
+            os.mkdir(Logger_Direccion) # Se crea el directorio /var/log/shell
 
         with open(Logger_Acciones, "a") as f:  # Verificar tener permiso suficiente para poder escribir
-            pass
+            pass    #Si se tiene suficientes permisos , seguir
 
     except PermissionError:  # Si el usuario no tiene los privilegios necesarios
 
@@ -42,8 +47,12 @@ def iniciar_logs():
         Logger_Acciones = os.path.join(Logger_Direccion, "shell.log")  # Direccion del archivo logger de acciones
         Logger_Errores = os.path.join(Logger_Direccion, "sistema_error.log")  # Direccion del archivo logger de errores
 
-        if not os.path.exists(Logger_Direccion):  # Si el directorio logs no existe en el directorio actual
-            os.makedirs(Logger_Direccion)  # Crear directorio logs
+        if not os.path.exists(f"/home/{os.getenv('USER')}/log/"):  # Si el directorio log no existe en el home del usuario
+            os.mkdir(f"/home/{os.getenv('USER')}/log/") # Crear directorio
+
+        if not os.path.exists(Logger_Direccion):  # Si el directorio shell no existe en el directorio log previo
+            os.mkdir(Logger_Direccion) # Crear directorio
+
 
 
 def registrar_accion(comando, args, exito, mensaje):  # Recibe el comando y lo registra

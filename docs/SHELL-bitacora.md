@@ -780,7 +780,38 @@ python prueba_echo.py
 
 
 
+---
 
+
+# Fecha: 26 de Diciembre del 2025
+# Objetivo del día: Corregir uso de makedirs() en iniciar_logs
+
+## Motivo
+Se utilizó la función os.makedirs() en la función iniciar_logs() por pura conveniencia, ya que este crea todos los directorios padres necesarios, sin embargo, esto vendría a ser una función de alto nivel y para no potencialmente usar una función prohibida, se decidió cambiar por os.mkdir()
+
+## Tareas realizadas:
+
+(15:47 - 16:11)
+
+- iniciar_logs() utiliza os.mkdir() en vez de os.makedirs()
+
+## Comandos utilizados
+
+#Borrar previos logs y directorio para confirmar el funcionamiento correcto
+
+rm -rf /var/log
+rm -rf /home/asd/log
+
+#python shell.py
+
+Correr el shell
+
+
+## Problema encontrados:
+
+Problema: No se sabía cómo implementar de una manera sencilla, sin implementar muchos condicionales uno adentro de otro.
+
+Solución: Como los directorios padres necesitan existir primero, en vez de hacer un else para cada caso de if not os.path.exists(directorio_a_checkear), se verifica si existe padre de mayor precedencia,si no, se crea con el if not, y después se sigue el linaje hacia abajo, pero con condicionales al mismo nivel, y no condicionales adentro de otros condicionales, 
 
 
 	
