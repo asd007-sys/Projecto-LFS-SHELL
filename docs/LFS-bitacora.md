@@ -4841,3 +4841,155 @@ En el paquete de python al hacer el test fallaron 10 tests que después pasaron.
 
 ![wheel-contruir-e-instalar](../imagenes/LFS/sesion26/wheel-construir-e-instalar.png)
 *Figura 8: wheel-contruir-e-instalar*
+
+
+---
+
+
+# Sesión 27: 27 de Diciembre - Instalación de Setuptool,Ninja,Meson,Kmod
+
+## Objetivo: Instalar paquetes 
+
+## Tareas Realizadas
+
+(11:46 -11:51 ) 
+- Setuptools-80.9.0  
+
+(11:51 - 12:03 ) 
+-  Ninja-1.13.1 
+
+(12:03 - 12:10) 
+- Meson-1.8.3 
+
+(12:10 -12:25 ) 
+- Kmod-34.2 
+ 
+
+  
+## Comandos principales ejecutados:
+
+
+### Se extrae con tar -xf nombre-paquete, y elimina el directorio al terminar con rm -rf nombre-paquete
+
+### Para ocupar menos espacio, se van a omitir los comandos repetidos. Se escriben primero los comandos compartidos por los paquetes, y después los comandos particulares separados por paquetes, se lamenta no haberlo hecho antes.
+
+### Comandos compartidos
+
+
+#Construir
+
+pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps $PWD
+
+
+#Crear en directorio dist
+
+#Prevenir que pip copie al directorio cache
+
+#Prevenir que pip busque en el repositorio online
+
+
+### Setuptools-80.9.0  
+
+#Instalar
+
+pip3 install --no-index --find-links dist setuptools
+
+
+###   Ninja-1.13.1 
+
+#Utilizar solo 4 nucleos del cpu
+
+export NINJAJOBS=4
+
+#Commando para utilizar la variable de entorno NINJAJOBS al construir
+
+sed -i '/int Guess/a \
+  int   j = 0;\
+….
+
+#Construir
+
+python3 configure.py --bootstrap --verbose
+
+
+#Instalar
+
+
+###  Meson-1.8.3 
+
+
+#Instalar
+
+pip3 install --no-index --find-links dist meson
+
+install -vDm644 data/shell-completions/bash/meson /usr/share/bash-completion/completions/meson
+
+install -vDm644 data/shell-completions/zsh/_meson /usr/share/zsh/site-functions/_meson
+
+
+###  Kmod-34.2 
+
+#Crear directorio para construir
+
+mkdir -p build
+cd       build
+
+#Configuraciones de compilación
+
+meson setup --prefix=/usr ..    \
+            --buildtype=release \
+            -D manpages=false
+
+#Compilar
+
+ninja
+
+#Instalar
+
+ninja install
+
+
+## Resultados Obtenidos
+
+
+####  Setuptools-80.9.0  - Instalado
+
+
+Herramienta utilizada para descargar,construir,actualizar e instalar paquetes de Python.
+
+####  Ninja-1.13.1  - Instalado
+
+Sistema de construcción ligero, se especializa en velocidad.
+
+#### Meson-1.8.3   - Instalado
+Sistema de construcción moderno y de alto nivel
+
+#### Kmod-34.2  - Instalado
+
+Conjunto de herramientas para gestionar módulos del kernel de Linux
+
+### Reflexiones Técnicas
+
+El paquete ninja no puede ejecutar su test suite en el entorno de chroot, sin embargo, el manual dice que al construir con el argumento –bootstrap ya estamos probando su funcionalidad, así que una construcción sin errores nos avisa que está funcionando correctamente también. Esto mismo pasa con el paquete Kmod, pero, en este si no se prueba , porque necesita los headers del kernel “crudo”, no los limpios que tiene chroot, y hasta el manual explica que esto va mas que lo que LFS requiere.
+
+## Evidencia
+
+
+![setuptools-build-install](../imagenes/LFS/sesion27/setuptools-build-install.png)
+*Figura 1: setuptools-build-install*
+
+
+![ninja-build](../imagenes/LFS/sesion27/ninja-build.png)
+*Figura 2: ninja-build*
+
+
+![ninja-install](../imagenes/LFS/sesion27/ninja-install.png)
+*Figura 3: ninja-installl*
+
+
+![meson-build-installl](../imagenes/LFS/sesion27/meson-build-install.png)
+*Figura 4: meson-build-install*
+
+
+![kmod-compilar-install](../imagenes/LFS/sesion27/kmod-compilar-install.png)
+*Figura 5: kmod-compilar-install*
