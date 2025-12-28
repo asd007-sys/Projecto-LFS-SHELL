@@ -4993,3 +4993,142 @@ El paquete ninja no puede ejecutar su test suite en el entorno de chroot, sin em
 
 ![kmod-compilar-install](../imagenes/LFS/sesion27/kmod-compilar-install.png)
 *Figura 5: kmod-compilar-install*
+
+
+---
+
+
+# Sesión 28: 28 de Diciembre - Instalación de  Coreutils,Diffutils
+
+## Objetivo: Instalar paquetes 
+
+## Tareas Realizadas
+
+(12:34 - 13:14 ) 
+- Coreutils-9.7 
+
+(13:14 -) 
+-   Diffutils-3.12  
+
+
+  
+## Comandos principales ejecutados:
+
+#### Generalmente al make se le agregar time, y a make, make install se les agrega 2>&1 | tee -a “nombre-del.log”
+
+### Se empezó a agregar 2>&1,  para redirigir stderr a stdout y que escriba en los archivos creados por tee.
+
+### Se extrae con tar -xf nombre-paquete, y elimina el directorio al terminar con rm -rf nombre-paquete
+
+### Para ocupar menos espacio, se van a omitir los comandos repetidos. Se escriben primero los comandos compartidos por los paquetes, y después los comandos particulares separados por paquetes, se lamenta no haberlo hecho antes.
+
+### Comandos compartidos
+
+
+#Compilar
+
+make
+
+#Instalar
+
+make install
+
+
+###  Coreutils-9.7 
+
+#Parchear problema de seguridad
+
+patch -Np1 -i ../coreutils-9.7-upstream_fix-1.patch
+
+#Parchear bugs de internalización
+
+patch -Np1 -i ../coreutils-9.7-i18n-1.patch
+
+
+#Configuración de compilación
+
+autoreconf -fv
+automake -af
+FORCE_UNSAFE_CONFIGURE=1 ./configure \
+            --prefix=/usr            \
+            --enable-no-install-program=kill,uptime
+
+#Correr tests como root
+
+make NON_ROOT_USERNAME=tester check-root
+
+#Crear usuario tester
+
+groupadd -g 102 dummy -U tester
+
+#Permisos para tester
+
+chown -R tester .
+
+#Correr el resto de los tests como tester, no root
+
+su tester -c "PATH=$PATH make -k RUN_EXPENSIVE_TESTS=yes check" \
+   < /dev/null
+groupdel dummy
+
+
+#Cambia de directorio a archivos,para cumplir el orden de FHS
+
+mv -v /usr/bin/chroot /usr/sbin
+mv -v /usr/share/man/man1/chroot.1 /usr/share/man/man8/chroot.8
+sed -i 's/"1"/"8"/' /usr/share/man/man8/chroot.8
+
+
+
+###  Diffutils-3.12 
+
+#Configuración de compilación
+
+./configure --prefix=/usr
+
+#Verificar compilación
+
+make check
+
+
+# Reflexiones Técnicas
+
+En el paquete de coreutils, se ejecuta el test suite tanto como root como usuario tester,ya que algunos tests requieren distintos niveles de privilegios. El usuario,por ejemplo, tester necesita ser parte de más de un grupo para que ciertos test no se salten o fallen.
+En diffutils, las pruebas verifican el correcto funcionamiento de las herramientas de comparación de archivos.
+
+## Resultados Obtenidos
+
+
+####  Coreutils-9.7 - Instalado
+
+Contiene utilidades básicas necesarias para todos los sistemas operativos
+
+####  Diffutils-3.12   - Instalado
+
+Contiene programas que muestran diferencias entre archivos y directorios
+
+
+
+## Evidencia
+
+
+![coreutils-make](../imagenes/LFS/sesion26/coreutils-make.png)
+*Figura 1: coreutils-make*
+
+![coreutils-test-root](../imagenes/LFS/sesion26/coreutils-test-root.png)
+*Figura 2: coreutils-test-root*
+
+![coreutils-tests-tester](../imagenes/LFS/sesion26/coreutils-tests-tester.png)
+*Figura 3: coreutils-tests-tester*
+
+![coreutils-make-install](../imagenes/LFS/sesion26/coreutils-make-install.png)
+*Figura 4: coreutils-make-install*
+
+![diffutils-make](../imagenes/LFS/sesion26/diffutils-make.png)
+*Figura 5: diffutils-make*
+
+![diffutils-make-check](../imagenes/LFS/sesion26/diffutils-make-check.png)
+*Figura 6: diffutils-make-check*
+
+![diffutils-make-install](../imagenes/LFS/sesion26/diffutils-make-install.png)
+*Figura 7: diffutils-make-install*
