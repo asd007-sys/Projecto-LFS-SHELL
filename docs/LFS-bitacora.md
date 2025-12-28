@@ -5007,7 +5007,7 @@ El paquete ninja no puede ejecutar su test suite en el entorno de chroot, sin em
 (12:34 - 13:14 ) 
 - Coreutils-9.7 
 
-(13:14 -) 
+(13:14 - 13:24) 
 -   Diffutils-3.12  
 
 
