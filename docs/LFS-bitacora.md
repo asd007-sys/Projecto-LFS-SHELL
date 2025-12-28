@@ -5112,23 +5112,23 @@ Contiene programas que muestran diferencias entre archivos y directorios
 ## Evidencia
 
 
-![coreutils-make](../imagenes/LFS/sesion26/coreutils-make.png)
+![coreutils-make](../imagenes/LFS/sesion28/coreutils-make.png)
 *Figura 1: coreutils-make*
 
-![coreutils-test-root](../imagenes/LFS/sesion26/coreutils-test-root.png)
+![coreutils-test-root](../imagenes/LFS/sesion28/coreutils-test-root.png)
 *Figura 2: coreutils-test-root*
 
-![coreutils-tests-tester](../imagenes/LFS/sesion26/coreutils-tests-tester.png)
+![coreutils-tests-tester](../imagenes/LFS/sesion28/coreutils-tests-tester.png)
 *Figura 3: coreutils-tests-tester*
 
-![coreutils-make-install](../imagenes/LFS/sesion26/coreutils-make-install.png)
+![coreutils-make-install](../imagenes/LFS/sesion28/coreutils-make-install.png)
 *Figura 4: coreutils-make-install*
 
-![diffutils-make](../imagenes/LFS/sesion26/diffutils-make.png)
+![diffutils-make](../imagenes/LFS/sesion28/diffutils-make.png)
 *Figura 5: diffutils-make*
 
-![diffutils-make-check](../imagenes/LFS/sesion26/diffutils-make-check.png)
+![diffutils-make-check](../imagenes/LFS/sesion28/diffutils-make-check.png)
 *Figura 6: diffutils-make-check*
 
-![diffutils-make-install](../imagenes/LFS/sesion26/diffutils-make-install.png)
+![diffutils-make-install](../imagenes/LFS/sesion28/diffutils-make-install.png)
 *Figura 7: diffutils-make-install*
