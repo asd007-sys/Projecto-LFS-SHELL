@@ -5132,3 +5132,149 @@ Contiene programas que muestran diferencias entre archivos y directorios
 
 ![diffutils-make-install](../imagenes/LFS/sesion28/diffutils-make-install.png)
 *Figura 7: diffutils-make-install*
+
+
+
+---
+
+
+# Sesión 29: 29 de Diciembre - Instalación de Gawk, Findutils, Groff
+
+## Objetivo: Instalar paquetes 
+
+## Tareas Realizadas
+
+(13:18 - 13:34 ) 
+- Gawk-5.3.2 
+
+(13:34 - 13:50 ) 
+- Findutils-4.10.0 
+
+(13:50 - 13:59) 
+- Groff-1.23.0  
+
+
+
+  
+## Comandos principales ejecutados:
+
+#### Generalmente al make se le agregar time, y a make, make install se les agrega 2>&1 | tee -a “nombre-del.log”
+
+### Se empezó a agregar 2>&1,  para redirigir stderr a stdout y que escriba en los archivos creados por tee.
+
+### Se extrae con tar -xf nombre-paquete, y elimina el directorio al terminar con rm -rf nombre-paquete
+
+### Para ocupar menos espacio, se van a omitir los comandos repetidos. Se escriben primero los comandos compartidos por los paquetes, y después los comandos particulares separados por paquetes, se lamenta no haberlo hecho antes.
+
+### Comandos compartidos
+
+
+#Compilar
+
+make
+
+#Dar privilegios necesarios al usuario tester, y ejecutar el make check con este mismo usuario
+
+chown -R tester .
+su tester -c "PATH=$PATH make check"
+
+
+#Instalar
+
+make install
+
+
+###  Gawk-5.3.2 
+
+#Comando para asegurarse que no se instalen archivos innecesarios
+
+sed -i 's/extras//' Makefile.in
+
+
+#Configuración de compilación
+
+./configure --prefix=/usr
+
+#Instalar
+
+rm -f /usr/bin/gawk-5.3.2
+make install
+
+#Symbolic link para en manpage
+
+ln -sv gawk.1 /usr/share/man/man1/awk.1
+
+#Instalar documentación
+
+ln -sv gawk.1 /usr/share/man/man1/awk.1
+
+
+
+###  Findutils-4.10.0 
+
+#Configuración de compilación
+
+./configure --prefix=/usr --localstatedir=/var/lib/locate
+
+#Instalar base de datos en /var/lib/locate
+
+###  Groff-1.23.0 
+
+#Configuración para compilar,groff necesita un tamaño de página específico, se eligió A4
+
+PAGE=A4 ./configure --prefix=/usr
+
+
+
+
+## Reflexiones Técnicas
+
+En gawk la eliminación previa del link gawk-5.3.2 asegura que el binario final reemplace correctamente la que se instaló en el capítulo 6.Ejecutar el test suite como el usuario tester permite detectar problemas de permisos o dependencias ocultas.
+En findutils, se reubica la base de datos de locate en /var/lib/locate para cumplir con el estándar FHS.
+En groff, al configurar explícitamente el tamaño de papel PAGE,se asegura consistencia en documentos, como pdfs.
+
+## Resultados Obtenidos
+
+
+####  Gawk-5.3.2  - Instalado
+
+Es un lenguaje de programación especializado para procesar y analizar texto. Busca patrones en los datos y ejecuta acciones cuando los encuentra.
+
+####  Findutils-4.10.0   - Instalado
+
+Es un paquete de utilidades de búsqueda, sirve para encontrar archivos y directorios en el sistema de archivos.
+
+####  Groff-1.23.0   - Instalado
+
+Contiene programas para procesar y dar formato a textos e imágenes.
+
+## Evidencia
+
+![findutils-make](../imagenes/LFS/sesion29/findutils-make.png)
+*Figura 1: findutils-make*
+
+![findutils-make-check](../imagenes/LFS/sesion29/findutils-make-check.png)
+*Figura 2: findutils-make-check*
+
+![findutils-make-install](../imagenes/LFS/sesion29/findutils-make-install.png)
+*Figura 3: findutils-make-install*
+
+![gawk-make](../imagenes/LFS/sesion29/gawk-make.png)
+*Figura 4: gawk-make*
+
+![gawk-make-install](../imagenes/LFS/sesion29/gawk-make-install.png)
+*Figura 5: gawk-make-install*
+
+![gawk-make-test](../imagenes/LFS/sesion29/gawk-make-test.png)
+*Figura 6: gawk-make-test*
+
+![groff-make](../imagenes/LFS/sesion29/groff-make.png)
+*Figura 7: groff-make*
+
+![groff-make-check](../imagenes/LFS/sesion29/groff-make-check.png)
+*Figura 8: groff-make-check*
+
+![groff-make-install](../imagenes/LFS/sesion29/groff-make-install.png)
+*Figura 9: groff-make-install*
+
+
