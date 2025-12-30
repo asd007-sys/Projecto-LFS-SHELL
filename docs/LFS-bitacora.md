@@ -5442,36 +5442,36 @@ Contiene herramientas para manejar el teclado y consola en Linux
 
 ## Evidencia
 
-![grub-make-error](../imagenes/LFS/sesion29/grub-make-error.png)
+![grub-make-error](../imagenes/LFS/sesion30/grub-make-error.png)
 *Figura 1: grub-make-error*
 
-![grub-make](../imagenes/LFS/sesion29/grub-make.png)
+![grub-make](../imagenes/LFS/sesion30/grub-make.png)
 *Figura 2: grub-make*
 
-![gzip-make](../imagenes/LFS/sesion29/gzip-make.png)
+![gzip-make](../imagenes/LFS/sesion30/gzip-make.png)
 *Figura 3: gzip-make*
 
-![grub-make-install](../imagenes/LFS/sesion29/grub-make-install.png)
+![grub-make-install](../imagenes/LFS/sesion30/grub-make-install.png)
 *Figura 4: grub-make-install*
 
-![gzip-make-check](../imagenes/LFS/sesion29/gzip-make-check.png)
+![gzip-make-check](../imagenes/LFS/sesion30/gzip-make-check.png)
 *Figura 5: gzip-make-check*
 
-![gzip-make-install](../imagenes/LFS/sesion29/gzip-make-install.png)
+![gzip-make-install](../imagenes/LFS/sesion30/gzip-make-install.png)
 *Figura 6: gzip-make-install*
 
-![iproute-make](../imagenes/LFS/sesion29/iproute-make.png)
+![iproute-make](../imagenes/LFS/sesion30/iproute-make.png)
 *Figura 7: iproute-make*
 
-![iproute-make-install](../imagenes/LFS/sesion29/iproute-make-install.png)
+![iproute-make-install](../imagenes/LFS/sesion30/iproute-make-install.png)
 *Figura 8: iproute-make-install*
 
-![kbd-make-error](../imagenes/LFS/sesion29/kbd-make-error.png)
+![kbd-make-error](../imagenes/LFS/sesion30/kbd-make-error.png)
 *Figura 9: kbd-make-error*
 
-![kbd-make-exitoso](../imagenes/LFS/sesion29/kbd-make-exitoso.png)
+![kbd-make-exitoso](../imagenes/LFS/sesion30/kbd-make-exitoso.png)
 *Figura 10: kbd-make-exitoso*
 
-![kbd-make-install](../imagenes/LFS/sesion29/kbd-make-install.png)
+![kbd-make-install](../imagenes/LFS/sesion30/kbd-make-install.png)
 *Figura 11: kbd-make-install*
 
