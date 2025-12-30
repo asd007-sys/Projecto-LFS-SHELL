@@ -5278,3 +5278,200 @@ Contiene programas para procesar y dar formato a textos e imágenes.
 *Figura 9: groff-make-install*
 
 
+---
+
+# Sesión 30: 30 de Diciembre - Instalación de GRUB,Gzip,IPRoute,Kbd
+
+## Objetivo: Instalar paquetes 
+
+## Tareas Realizadas
+
+(09:33 - 09:52  ) 
+- GRUB-2.12 
+
+(09:52  - 10:10 ) 
+- Gzip-1.14 
+
+(10:10  - 10:21) 
+- IPRoute2-6.16.0  
+
+(10:21  - 10:45 ) 
+- Kbd-2.8.0 
+
+
+  
+## Comandos principales ejecutados:
+
+#### Generalmente al make se le agregar time, y a make, make install se les agrega 2>&1 | tee -a “nombre-del.log”
+
+### Se empezó a agregar 2>&1,  para redirigir stderr a stdout y que escriba en los archivos creados por tee.
+
+### Se extrae con tar -xf nombre-paquete, y elimina el directorio al terminar con rm -rf nombre-paquete
+
+### Para ocupar menos espacio, se van a omitir los comandos repetidos. Se escriben primero los comandos compartidos por los paquetes, y después los comandos particulares separados por paquetes, se lamenta no haberlo hecho antes.
+
+### Comandos compartidos
+
+
+#Compilar
+
+make
+
+#Instalar
+
+make install
+
+
+###  GRUB-2.12 
+
+#Añadir archivo faltante en el archivo comprimido
+
+echo depends bli part_gpt > grub-core/extra_deps.lst
+
+#Configuración de compilación
+
+./configure --prefix=/usr     \
+…..
+
+#Instalar en /usr
+
+#Archivos de configuración en /etc
+
+#Configuración para que warnings  no paren la compilación
+
+#Deshabilitar algunos tests
+
+
+
+#Después de instalar, mover archivos de soporte
+
+mv -v /etc/bash_completion.d/grub /usr/share/bash-completion/completions
+
+
+
+###  Gzip-1.14 
+
+#Configuración de compilación
+
+./configure --prefix=/usr
+
+###  IPRoute2-6.16.0 
+
+#Prevenir instalar manpages para programa que no se construye (arpd)
+
+sed -i /ARPD/d Makefile
+rm -fv man/man8/arpd.8
+
+#Compilar
+
+make NETNS_RUN_DIR=/run/netns
+
+#Instalar paquete y documentacion
+
+make SBINDIR=/usr/sbin install
+
+install -vDm644 COPYING README* -t /usr/share/doc/iproute2-6.16.0
+
+### Kbd-2.8.0 
+
+#Arreglar comportamiento de los botones para borrar
+
+patch -Np1 -i ../kbd-2.8.0-backspace-1.patch
+
+#Remover programa resizecons y su documentación
+
+sed -i '/RESIZECONS_PROGS=/s/yes/no/' configure
+sed -i 's/resizecons.8 //' docs/man/man8/Makefile.in
+
+#Configurar para compilar
+
+./configure --prefix=/usr --disable-vlock
+
+#Instalar en /usr
+
+#Deshabilitar utilidad vlock, porque requiere la librería PAM, que no está disponible en el entorno chroot
+
+#Instalar documentación
+
+cp -R -v docs/doc -T /usr/share/doc/kbd-2.8.0
+
+
+
+## Problemas Encontrados
+
+Problema:Al instalar el paquete Grub, no se sabía cual era el modo de arranque, uefi o bios.
+
+Solución: Con ayuda de la inteligencia artificial, se ejecuto el comando: “test -d /sys/firmware/efi && echo UEFI || echo BIOS” al salir de chroot. Este comando verifica si existe el directorio, si existe, entonces significa que el modo de arranque es UEFI, si no existe, es BIOS, como no existía, entonces se llega a la conclusión de que es BIOS el modo de arranque
+
+Problema: Al compilar el paquete de Grub, dio error 2.
+
+Solución: Se revisaron los comandos previos, y el comando que se escribió mal fue:” echo depends bli part_gpt > grub-core/extra_deps.lst “, agregando una s en extra, se borro todo el directorio, extrajo de nuevo, ejecutaron todos los comandos de nuevos y se compilo correctamente.
+
+Problema: El paquete kbd no se compilo correctamente
+
+Solucion: Al escribir el configure para compilar, se omitio el argumento –disable_vloc, al no tener la librería libpam, fallaba directamente la compilación, volver a comenzar y agregarlo, compilar correctamente
+
+
+
+## Reflexiones Técnicas
+
+En el paquete GRUB, no se ejecuta el test suite, ya que muchos tests requieren de paquetes que no están disponibles en el entorno chroot. Y también el manual mismo recomienda no ejecutarlos.
+El paquete IPRoute contiene utilidades tanto básicas como avanzadas para el control de redes ipv4,esto asegura que el LFS.
+El paquete Kbd contiene muchas utilidades y funciones para teclados, como el mapeo de tecleado.El mapeo de teclado permite establecer las teclas según el idioma utilizado.
+El patch utilizado en el manual, permite que diferentes mapeos utilicen el mismo carácter para el botón backspace, y el botón “del” un carácter de escape conocido, así creando uniformidad en los mapeos en lo que estos botones conciernen
+
+
+## Resultados Obtenidos
+
+
+####  GRUB-2.12  - Instalado
+
+Controlador de booteo,permite seleccionar y cargar el sistema operativo al iniciar la computadora.
+
+####  Gzip-1.14    - Instalado
+
+Herramienta de compresión que reduce el tamaño de archivos usando el algoritmo gzip.
+
+####  IPRoute2-6.16.0    - Instalado
+
+Conjunto de utilidades para configurar y administrar la red en sistemas Linux
+
+####  Kbd-2.8.0  - Instalado
+
+Contiene herramientas para manejar el teclado y consola en Linux
+
+## Evidencia
+
+![grub-make-error](../imagenes/LFS/sesion29/grub-make-error.png)
+*Figura 1: grub-make-error*
+
+![grub-make](../imagenes/LFS/sesion29/grub-make.png)
+*Figura 2: grub-make*
+
+![gzip-make](../imagenes/LFS/sesion29/gzip-make.png)
+*Figura 3: gzip-make*
+
+![grub-make-install](../imagenes/LFS/sesion29/grub-make-install.png)
+*Figura 4: grub-make-install*
+
+![gzip-make-check](../imagenes/LFS/sesion29/gzip-make-check.png)
+*Figura 5: gzip-make-check*
+
+![gzip-make-install](../imagenes/LFS/sesion29/gzip-make-install.png)
+*Figura 6: gzip-make-install*
+
+![iproute-make](../imagenes/LFS/sesion29/iproute-make.png)
+*Figura 7: iproute-make*
+
+![iproute-make-install](../imagenes/LFS/sesion29/iproute-make-install.png)
+*Figura 8: iproute-make-install*
+
+![kbd-make-error](../imagenes/LFS/sesion29/kbd-make-error.png)
+*Figura 9: kbd-make-error*
+
+![kbd-make-exitoso](../imagenes/LFS/sesion29/kbd-make-exitoso.png)
+*Figura 10: kbd-make-exitoso*
+
+![kbd-make-install](../imagenes/LFS/sesion29/kbd-make-install.png)
+*Figura 11: kbd-make-install*
+
