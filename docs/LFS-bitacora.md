@@ -5475,3 +5475,165 @@ Contiene herramientas para manejar el teclado y consola en Linux
 ![kbd-make-install](../imagenes/LFS/sesion30/kbd-make-install.png)
 *Figura 11: kbd-make-install*
 
+---
+
+
+# Sesión 31: 2 de Enero - Instalación de Libpipeline,Make,Patch,Tar
+
+## Objetivo: Instalar paquetes 
+
+## Tareas Realizadas
+
+(11:04 - 11:11 ) 
+- Libpipeline-1.5.8 
+
+(11:11 - 11:27) 
+- Make-4.4.1 
+
+(11:27  - 11:37 ) 
+- Patch-2.8   
+
+(11:37  - 12:01 ) 
+- Tar-1.35 
+
+
+  
+## Comandos principales ejecutados:
+
+#### Generalmente al make se le agregar time, y a make, make install se les agrega 2>&1 | tee -a “nombre-del.log”
+
+### Se empezó a agregar 2>&1,  para redirigir stderr a stdout y que escriba en los archivos creados por tee.
+
+### Se extrae con tar -xf nombre-paquete, y elimina el directorio al terminar con rm -rf nombre-paquete
+
+### Para ocupar menos espacio, se van a omitir los comandos repetidos. Se escriben primero los comandos compartidos por los paquetes, y después los comandos particulares separados por paquetes, se lamenta no haberlo hecho antes.
+
+### Comandos compartidos
+
+#Configuracion para compilar
+./configure --prefix=/usr
+
+#Compilar
+
+make
+
+#Instalar
+
+make install
+
+
+
+
+
+###  Libpipeline-1.5.8
+
+#Solo ejecuta comandos compartidos
+
+
+###  Make-4.4.1 
+
+#Dar privilegios necesarios a usuario tester, hacerlo owner del directorio actual
+
+chown -R tester .
+
+#Ejecutar los tests
+
+su tester -c "PATH=$PATH make check"
+
+###  Patch-2.8 
+
+#Verificar compilación correcta con tests
+
+make check
+
+
+### Tar-1.35
+
+#Configuración para compilar
+
+FORCE_UNSAFE_CONFIGURE=1  \
+./configure --prefix=/usr
+
+#Forzar correr el test mknod como root
+
+
+#Instalar documentación
+
+
+make -C doc install-html docdir=/usr/share/doc/tar-1.35
+
+## Problemas Encontrados
+
+Problema: Al terminar de instalar el paquete Make, en vez de borrar el directorio donde se construyó Make, se borro sin intención alguna el próximo paquete comprimido a instalar Patch-2.8.tar.xz
+
+Solución: Para no comenzar de nuevo, y perder tiempo, se decidió descargar solo ese paquete, sin embargo, no existe wget en el entorno chroot, entonces en vez de salir descargar volver a correctamente entrar al entorno, y correr el riesgo de cometer un grave error, se restauro el último snapshot y se volvió a comenzar.
+
+
+
+
+
+## Reflexiones Técnicas
+
+En el paquete Libpipeline no se ejecuta el test suite porque una de las dependencias no se instala en LFS.
+El paquete Libpipeline es importante porque es una librería implementa enviar la información de un comando a otro, esto es esencial para una terminal.
+El make es obviamente otro paquete esencial para cualquier sistema, ya que como se demostró, se utiliza para instalar casi todos los paquetes que necesita LFS.
+El paquete Patch permite cambiar el código fuente de un paquete antes de compilarlo, lo que ayuda si cierto paquete da un error en algún tipo de sistema particular o alguna introduce algún tipo de vulnerabilidad.
+El paquete Tar que se instaló, es el mismo que se usa para descomprimir los paquetes a  instalar en LFS, con el comando tar -xf nombre-paquete, conocidos como “tarball”.
+
+
+
+
+## Resultados Obtenidos
+
+
+####  Libpipeline-1.5.8  - Instalado
+
+Contiene librería que permite crear y manejar pipelines de procesos (ej: ls -la | grep a )
+
+####  Make-4.4.1     - Instalado
+
+Herramienta de compilación automatizada
+
+#### Patch-2.8      - Instalado
+
+Herramienta para generar cambios en archivos antes de compilar
+
+####  Tar-1.35  - Instalado
+
+Herramienta para comprimir y descomprimir archivos
+
+## Evidencia
+
+![libpipeline-make](../imagenes/LFS/sesion31/libpipeline-make.png)
+*Figura 1: libpipeline-make*
+
+![libpipeline-make-install](../imagenes/LFS/sesion31/libpipeline-make-install.png)
+*Figura 2: libpipeline-make-install*
+
+![make-make](../imagenes/LFS/sesion31/make-make.png)
+*Figura 3: make-make*
+
+![make-make-check](../imagenes/LFS/sesion31/make-make-check.png)
+*Figura 4: make-make-check*
+
+![make-make-install](../imagenes/LFS/sesion31/make-make-install.png)
+*Figura 5: make-make-install*
+
+![patch-make](../imagenes/LFS/sesion31/patch-make.png)
+*Figura 6: patch-make*
+
+![patch-make-check](../imagenes/LFS/sesion31/patch-make-check.png)
+*Figura 7: patch-make-check*
+
+![patch-make-install](../imagenes/LFS/sesion31/patch-make-install.png)
+*Figura 8: patch-make-install*
+
+![tar-make](../imagenes/LFS/sesion31/tar-make.png)
+*Figura 9: tar-make*
+
+![tar-make-check](../imagenes/LFS/sesion31/tar-make-check.png)
+*Figura 10: tar-make-check*
+
+![tar-make-install](../imagenes/LFS/sesion31/tar-make-install.png)
+*Figura 11: tar-make-install*
+
