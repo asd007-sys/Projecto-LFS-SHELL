@@ -814,4 +814,18 @@ Problema: No se sabía cómo implementar de una manera sencilla, sin implementar
 Solución: Como los directorios padres necesitan existir primero, en vez de hacer un else para cada caso de if not os.path.exists(directorio_a_checkear), se verifica si existe padre de mayor precedencia,si no, se crea con el if not, y después se sigue el linaje hacia abajo, pero con condicionales al mismo nivel, y no condicionales adentro de otros condicionales, 
 
 
+---
+
+
+# Fecha: 2 de Enero 2026
+# Objetivo del día: Implementar logger en todas las funciones
+
+## Tareas realizadas:
+
+(14:10 -15:25)
+
+- Implementar el logger en todas las funciones
+
+
+
 	

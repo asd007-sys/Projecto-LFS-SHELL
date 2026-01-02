@@ -105,8 +105,7 @@ def mostrar_logs(tipo):
 
 def registrar_error(comando, args, tipo_error, mensaje_error):
     try:
-        timestamp = datetime.now().strftime(
-            "%Y-%m-%d %H:%M:%S")  # Crear timestamp con formato ano/mes/dia hora:minutos:segundos
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Crear timestamp con formato ano/mes/dia hora:minutos:segundos
         usuario = os.getenv("USER") or os.getenv("USERNAME") or "Estudiante"  # Nombre del usuario para registrar
 
         formateado = f"[{timestamp}] {usuario} | {comando + (' ' + ' '.join(args) if args else '')} | {tipo_error} | {mensaje_error}\n"  # Formateo de linea a ingresar en Logger_Errores
@@ -129,16 +128,21 @@ def registrar_error(comando, args, tipo_error, mensaje_error):
 def echo(args):
     if not args:
         print() #Imprimir linea vacia si no hay argumentos
+        registrar_accion("echo", args, True, "Se imprimio una linea vacia")  # Funcion para registrar accion exitosa
         return #Volver a menu principal
 
     try:
         #Si args no esta vacio
         salida=" ".join(args)  #Agregar todos los argumentos separadados por espacio
         print(salida) #imprimir el texto con los argumentos
-        return
+        registrar_accion("echo", args, True, "Se imprimio correctamente argumentos ingresado")  # Funcion para registrar accion exitosa
+        return #Volver a menu principal
 
     except OSError: #Si salta algun error
         print("Ha ocurrido un error")
+        registrar_accion("echo", args, False,"Ha ocurrido un error")  # Funcion para registrar accion fallida
+        registrar_error("echo", args, "ErrorGenerico","Ha ocurrido un error")  # Funcion para regisrar error
+
 
 """
 
@@ -153,7 +157,9 @@ def echo(args):
 
 def cat(args):
     if not args:  #Si no hay argumento (archivo a leer) recibido en la funcion
-        print("Falta ingresar el archivo a leer!") #Advertir al usuario
+        print("Falta ingresar el archivo a leer!, ej: cat libro.txt , cat /home/user/librito.txt") #Advertir al usuario
+        registrar_accion("cat", args, False,"Falta argumento para el nombre del archivo a leer")  # Funcion para registrar accion fallida
+        registrar_error("cat", args, "FaltaNombreArchivoALeer","Falta argumento para el nombre del archivo a leer")  # Funcion para regisrar error
         return #Volver a menu principal
 
     archivo = args[0]  #El primer argumento es el archivo
@@ -163,12 +169,17 @@ def cat(args):
               for linea in zeta:  #Loopear sobre el archivo por linea
                 print(linea.strip())
         print( f"Contenido de {archivo} mostrado")
+        registrar_accion("cat", args, True, "Lectura de archivo exitosa")  # Funcion para registrar accion exitosa
         return
     except FileNotFoundError: #Error de archivo no encontrado
-        print(f"Archivo no existe: {archivo}")
+        print(f"Archivo no existe: {archivo}. Puede utilizar el comando ls para verificar nombre o directorio correcto")
+        registrar_accion("cat", args, False,"El archivo a leer no existe o no fue encontrado")  # Funcion para registrar accion fallida
+        registrar_error("cat", args, "NoSeEncontroArchivoALeer", "El archivo a leer no existe o no fue encontrado")  # Funcion para regisrar error
         return
     except PermissionError:#Permisos insuficientes
         print("Permiso denegado,no tiene los privilegios necesarios")
+        registrar_accion("cat", args, False,"No tiene los privilegios suficientes para leer archivo")  # Funcion para registrar accion fallida
+        registrar_error("cat", args, "PermisoInsuficiente","No tiene los privilegios suficientes para leer archivo")  # Funcion para regisrar error
         return
 
 """
@@ -184,11 +195,9 @@ def cat(args):
 
 def mkdir(args):
     if not args:  # Si no se ingreso un argumento para el nombre del directorio
-        print("Falta ingresar el nombre del directorio a crear")
-        registrar_accion("mkdir", args, False,
-                         "Falta argumento para el nombre del directorio a crear")  # Funcion para registrar accion fallida
-        registrar_error("mkdir", args, "FaltaNombre",
-                        "Falta argumento para el nombre del directorio a crear")  # Funcion para regisrar error
+        print("Falta ingresar el nombre del directorio a crear, ej: mkdir nombre123")
+        registrar_accion("mkdir", args, False,"Falta argumento para el nombre del directorio a crear")  # Funcion para registrar accion fallida
+        registrar_error("mkdir", args, "FaltaNombre","Falta argumento para el nombre del directorio a crear")  # Funcion para regisrar error
         return  # Volver al shell
 
     directorio = args[0]  # Nombre del directorio a crear
@@ -198,16 +207,13 @@ def mkdir(args):
         print(f"Directorio creado: {directorio}")
         registrar_accion("mkdir", args, True, "Creado")  # Funcion para registrar accion exitosa
     except FileExistsError:  # Error de que ya existe el directorio
-        print(f"ERROR, Directorio ya existe: {directorio}, ingresar un nombre no existente")
-        registrar_accion("mkdir", args, False,
-                         "El archivo no existe/no fue encontrado")  # Funcion para registrar accion fallida
+        print(f"ERROR, Directorio ya existe: {directorio}, ingresar un nombre no existente,puede utilizar ls para verificar nombres existentes")
+        registrar_accion("mkdir", args, False,"El archivo no existe/no fue encontrado")  # Funcion para registrar accion fallida
         registrar_error("mkdir", args, "FileExistsError", f"Directorio ya existe")  # Funcion para regisrar error
     except PermissionError:  # Error de que no tiene los privilegios para crearlo
-        print("ERROR, Permiso denegado, no tiene suficientes privilegios")
-        registrar_accion("mkdir", args, False,
-                         "No tiene los privilegios suficientes")  # Funcion para registrar accion fallida
-        registrar_error("mkdir", args, "PermissionError",
-                        "No tiene los privilegios suficientes")  # Funcion para regisrar error
+        print("ERROR, Permiso denegado, no tiene suficientes privilegios,intente crearlo en otro directorio por favor")
+        registrar_accion("mkdir", args, False,"No tiene los privilegios suficientes")  # Funcion para registrar accion fallida
+        registrar_error("mkdir", args, "PermissionError","No tiene los privilegios suficientes")  # Funcion para regisrar error
 
 
 """
@@ -223,14 +229,17 @@ def mkdir(args):
 
 def rm(args):
     if not args:  # El primer argumento es la direccion del archivo a borrar,si no existe, avisar al usuario
-        print("Le falto ingresar la ruta absoluta o relativa del archivo a borrar ")
+        print("Le falto ingresar la ruta absoluta o relativa del archivo a borrar (Ej: rm archivo_existente, rm /home/archivo_existente )")
+        registrar_accion("rm", args, False,"Falta argumento del nombre del archivo a borrar")  # Funcion para registrar accion fallida
+        registrar_error("rm", args, "FaltaNombre","Falta argumento del nombre del archivo a borrar")  # Funcion para regisrar error
         return  # Retorna al shell
 
     archivo = args[0]  # Obtener la direccion y nombre del archivo a borrar
 
-    if os.path.isdir(
-            archivo):  # Verificar antes de confirmar si es un directorio, y avisar al usuario que solo puede borrar archivos
-        print("El comando solo soporta eliminar archivos, por favor solo ingresar archivos")
+    if os.path.isdir(archivo):  # Verificar antes de confirmar si es un directorio, y avisar al usuario que solo puede borrar archivos
+        print("El comando solo soporta eliminar archivos, por favor solo ingresar archivos, puede utilizar ls para saber si es archivo o directorio")
+        registrar_accion("rm", args, False,"Prohibido borrar directorio, solo archivos")  # Funcion para registrar accion fallida
+        registrar_error("rm", args, "EsDirectorio","Prohibido borrar directorio, solo archivos")  # Funcion para regisrar error
         return
 
     # Prompt de confirmacion a borrar el archivo
@@ -242,12 +251,16 @@ def rm(args):
     try:
         os.unlink(archivo)  # Llamada al sistema para borar el archivo
         print(f"Archivo eliminado: {archivo}")
+        registrar_accion("rm", args, True, "Archivo eliminado correctamente")  # Funcion para registrar accion exitosa
 
     except FileNotFoundError:  # Archivo no existe
-        print(f"El Archivo ingresado no existe: {archivo}")
+        print(f"El Archivo ingresado no existe: {archivo},puede utilizar ls para buscar el nombre correcto")
+        registrar_accion("rm", args, False,"No se encontro el archivo")  # Funcion para registrar accion fallida
+        registrar_error("rm", args, "ArchivoNoEncontrado","No se encontro el archivo")  # Funcion para regisrar error
     except PermissionError:  # El usuario no tiene los privilegios necesario para borrar
         print("Usted carece de privilegios para borrar el archivo")
-
+        registrar_accion("rm", args, False,"No tiene los privilegios suficientes")  # Funcion para registrar accion fallida
+        registrar_error("rm", args, "FaltaPermiso","No tiene los privilegios suficientes")  # Funcion para regisrar error
 
 """
    Función built-in cp
@@ -263,9 +276,11 @@ def rm(args):
 
 def cp(args):
     if (len(args) != 2):  # Si la cantidad de argumentos recibidos es diferente a 2, se abandona la funcion
-        print(
-            "Esta funcion precisa de dos argumentos,primero: la ruta del archivo a copiar, segundo: la ruta del archivo a ser creado")
+        print("Esta funcion precisa de dos argumentos,primero: la ruta del archivo a copiar, segundo: la ruta del archivo a ser creado, ej: cp asd.txt /home/user/asd.txt")
+        registrar_accion("cp", args, False,"Numero de argumentos incorrecto")  # Funcion para registrar accion fallida
+        registrar_error("cp", args, "NumArgsIncorrecto","Numero de argumentos incorrecto")  # Funcion para regisrar error
         return  # Abandonamos
+
     else:
 
         origen = os.path.abspath(args[0])  # Argumento recibido como direccion y nombre del archivo a copiar
@@ -288,13 +303,24 @@ def cp(args):
                         a_destino.write(datos)  # Se escribe al archivo destino el bloque leido
 
             print(f"Copia exitosa de '{origen}' a '{destino}'")
+            registrar_accion("cp", args, True, "Archivo copiado correctamente")  # Funcion para registrar accion exitosa
+
 
         except FileNotFoundError:  # Si no se encuentra el archivo a copiar
-            print(f"Error: El archivo de origen '{origen}' no fue encontrado.")
+            print(f"Error: El archivo de origen '{origen}' no fue encontrado, puede utilizar ls para informarse")
+            registrar_accion("cp", args, False, "No se encontro el archivo")  # Funcion para registrar accion fallida
+            registrar_error("cp", args, "ArchivoNoEncontrado","No se encontro el archivo")  # Funcion para regisrar error
+
         except PermissionError:  # Si no se puede acceder  por falta de privilegio el archivo a copiar
             print(f"Error: No tiene los privilegios suficientes para copiar en {destino}' ")
+            registrar_accion("cp", args, False,"No tiene los privilegios suficientes para copiar")  # Funcion para registrar accion fallida
+            registrar_error("cp", args, "FaltaPermiso","No tiene los privilegios suficientes para copiar")  # Funcion para regisrar error
+
         except OSError as e:  # Error generico
             print(f"Ocurrió un error durante la copia: {e}")
+            registrar_accion("cp", args, False,"Ha ocurrido un error")  # Funcion para registrar accion fallida
+            registrar_error("cp", args, "ErrorGenerico","Ha ocurrido un error")  # Funcion para regisrar error
+
 
 
 """
@@ -314,15 +340,21 @@ def cd(args):
         nuevo_dir = (args[0])  # El directorio ingresado por el usuario por argumento
     else:  # Si la lista esta vacia
         print(f"Usted reside en el directorio {os.getcwd()}")
+        registrar_accion("cd", args, True, "Permanecer en el mismo directorio")  # Funcion para registrar accion exitosa
         nuevo_dir = "."  # La variable es asignada el directorio actual.
+        return #Terminar y no seguir ejecutando el resto del codigo
 
     try:
         os.chdir(nuevo_dir)  # Cambiar de directorio a la que se paso como argumento
         print(f"EXITO Cambio a {os.getcwd()}")  # Imprimir exito para debug
+        registrar_accion("cd", args, True, "Cambiar de directorio exitosamente")  # Funcion para registrar accion exitosa
     except FileNotFoundError:  # Atrapar error si no encuentra o existe el directorio
-        print(f"ERROR Directorio no encontrado: {nuevo_dir}")
+        print(f"ERROR Directorio no encontrado: {nuevo_dir}. Utlize el comando ls para saber si es correcto el directorio ingresado ")
+        registrar_accion("cd", args, False, "No se pudo encontrar el directorio a ingresar")  # Funcion para registrar accion fallida
+        registrar_error("cd", args, "DirNoEncontrado", "No se pudo encontrar el directorio a ingresar")  # Funcion para regisrar error
     except OSError as e:  # Error generico
-        print(f"Ocurrió un error durante la copia: {e}")
+        registrar_accion("cd", args, False, "Ha ocurrido un error")  # Funcion para registrar accion fallida
+        registrar_error("cd", args, "ErrorGenerico", "Ha ocurrido un error")  # Funcion para regisrar error
 
 
 """
@@ -339,29 +371,33 @@ def cd(args):
 def ls(args):
     ruta = "."
     if args:
-        ruta = args[
-            0]  # Determina la ruta a listar. Si args tiene elementos (if args),elige el primer elemento (args[0]) como la ruta, osino , usa el directorio actual .
+        ruta = args[0]  # Determina la ruta a listar. Si args tiene elementos (if args),elige el primer elemento (args[0]) como la ruta, osino , usa el directorio actual .
 
     try:  # Para atrapar errores si los hay
         elementos = os.listdir(ruta)  # Listar todos los archivos y directorios en la direccion ruta
         if ruta == '.':
             print(f"Contenido de '{os.getcwd()}':")
+            registrar_accion("ls", args, True, "Listar archivos y directorios del directorio actual correctamente")  # Funcion para registrar accion exitosa
         else:
             print(f"Contenido de '{ruta}':")
+            registrar_accion("ls", args, True, "Listar archivos y directorios del directorio ingresado correctamente")  # Funcion para registrar accion exitosa
         if elementos:  # Si elementos contiene al menos un archivo o directorio
             for elem in elementos:  # Loop para determinar directorios
-                if os.path.isdir(os.path.join(ruta,
-                                              elem)):  # Se verifica si el archivo actual es o no un directorio , se arma la ruta(Direccion) + archivo, y checkea si es un directorio
+                if os.path.isdir(os.path.join(ruta,elem)):  # Se verifica si el archivo actual es o no un directorio , se arma la ruta(Direccion) + archivo, y checkea si es un directorio
                     print(f"  [Dir]  {elem}")
                 else:  # Si no es un directorio el archivo actual
                     print(f"  [Arc] {elem}")
             return
         else:  # Si elemento esta vacio
             print("El directorio esta vacio!")
+            registrar_accion("ls", args, True, "Tratar de listar un directorio vacio")  # Funcion para registrar accion exitosa
     except FileNotFoundError as e:  # Si no existe o no se encuentra el archivo
         print(f" El directorio {ruta} no existe o no se puede acceder ")
+        registrar_accion("ls", args, False, "No se pudo encontrar el directorio a listar")  # Funcion para registrar accion fallida
+        registrar_error("ls", args, "DirNoEncontrado", "No se pudo encontrar el directorio a listar")  # Funcion para regisrar error
     except OSError as e:  # Error generico
-        print(f"Ocurrió un error durante la copia: {e}")
+        registrar_accion("ls", args, False, "Ha ocurrido un error")  # Funcion para registrar accion fallida
+        registrar_error("ls", args, "ErrorGenerico", "Ha ocurrido un error")  # Funcion para regisrar error
 
 
 """
