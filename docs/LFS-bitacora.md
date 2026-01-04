@@ -5778,5 +5778,8 @@ Editor de texto
 ![vim-make-check](../imagenes/LFS/sesion32/vim-make-check.png)
 *Figura 6: vim-make-check*
 
+![vim-make-check](../imagenes/LFS/sesion32/vim-make-check2.png)
+*Figura 7: vim-make-check2*
+
 ![vim-make-install](../imagenes/LFS/sesion32/vim-make-install.png)
-*Figura 7: vim-make-install*
+*Figura 8: vim-make-install*
