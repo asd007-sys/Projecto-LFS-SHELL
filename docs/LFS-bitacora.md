@@ -5637,3 +5637,146 @@ Herramienta para comprimir y descomprimir archivos
 ![tar-make-install](../imagenes/LFS/sesion31/tar-make-install.png)
 *Figura 11: tar-make-install*
 
+---
+
+# Sesión 32: 4 de Enero - Instalación de Texinfo,Vim
+
+## Objetivo: Instalar paquetes 
+
+## Tareas Realizadas
+
+(08:41 - 08:53 ) 
+- Texinfo-7.2
+
+(08:53 - 10:33  ) 
+- Vim-9.1.1629
+
+
+  
+## Comandos principales ejecutados:
+
+#### Generalmente al make se le agregar time, y a make, make install se les agrega 2>&1 | tee -a “nombre-del.log”
+
+### Se empezó a agregar 2>&1,  para redirigir stderr a stdout y que escriba en los archivos creados por tee.
+
+### Se extrae con tar -xf nombre-paquete, y elimina el directorio al terminar con rm -rf nombre-paquete
+
+### Para ocupar menos espacio, se van a omitir los comandos repetidos. Se escriben primero los comandos compartidos por los paquetes, y después los comandos particulares separados por paquetes, se lamenta no haberlo hecho antes.
+
+### Comandos compartidos
+
+#Configuración para compilar
+./configure --prefix=/usr
+
+#Compilar
+
+make
+
+#Instalar
+
+make install
+
+
+
+
+
+###  Texinfo-7.2 
+
+#Comando para arreglar un warning generado por perl
+
+sed 's/! $output_file eq/$output_file ne/' -i tp/Texinfo/Convert/*.pm
+
+#Instalar componentes de TeX
+
+make TEXMF=/usr/share/texmf install-tex
+
+###  Vim-9.1.1629 
+
+#Cambiar directorio de vimrc a /etc
+
+echo '#define SYS_VIMRC_FILE "/etc/vimrc"' >> src/feature.h
+
+#Privilegio necesario para tester, owner de directorio actual
+
+chown -R tester .
+
+#Ejecutar los tests
+
+su tester -c "TERM=xterm-256color LANG=en_US.UTF-8 make -j1 test" \
+&> vim-test.log
+
+#Symbolic link para que el comando vi corra vim
+
+ln -sv vim /usr/bin/vi
+for L in  /usr/share/man/{,*/}man1/vim.1; do
+    ln -sv vim.1 $(dirname $L)/vi.1
+done
+
+
+#Configuración de vim
+
+cat > /etc/vimrc << "EOF"
+" Begin /etc/vimrc
+…..
+
+
+
+## Problemas Encontrados
+
+Problema: Al ejecutar el make check de vim, en el comando “su tester -c "TERM=xterm-256color LANG=en_US.UTF-8 make -j1 test" \”, se ingreso accidentalmente un espacio al final
+
+Solución: Al tratar de terminar el comando, el programa no parecía responder, inclusive al ingresar control+C, entonces, se volvió a comenzar a instalar desde TexInfo.
+
+Problema: Al terminar el make check de vim, no aparece ALL DONE como se espera
+
+Solución: Al revisar vim-test.log, se muestra que falló el test Test_syntax_hang, entonces se volvió a correr el test para ver si la segunda vez no falla. Esto puede deberse a que la carga del sistema al ejecutar el test, altere el timing esperado del test. Sin embargo, otro error ocurrió por el entorno o timing, entonces, al buscar ayuda con la inteligencia artificial, se decidió seguir con la instalación y después de unas pruebas básicas, se confirmó su funcionamiento e instalación.
+
+
+Problema: Se decidió seguir adelante por consejo de la inteligencia artificial, pero se quiere revisar funcionalidad básica.
+
+Solución:Con ayuda de la inteligencia artificial. Se ejecutaron comandos como: vim –version, vi –version, para saber si la versiones correcta está instalada, ls /usr/bin/vim, para saber si existe o no el directorio que tiene que existir. dentro de vim “:set compatible?”, para saber si corre la configuración correcta que pide el manual.
+
+## Reflexiones Técnicas
+
+Texinfo permite poder leer la documentación de programas. Utilizo para leer comandos básicos o documentación cuando se necesite.
+El paquete Vim vendría a ser el editor de texto para el LFS final. 
+En los varios intentos de ejecutar los tests, siempre fallaba solo uno,pero siempre diferente, con la ayuda de inteligencia artificial se investigó. Esto puede darse por estar en el entorno chroot, timing incorrecto por carga en el sistema, o una variedad diferentes de factores. Por esto se decidió instalar y verificar si al menos tenia funcionamiento mínimo requerido, no es la manera más agraciada de resolver el problema, pero por la falta de contexto por el cual fallan los tests, no queda mucho más que hacer que intentar instalar y verificar funcionalidad
+En la configuración de vim, este funciona con el funcionamiento moderno de vim, pero para prevenir problemas, se le agrega nocompatible a /etc/vimrc para asegurar que este no se comporte como el editor vi clasico.
+
+
+
+## Resultados Obtenidos
+
+
+####  Texinfo-7.2  - Instalado
+
+Contiene programas para leer,escribir y convertir documentacion.
+
+####  Vim-9.1.1629  - Instalado
+
+Editor de texto
+
+
+
+## Evidencia
+
+![texinfo-make](../imagenes/LFS/sesion32/texinfo-make.png)
+*Figura 1: texinfo-make*
+
+![texinfo-make-check](../imagenes/LFS/sesion32/texinfo-make-check.png)
+*Figura 2: texinfo-make-check*
+
+![texinfo-make-install](../imagenes/LFS/sesion32/texinfo-make-install.png)
+*Figura 3: texinfo-make-install*
+
+![vim-make](../imagenes/LFS/sesion32/vim-make.png)
+*Figura 4: vim-make*
+
+![vim-make2](../imagenes/LFS/sesion32/vim-make2.png)
+*Figura 5: vim-make2*
+
+![vim-make-check](../imagenes/LFS/sesion32/vim-make-check.png)
+*Figura 6: vim-make-check*
+
+![vim-make-install](../imagenes/LFS/sesion32/vim-make-install.png)
+*Figura 7: vim-make-install*
