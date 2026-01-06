@@ -5969,10 +5969,10 @@ Sistema de mensajería para comunicación entre aplicaciones y servicios en Linu
 
 ## Evidencia
 
-![markupsafe-construir](../imagenes/LFS/sesion33/markupsafe-construir.png)
+![markupsafe-construir](../imagenes/LFS/sesion33/markupsafe_construir.png)
 *Figura 1: markupsafe-construir*
 
-![jinja-construir-install](../imagenes/LFS/sesion33/jinja-construir-install.png)
+![jinja-construir-install](../imagenes/LFS/sesion33/jinja_construir_install.png)
 *Figura 2: jinja-construir-install*
 
 ![systemd-ninja](../imagenes/LFS/sesion33/systemd-ninja.png)
