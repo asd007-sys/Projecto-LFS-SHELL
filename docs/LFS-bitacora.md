@@ -5783,3 +5783,212 @@ Editor de texto
 
 ![vim-make-install](../imagenes/LFS/sesion32/vim-make-install.png)
 *Figura 8: vim-make-install*
+
+
+---
+
+# Sesión 33: 6 de Enero - Instalación de MarkupSafe,Jinja,Systemd,D-Bus
+
+## Objetivo: Instalar paquetes 
+
+## Tareas Realizadas
+
+(10:39 - 10:45 ) 
+- MarkupSafe-3.0.2 
+
+(10:45 - 10:51 ) 
+- Jinja2-3.1.6 
+
+(10:51 - 11:31 ) 
+- Systemd-257.8 
+
+(11:31 - 11:40) 
+- D-Bus-1.16.2 
+
+  
+## Comandos principales ejecutados:
+
+#### Generalmente al make se le agregar time, y a make, make install se les agrega 2>&1 | tee -a “nombre-del.log”
+
+### Se empezó a agregar 2>&1,  para redirigir stderr a stdout y que escriba en los archivos creados por tee.
+
+### Se extrae con tar -xf nombre-paquete, y elimina el directorio al terminar con rm -rf nombre-paquete
+
+### Para ocupar menos espacio, se van a omitir los comandos repetidos. Se escriben primero los comandos compartidos por los paquetes, y después los comandos particulares separados por paquetes, se lamenta no haberlo hecho antes.
+
+### Comandos compartidos
+
+### MarkUpSafe y JinJa
+
+pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps $PWD
+
+#Crear en directorio dist
+
+#Prevenir que pip copie al directorio cache
+
+#Prevenir que pip busque en el repositorio online
+
+
+### Systemd  y Dbus
+
+#Compilar
+
+ninja
+
+#Ejecutar tests
+
+ninja test
+
+#Instalar
+
+ninja install
+
+
+
+###  MarkupSafe-3.0.2 
+
+#Instalar
+
+pip3 install --no-index --find-links dist Markupsafe
+
+
+###  Jinja2-3.1.6
+
+#Instalar
+
+pip3 install --no-index --find-links dist Jinja2
+
+
+### Systemd-257.8 
+
+#Remover grupos innecesarios
+
+sed -e 's/GROUP="render"/GROUP="video"/' \
+    -e 's/GROUP="sgx", //'               \
+    -i rules.d/50-udev-default.rules.in
+
+#Configuración para compilar
+
+mkdir -p build
+cd       build
+
+meson setup ..                \
+      --prefix=/usr           \
+……
+
+
+#Prevenir compilarse como debug, está sin optimizarse
+
+#Deshabilita firstboot, servicio que se ejecuta al prenderse por primera vez, ya se realizan los pasos manualmente
+
+#Deshabilitar instalacion de tests compilados
+
+#Cómo group y passwd fueron creados previamente, evitar la instalación automática de de estos
+
+#LFS no soporta rpm, deshabilitar rpm macros
+
+#Remover servicios con dependencias innecesarios. homed,userdb
+
+#Deshabilitar PAM, características experimentales, generación automática de manages.
+
+#Crear grupo nogroup con GID 65534
+
+#Deshabilitar systemd-sysupdate
+
+
+#Instalar manpages
+
+tar -xf ../../systemd-man-pages-257.8.tar.xz \
+  …
+
+#Crear archivo machine id, necesario para systemd-journald
+
+systemd-machine-id-setup
+
+
+
+### D-Bus-1.16.2 
+
+#Configuración para compilar
+
+mkdir build
+cd    build
+
+meson setup --prefix=/usr --buildtype=release --wrap-mode=nofallback ..
+
+#Instalar en /usr
+
+#Compilar como release
+
+#Prevenir descargar glib para los tests
+
+#Compilar
+
+ninja
+
+#Ejecutar tests
+
+ninja test
+
+#Instalar
+
+ninja install
+
+
+## Reflexiones Técnicas
+
+Los paquetes MarkupSafe y Jinja son librerías de Python.
+MarkupSafe se encarga de manejar strings de forma segura, principalmente escapando caracteres especiales para evitar problemas como inyecciones en HTML.
+
+Jinja es un motor de plantillas que permite generar HTML dinámico. Usa MarkupSafe para asegurarse de que los strings se inserten correctamente en las plantillas. Se utiliza mucho en aplicaciones web, emails y generación de documentos.
+
+El paquete systemd es el sistema de inicio y el administrador de servicios en Linux. Es el primer proceso que se ejecuta al arrancar el sistema (PID 1) y se encarga de iniciar y controlar los servicios, además de manejar logs y otros recursos del sistema.
+El manual indica que algunos tests pueden fallar a causa del entorno, como el test  test-namespace dio un fallo al correr los tests, como esto es esperado según el manual, se siguió con la instalación.
+
+
+
+## Resultados Obtenidos
+
+
+####  MarkupSafe-3.0.2   - Instalado
+
+Librería de Python que permite usar objetos strings con confianza de correcta implementacion
+
+####  Jinja2-3.1.6  - Instalado
+
+Generador de plantillas de html
+
+####  Systemd-257.8   - Instalado
+
+Sistema de inicio y administrador de servicios en Linux.
+
+####  D-Bus-1.16.2   - Instalado
+
+Sistema de mensajería para comunicación entre aplicaciones y servicios en Linux.
+
+
+## Evidencia
+
+![markupsafe-construir](../imagenes/LFS/sesion33/markupsafe-construir.png)
+*Figura 1: markupsafe-construir*
+
+![jinja-construir-install](../imagenes/LFS/sesion33/jinja-construir-install.png)
+*Figura 2: jinja-construir-install*
+
+![systemd-ninja](../imagenes/LFS/sesion33/systemd-ninja.png)
+*Figura 3: systemd-ninja*
+
+![systemd-test](../imagenes/LFS/sesion33/systemd-test.png)
+*Figura 4: systemd-test*
+
+![systemd-install](../imagenes/LFS/sesion33/systemd-install.png)
+*Figura 5: systemd-install*
+
+![dbus-ninja](../imagenes/LFS/sesion33/dbus-ninja.png)
+*Figura 6: dbus-ninja*
+
+![dbus-ninja-test](../imagenes/LFS/sesion33/dbus-ninja-test.png)
+*Figura 7: dbus-ninja-test*
+
+![dbus-install](../imagenes/LFS/sesion33/dbus-install.png)
+*Figura 8: dbus-install*
