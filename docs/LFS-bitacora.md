@@ -5992,3 +5992,258 @@ Sistema de mensajería para comunicación entre aplicaciones y servicios en Linu
 
 ![dbus-install](../imagenes/LFS/sesion33/dbus-install.png)
 *Figura 8: dbus-install*
+
+---
+
+
+# Sesión 34: 7 de Enero - Instalación de Man-DB,Procps-ng,Util-linux,E2fsprogs
+
+## Objetivo: Instalar paquetes 
+
+## Tareas Realizadas
+
+(11:42 - 12:03 ) 
+- Man-DB-2.13.1 
+
+(12:03 - 12:36 ) 
+- Procps-ng-4.0.5 
+
+(12:36 - 13:03) 
+- Util-linux-2.41.1 
+
+(13:03 - 13:26) 
+- E2fsprogs-1.47.3 
+
+  
+## Comandos principales ejecutados:
+
+#### Generalmente al make se le agregar time, y a make, make install se les agrega 2>&1 | tee -a “nombre-del.log”
+
+### Se empezó a agregar 2>&1,  para redirigir stderr a stdout y que escriba en los archivos creados por tee.
+
+### Se extrae con tar -xf nombre-paquete, y elimina el directorio al terminar con rm -rf nombre-paquete
+
+### Para ocupar menos espacio, se van a omitir los comandos repetidos. Se escriben primero los comandos compartidos por los paquetes, y después los comandos particulares separados por paquetes, se lamenta no haberlo hecho antes.
+
+### Comandos compartidos
+
+#Compilar
+
+make
+
+#Ejecutar tests para verificar compilación
+
+make check
+
+#Instalar
+
+make install
+
+
+
+###  Man-DB-2.13.1 
+
+#Configuración para compilar
+
+./configure --prefix=/usr  \
+…..
+
+#Instalar en /usr
+
+#Establecer directorio para documentación
+
+#Archivos de configuración en /etc
+
+#Owner del cache es el user bin
+
+#Establecer programas predeterminados, lynx navegador a base de texto,vgrind,grap
+
+
+###  Procps-ng 
+
+#Configuración para compilar
+
+./configure --prefix=/usr  \
+…..
+
+#Instalar en /usr
+
+#Establecer directorio para documentación
+
+#Deshabilitar: librerías estáticas, instalar el comando kill, se instala con util-linux
+
+#Soporte para caracteres de 8 bits en el comando watch.
+
+#Habilita integración con systemd
+
+#Dar privilegios a tester y después ejecutar el make check como usuario tester
+
+chown -R tester .
+su tester -c "PATH=$PATH make check"
+
+
+### Util-linux-2.41.1 
+
+#Configuración para compilar
+
+./configure --bindir=/usr/bin     \
+……
+
+#Crear directorios para: /usr/bin para ejecutables de usuario, 
+
+/usr/sbin para ejecutables de administración
+
+/usr/lib para librerías compartidas
+
+ /run archivos de estado en tiempo de ejecución (Ej: PID)
+
+
+#Establece directorio de documentación
+
+#Deshabilitar herramientas y comandos no necesarios: login, nologin,chfn,chsh,su (cambio de usuario),setpriv
+
+#Deshabilita librerías: libmount,liblastlog2
+
+#Deshabilitar compilación de librerías estáticas
+
+
+#Crear fstab temporal para los tests 
+
+touch /etc/fstab
+
+#Usuario tester owner del directorio actual
+
+chown -R tester .
+
+#Ejecutar tests como usuario tester
+
+su tester -c "make -k check"
+
+
+### E2fsprogs-1.47.3
+
+#Configuración para compilar
+
+mkdir build
+cd    build
+
+../configure --prefix=/usr     \
+…..
+
+#Instalar en /usr
+
+#Archivos de configuración en /etc
+
+#Prevenir descargar glib para los tests
+
+#Habilitar compilación de librerías compartidas
+
+#Deshabilitar compilación de librería libblkid
+
+#Deshabilitar servicio uuidd
+
+#Deshabilitar herramienta fsck
+
+#Remover librerías estáticas
+
+rm -fv /usr/lib/{libcom_err,libe2p,libext2fs,libss}.a
+
+#Descomprimir e instalar libext2fs
+
+gunzip -v /usr/share/info/libext2fs.info.gz
+install-info --dir-file=/usr/share/info/dir /usr/share/info/libext2fs.info
+
+
+
+
+## Reflexiones Técnicas
+
+El paquete Man-Db es un visualizador y buscador de man pages. Es esencial para un usuario sin conexión a internet que quiera ver o buscar información de man pages.
+
+El paquete Procps-ng sirve para monitorear procesos.
+Este paquete dio un error en el make check en pgrep, el cual el manual lo menciona. Con ayuda de la inteligencia artificial, este fallo se debe a que el entorno chroot es limitado, y el comando pgrep intenta usar /proc, aunque este montado, este es del Rocky Linux y no del LFS mismo que se está armando. así que proc accede a la información del Rocky Linux. y como pgrep y los tests esperan un entorno con control completo del sistema de procesos,que el chroot no cumple.
+
+El paquete util-linux contiene muchas herramientas y programas útiles para el uso del sistema operativo: manejo de archivos,consola,mensajes,etc.
+Este paquete también dio un error esperado, el test fallado era kill decode, que por razones parecidas, falla a causa del limitado entorno chroot.
+
+El paquete E2fsprogs trae herramientas para crear, verificar, reparar y mantener los sistemas de archivos ext2, ext3 y ext4. En el caso actual tenemos el sistema de archivo ext4.
+Este paquete también dio un error al ejecutar el make check, pero fue más fácil verificar porque en el summary final apareció que m_assume_storage_prezeroed fallo, el cual es un fallo esperado según el manual.
+
+### Problemas Encontrados
+
+Problema: El make check de Procps-ng fallo y no informa en el summary cual es el test fallado
+
+Solucion: Despues de leer el log creado con tee , en /sources/tee, se determinó que el test era pgrep, y el manual informa que este puede fallar en el entorno chroot, entonces se decidió seguir con la instalación, ya que esa fue la una falla.
+
+Problema: Por falta de atención, se escribió  los comandos de la instalación del paquete util-linux residiendo en la carpeta de Procps-ng.
+
+Solución: Cómo sólo se llegó al comando make-check, no se alteró nada excepto que se volvió a compilar y se creó el archivo en /etc/fstab. Se siguió borrando la carpeta de Procps-ng,se extrajo util-linux, y se siguió con la instalación de dicho paquete.
+
+Problema: El make check de util-linux también dio un error.
+
+Solución: Se encontró que el error era por el tests kill decode que el manual explica que falla por la versión del bash. Entonces se siguió con la instalación
+
+## Resultados Obtenidos
+
+
+####  Man-DB-2.13.1    - Instalado
+
+Herramientas necesarias para visualizar y buscar los man pages.
+
+####  Procps-ng-4.0.5   - Instalado
+
+Programas para monitorear, administrar procesos y el estado del sistema.
+
+####  Util-linux-2.41.1    - Instalado
+
+Herramientas esenciales de bajo nivel para la administración básica de Linux.
+
+####  E2fsprogs-1.47.3    - Instalado
+
+Herramientas para crear, reparar y mantener los sistemas de archivos ext2, ext3 y ext4
+
+
+## Evidencia
+
+![man-db-make](../imagenes/LFS/sesion34/man-db-make.png)
+*Figura 1: man-db-make*
+
+![man-db-make-check](../imagenes/LFS/sesion34/man-db-make-check.png)
+*Figura 2: man-db-make-check*
+
+![man-db-make-install](../imagenes/LFS/sesion34/man-db-make-install.png)
+*Figura 3: man-db-make-install*
+
+![procps-ng-make](../imagenes/LFS/sesion34/procps-ng-make.png)
+*Figura 4: procps-ng-make*
+
+![procps-ng-make-check-fallo-pgrep](../imagenes/LFS/sesion34/procps-ng-make-check-fallopgrep.png)
+*Figura 5: procps-ng-make-check-fallo-pgrep*
+
+![procps-ng-make-check](../imagenes/LFS/sesion34/procps-ng-make-check.png)
+*Figura 6: procps-ng-make-check*
+
+![procps-ng-make-install](../imagenes/LFS/sesion34/procps-ng-make-install.png)
+*Figura 7: procps-ng-make-install*
+
+![util-linux-make](../imagenes/LFS/sesion34/util-linux-make.png)
+*Figura 8: util-linux-make*
+
+![util-linux-make-check](../imagenes/LFS/sesion34/util-linux-make-check.png)
+*Figura 9: util-linux-make-check*
+
+![util-linux-make-check-kill-decode](../imagenes/LFS/sesion34/util-linux-make-check-kill-decode.png)
+*Figura 10: util-linux-make-check-kill-decode*
+
+![util-linux-make-install](../imagenes/LFS/sesion34/util-linux-make-install.png)
+*Figura 11: util-linux-make-install*
+
+![e2fsprogs-make](../imagenes/LFS/sesion34/e2fsprogs-make.png)
+*Figura 12: e2fsprogs-make*
+
+![e2fsprogs-make-check-fallo-esperado](../imagenes/LFS/sesion34/e2fsprogs-make-check-fallo-esperado.png)
+*Figura 13: e2fsprogs-make-check-fallo-esperado*
+
+![e2fsprogs-make-install](../imagenes/LFS/sesion34/e2fsprogs-make-install.png)
+*Figura 14: e2fsprogs-make-install*
+
