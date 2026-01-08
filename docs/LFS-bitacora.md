@@ -6316,20 +6316,20 @@ DHCP=ipv4
 UseDomains=true
 EOF
 
-### Nombre del host
+#Nombre del host
 
 echo "<LFSito>" > /etc/hostname
 
 #Configuración de /etc/hosts
 
 cat > /etc/hosts << "EOF"
-# Begin /etc/hosts
+#Begin /etc/hosts
 
 ::1       ip6-localhost ip6-loopback
 ff02::1   ip6-allnodes
 ff02::2   ip6-allrouters
 
-# End /etc/hosts
+#End /etc/hosts
 EOF
 
 ### 9.6
@@ -6362,7 +6362,7 @@ cat > /etc/inputrc << "EOF"
 #Lista de shells válidos para el sistema
 
 cat > /etc/shells << "EOF"
-# Begin /etc/shells
+#Begin /etc/shells
 
 /bin/sh
 ….
