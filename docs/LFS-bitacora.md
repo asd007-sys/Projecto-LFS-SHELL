@@ -6247,3 +6247,159 @@ Herramientas para crear, reparar y mantener los sistemas de archivos ext2, ext3 
 ![e2fsprogs-make-install](../imagenes/LFS/sesion34/e2fsprogs-make-install.png)
 *Figura 14: e2fsprogs-make-install*
 
+---
+
+
+# Sesión 35: 8 de Enero - Configuraciones del sistema
+
+## Objetivo:  Configurar el sistema correctamente para un buen primer booteo.
+
+## Tareas Realizadas
+
+(09:15 - 09:24 ) 
+- Limpiar al terminar capitulo 8
+
+(09:24- 09:41 ) 
+- 9.2 Configuración de Red para el sistema final 
+
+(09:41 - 10:00 ) 
+- Leer y saltar 9.3,9.4,9.5
+
+(10:00 - 10:11) 
+- 9.6 Configuración de la consola
+
+(10:11 - 10:38) 
+- 9.7 Configuración del Locale
+
+(10:38 - 10:55) 
+- 9.8 Configuración del archivo /etc/inputrc
+
+(10:55 - 11:01) 
+- 9.9 Configuración del archivo /etc/shells
+  
+## Comandos principales ejecutados:
+
+### 8.84
+
+#Remover archivos de los tests
+
+rm -rf /tmp/{*,.*}
+
+#Remover archivos libtool no necesarios
+
+find /usr/lib /usr/libexec -name \*.la -delete
+
+#Eliminar compilador usado en capitulos anteriores
+
+find /usr -depth -name $(uname -m)-lfs-linux-gnu\* | xargs rm -rf
+
+#Eliminar usario utilizado para los tests
+
+userdel -r tester
+
+### 9.2
+
+#Buscar nombre de interfaz de red
+
+ip link
+
+#Configuración automática DHCP
+
+cat > /etc/systemd/network/10-eth-dhcp.network << "EOF"
+[Match]
+Name=enp0s3
+
+[Network]
+DHCP=ipv4
+
+[DHCPv4]
+UseDomains=true
+EOF
+
+### Nombre del host
+
+echo "<LFSito>" > /etc/hostname
+
+#Configuración de /etc/hosts
+
+cat > /etc/hosts << "EOF"
+# Begin /etc/hosts
+
+::1       ip6-localhost ip6-loopback
+ff02::1   ip6-allnodes
+ff02::2   ip6-allrouters
+
+# End /etc/hosts
+EOF
+
+### 9.6
+
+#Establecer fuenta para la consola del LFS
+
+echo FONT=Lat2-Terminus16 > /etc/vconsole.conf
+
+#No se ingresa keymap, ya que se va a usar el predeterminado.
+
+### 9.7
+
+#Mostrar los locales disponibles
+
+locale -a
+
+#Determinar locale correcto e iso correcto
+
+LC_ALL=en_US locale charmap
+
+### 9.8
+
+#Crear el archivo inputrc,este archivo controla el comportamiento del teclado al escribir en la terminal
+
+cat > /etc/inputrc << "EOF"
+…..
+
+### 9.9
+
+#Lista de shells válidos para el sistema
+
+cat > /etc/shells << "EOF"
+# Begin /etc/shells
+
+/bin/sh
+….
+
+
+## Reflexiones Técnicas
+
+La sección 8.83 se decidió saltar por que es opcional, se encuentra innecesario reducir el tamaño y también, elimina el debugging, que es esencial para este caso ya que se está armando y aprendiendo por primera vez.
+La sección 8.84 se encarga de eliminar archivos que no son necesarios o hasta perjudiciales si se decide instalar BLFS.
+
+En el capítulo 9.2 para la configuración de red, se decidió dejar el nombre de la interfaz enp0s3,ya que no demuestra útil cambiarlo.
+Para la configuración de ip se utiliza DHCP simplemente por conveniencia, y también porque no se necesita una ip específica para este sistema.
+El DNS se va a manejar con systemd-resolved en vez del archivo /etc/resolv.conf.Por lo que no hace falta configurarlo.
+El archivo /etc/hosts es idéntico al del manual excepto la linea <192.168.0.2> <FQDN> [alias1] [alias2] …, ya que el manual explica que no es necesario si se usa DHCP, lo cual se decidió usar. Usualmente este archivo incluirá localhost, pero el manual estipula que el modulo NSS se encarga de esto, por esto no se le ingresa localhost.
+
+En la sección 9.4 no se realizó porque no hay dispositivo que configurar, entonces no se vio necesario porque no hay dispositivo alguno que ingresar.
+La sección 9.5 en la configuración del tiempo del sistema, solo especifica ingresar el archivo adjtime si esta correcta la hora del sistema, como no lo está, se decide dejar al terminar y cambiar la hora si es necesario con los comandos timedatectl set-time YYYY-MM-DD HH:MM:SS al entrar al sistema por primera vez.
+
+En la sección 9.6 configuración de la consola, solo se especificó el tipo de fuente a utilizar para el soporte de caracteres correcto, el key-map se decidió usar el predeterminado, de nuevo, si hace falta cambiar algo.De nuevo, si mas adelante hace falta cambiarlo, se puede hacer después del primer booteo del sistema con el comando localectl set-keymap MAP.
+
+En la sección 9.7 configuración del local, se encontró el locale a utilizar, y con el comando LC_ALL=en_US.utf8 locale charmap se encontró que devolvía el nombre canónico UTF-8, y según el manual hay que utilizar el nombre canónico y no la del locale, osea en_US.UTF-8 es el nombre correcto a utilizar y es el que se utilizó para el archivo /etc/locale.conf. El archivo /etc/profile se ingresó como esta en el manual,no se modificó.
+
+En la sección 9.8 se ingresó como esta el manual el archivo /etc/inputrc ya que no se vio necesario modificarlo.Habilita caracteres de 8-bits,funciones como el botón de home,end con comportamiento esperado, que visualmente siga un comando largo en una nueva línea y no horizontalmente desplazando el terminal.
+
+En la sección 9.9 se crea el archivo /etc/shells para ingresar los shells que van a estar habilitados en el sistema. Programas utilizan este archivo para saber cuáles shells están permitidos. El archivo se ingresó como está en el manual y no se modificó.
+
+
+El capítulo  9 consiste en configuraciones para el funcionamiento correcto del sistema final,asegurarse de que la red, dispositivos, tiempo del sistema, comportamiento de la terminal, fuente y lenguaje del sistema,y archivos de sistemas, existan y funcionen correctamente. Esto ayuda a que al entrar al sistema por primera vez, se tenga que solo lidiar con una significativa menor cantidad de problemas posibles, ya que se asume que al construir por primera vez, es muy probable encontrar muchos problemas.
+
+
+
+### Problemas Encontrados
+
+Problema: No se sabía el nombre del dispositivo de red
+
+Solución: Al preguntar a la inteligencia artificial sobre un comando, se recomendó utilizar el comando ip link, que lista el dispositivo que se buscaba.
+
+Problema: No podia ejecutar el comando timedatectl 
+
+Solución: Esto es un comportamiento esperado, ya que se necesita bootear al sistema (el aviso de esto no aparece hasta después de varios comandos en el manual, sería conveniente tener el aviso encima del primer comando, en vez de después del último.)
