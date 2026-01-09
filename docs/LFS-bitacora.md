@@ -6403,3 +6403,335 @@ Solución: Al preguntar a la inteligencia artificial sobre un comando, se recome
 Problema: No podia ejecutar el comando timedatectl 
 
 Solución: Esto es un comportamiento esperado, ya que se necesita bootear al sistema (el aviso de esto no aparece hasta después de varios comandos en el manual, sería conveniente tener el aviso encima del primer comando, en vez de después del último.)
+
+
+---
+
+# Sesión 36: 9 de Enero - Configuraciones finales del sistema 
+
+## Objetivo: Configurar el sistema correctamente para un buen primer booteo.
+
+## Tareas Realizadas
+
+(09:43 - 09:55) 
+- Cap 9.10 Configuración systemd
+
+(09:55- 10:08 ) 
+- Crear /etc/fstab
+
+(10:08 - 11:23 ) 
+- 10.3 - Linux-6.16.1 
+
+(11:23 - 11:58) 
+- Configuraciones finales
+
+(11:58 - 12:14)
+BREAK
+
+(12:14 -  12:34)
+Reinstalar util-linux
+
+(12:34 -  13:30)
+Resolver problema con montaje /home inesperado
+
+  
+## Comandos principales ejecutados:
+
+### 9.10
+
+#Crear directorio para servicio
+
+mkdir -pv /etc/systemd/system/getty@tty1.service.d
+
+#Archivo para que no se borren automáticamente los logs al bootear
+
+cat > /etc/systemd/system/getty@tty1.service.d/noclear.conf << EOF
+[Service]
+TTYVTDisallocate=no
+EOF
+
+
+
+mkdir -pv /etc/systemd/coredump.conf.d
+
+#Crear archivo para limitar el tamaño máximo del core dump
+
+cat > /etc/systemd/coredump.conf.d/maxuse.conf << EOF
+[Coredump]
+MaxUse=5G
+EOF
+
+
+
+
+
+### 10.2. Crear fstab
+
+#Para ver las particiones
+
+lsblk
+
+
+#Crear fstab, para establecer montajes predeterminados
+
+cat > /etc/fstab << "EOF"
+
+# file system  mount-point  type     options             dump  fsck
+#                                                              order
+
+/dev/sda6     /            ext4    defaults            1     1
+/dev/sda3     swap         swap     pri=1               0     0
+
+# End /etc/fstab
+EOF
+
+#Limpiar el kernel tree
+
+make mrproper
+
+#Hacer configuración predeterminada en base del sistema actual
+
+make defconfig
+
+#Configurar el .config
+
+make menuconfig
+
+load .config
+
+Usar las configuraciones de manual
+
+save .config
+
+#Compilar la imagen del kernel y sus módulos
+
+make
+make modules_install
+
+#Asegurar de que exista la imagen kernel en el directorio esperado, diferentes plataformas pueden instalarlo en diferentes lugares
+
+cp -iv arch/x86/boot/bzImage /boot/vmlinuz-6.16.1-lfs-12.4-systemd
+
+#Recurso usado para investigar problemas en el kernel
+
+cp -iv System.map /boot/System.map-6.16.1
+
+#Hacer backup del archivo .config creado (para futura referencia)
+
+cp -iv .config /boot/config-6.16.1
+
+#Instalar documentación
+
+cp -r Documentation -T /usr/share/doc/linux-6.16.1
+
+
+### 10.4 Grub
+
+Se decidió no instalar grub, si no cambiar el existente en el build system
+
+#Salir de chroot
+exit
+
+#Editar archivo de entradas GRUB
+
+nano /etc/grub.d/40_custom
+
+   # Agregar esta entrada de menu para LFS
+  #Soporte para particiones gpt, sistemas de archivos ext2-ext3-ext4, especificar root (primer disco sexta particion), kernel y parametro
+   menuentry "LFS 12.4 - Linux 6.16.1" {
+       insmod part_gpt
+       insmod ext2
+       set root=(hd0,6)
+       linux /boot/vmlinuz-6.16.1-lfs-12.4-systemd root=/dev/sda6 ro
+   }
+   
+#Regenerar la configuración de GRUB
+
+grub2-mkconfig -o /boot/grub2/grub.cfg
+
+### 11.1 Configuraciones finales
+
+#Agregar información del sistema para referencia a los archivos lfs-release,lsb-release,os-release
+
+#En esta parte, como se salio anteriormente del chroot, se ingreso de vuelta y se volvio a agregar las informaciones a los archivos correspondientes
+
+
+echo 12.4-systemd > /etc/lfs-release
+
+cat > /etc/lsb-release << "EOF"
+….
+
+cat > /etc/os-release << "EOF"
+…
+
+
+### 11.3 Pasos finales
+
+#Desmontar todo el sistema de archivos virtual
+
+umount -v $LFS/dev/pts
+mountpoint -q $LFS/dev/shm && umount -v $LFS/dev/shm
+umount -v $LFS/dev
+umount -v $LFS/run
+umount -v $LFS/proc
+umount -v $LFS/sys
+umount -v $LFS
+
+
+
+### Reinstalar util-linux
+
+#Después de que falle el primer booteo
+
+#montar lfs
+
+mount /dev/sda6 /mnt/lfs
+
+export LFS=/mnt/lfs
+cd $LFS
+source ~/.bashrc
+source ~/.bash_profile
+
+#montar sistema de archivos virtual
+
+mount -v --bind /dev $LFS/dev
+mount -vt devpts devpts -o gid=5,mode=0620 $LFS/dev/pts
+mount -vt proc proc $LFS/proc
+mount -vt sysfs sysfs $LFS/sys
+mount -vt tmpfs tmpfs $LFS/run
+if [ -h $LFS/dev/shm ]; then
+  install -v -d -m 1777 $LFS$(realpath /dev/shm)
+else
+  mount -vt tmpfs -o nosuid,nodev tmpfs $LFS/dev/shm
+fi
+
+#Entrar a chroot
+
+chroot "$LFS" /usr/bin/env -i \
+HOME=/root  \
+TERM="$TERM" \
+PS1='(lfs chroot) \u:\w\$ ' \
+PATH=/usr/bin:/usr/sbin \
+MAKEFLAGS="-j$(nproc)" \
+TESTSUITEFLAGS="-j$(nproc)" \
+/bin/bash --login
+
+#Reinstalar util-linux
+
+cd /sources
+
+tar -xf util-linux-2.41.1
+cd util-linux-2.41.1
+
+./configure --bindir=/usr/bin     \
+…..
+
+make
+
+make install
+
+### Error del home partition
+
+#Ver el problema sugerido por los logs
+
+systemctl status home.mount
+
+#Crear el directorio para generadores de systemd si no existe
+mkdir -p /etc/systemd/system-generators
+
+#Crear symbolic link con el nombre del generador a un valor nulo,para deshabilitar el generador automático
+
+ln -sf /dev/null /etc/systemd/system-generators/systemd-gpt-auto-generator
+
+
+
+
+## Reflexiones Técnicas
+
+
+En la sección 9.10 configuraciones y usos de Systemd, solo se decidió cambiar el comportamiento predeterminado de limpiar la pantalla al bootear, ya que puede haber información útil y también no se encuentra necesario borrarlo. No se encontró necesario cambiar tmpfs,a creación automática o comportamiento predeterminado de los servicios.
+También se cambió el tamaño máximo de los core dumps a 5 gigas, ya que advierte que pueden llegar a utilizar mucho espacio,entonces limitar el tamaño máximo tiene coherencia.
+
+El crear el fstab es importante  para el funcionamiento de Linux, le indica donde se monta, qué partición se monta , qué tipo de sistema de archivo,en que orden, entonces, por más de que sea una sección corta es de suma importancia tener los valores correctos para el root y el swap, ya que hacerlo mal se asume que es un punto de falla muy común para principiantes como este mismo autor.
+
+El paquete 10.3 Linux-6.16.1 es el kernel propio del sistema LFS, de suma importancia y potencialmente igual complejidad, el manual se encarga de explicar muy bien paso a paso que hay que hacer. Aun así, cometió muchos errores. El primer intento de correr make menuconfig, no se usó la opción  de make defconfig, que toma en cuenta la arquitectura actual del sistema, entonces se volvió a comenzar. El segundo intento se utilizó correctamente make defconfig, sin embargo, no se corrió make menuconfig como se debe, entonces, se volvió a comenzar. En el tercer intento se guardó en el archivo Kconfig y no .config. Esto demuestra que aun con explicaciones claras es fácil de malinterpretar los pasos.
+
+En el paso del Grub se utilizó inteligencia artificial para ayudar a modificar el bootloader actual para incluir el nuevo LFS.
+
+
+
+### Problemas Encontrados
+
+Problema: Al crear el /etc/fstab, no se recordaba el /dev/sdax del swap o del LFS
+
+Solución:Utilizando el comando lsblk se logró encontrar
+
+Problema:No se sabía si era necesario crear grub
+
+Solución: El manual explícitamente dice que se puede usar el bootloader actual y modificarlo para agregar el LFS.
+
+Problema: Se trataba de desmontar /mnt/lfs pero el sistema operativo avisaba que estaba ocupado
+
+Solución:Se logró matando el proceso que lo estaba utilizando y después desmontarlo con los comandos :
+
+fuser -km $LFS        #Matar procesos que usan el punto montaje /mnt/lfs
+
+umount -v $LFS     #Desmontar
+
+
+Problema: Al bootear por primera vez salió un mensaje: Failed to execute /usr/sbin/sulogin: No such file or directory
+
+Solución:Con ayuda de la inteligencia artificial y del manual LFS, se encontró que sulogin que no se encontraba al entrar al modo emergencia debería estar instalado por util-linux Por razón alguna, al instalar util-linux, este no instalo sulogin,es probable que al correr el make check, no se haya ingresado correctamente y pudo causar alguna eliminación. Entonces, se volvió a ingresar al sistema build (Rocky linux), se monto la partición lfs, el sistema de archivos virtual , se ingresó al chroot, y se volvió a instalar util-linux, saltando el make check por si acaso, haciendo esto se logró a ingresar al modo emergencia ingresando la contraseña del root.
+
+Problema: Ahora el próximo problema,después del sulogin, es que la partición /home no se puede montar, sin embargo este no existe en el fstab
+
+Solución:Con ayuda de la inteligencia artificial y del comando systemctl status home.mount, se determinó que la componente systemd-gpt-auto-generator intentaba montar la partición /home del Rocky Linux automáticamente. El problema siendo que este fue asignado el sistema de archivo xfs y no ext4, también el hecho que no había intención alguna de montarlo, y lo más importante es que no se encontraba la componente el la dirección esperada, según la IA, esto es porque existe un binario de esta componente que se ejecuta automáticamente desde algún directorio.
+Por esto,para desactivarlo los comandos utilizados fueron:
+
+mkdir -p /etc/systemd/system-generators
+ln -sf /dev/null /etc/systemd/system-generators/systemd-gpt-auto-generator
+
+Así que cuando se encuentre con el symbolic link nulo en el directorio esperado, no ejecuta nada.
+
+
+### Evidencias
+
+![linux-make](../imagenes/LFS/sesion11/linux-make.png)
+*Figura 1: linux make*
+
+![error_al_bootar_1ra_vez](../imagenes/LFS/sesion11/error_al_bootar_1ra_vez.png)
+*Figura 2: error al bootear por primera vez*
+
+![utillinux-make](../imagenes/LFS/sesion11/utillinux-make.png)
+*Figura 3: util-linux make*
+
+![utillinux-make-install](../imagenes/LFS/sesion11/utillinux-make-install.png)
+*Figura 4: util-linux make install*
+
+![existe_sulogin](../imagenes/LFS/sesion11/existe_sulogin.png)
+*Figura 5: existe sulogin*
+
+![2ndo_booteo_modoemergencia](../imagenes/LFS/sesion11/2ndo_booteo_modoemergencia.png)
+*Figura 6: segundo booteo en modo emergencia*
+
+![journalctl](../imagenes/LFS/sesion11/journalctl.png)
+*Figura 7: journalctl*
+
+![ver_donde_Esta_montando](../imagenes/LFS/sesion11/ver_donde_Esta_montando.png)
+*Figura 8: ver dónde está montando*
+
+![Booteo_exitoso](../imagenes/LFS/sesion11/Booteo_exitoso.png)
+*Figura 9: booteo exitoso*
+
+![systemctl-status](../imagenes/LFS/sesion11/systemctl-status.png)
+*Figura 10: systemctl status*
+
+
+
+
+
+
+
+
+
+
