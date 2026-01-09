@@ -6476,13 +6476,13 @@ lsblk
 
 cat > /etc/fstab << "EOF"
 
-# file system  mount-point  type     options             dump  fsck
-#                                                              order
+#file system  mount-point  type     options             dump  fsck
+                                                              order
 
 /dev/sda6     /            ext4    defaults            1     1
 /dev/sda3     swap         swap     pri=1               0     0
 
-# End /etc/fstab
+#End /etc/fstab
 EOF
 
 #Limpiar el kernel tree
