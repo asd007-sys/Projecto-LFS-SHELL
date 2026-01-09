@@ -6696,34 +6696,34 @@ Así que cuando se encuentre con el symbolic link nulo en el directorio esperado
 
 ### Evidencias
 
-![linux-make](../imagenes/LFS/sesion11/linux-make.png)
+![linux-make](../imagenes/LFS/sesion36/linux-make.png)
 *Figura 1: linux make*
 
-![error_al_bootar_1ra_vez](../imagenes/LFS/sesion11/error_al_bootar_1ra_vez.png)
+![error_al_bootar_1ra_vez](../imagenes/LFS/sesion36/error_al_bootar_1ra_vez.png)
 *Figura 2: error al bootear por primera vez*
 
-![utillinux-make](../imagenes/LFS/sesion11/utillinux-make.png)
+![utillinux-make](../imagenes/LFS/sesion36/utillinux-make.png)
 *Figura 3: util-linux make*
 
-![utillinux-make-install](../imagenes/LFS/sesion11/utillinux-make-install.png)
+![utillinux-make-install](../imagenes/LFS/sesion36/utillinux-make-install.png)
 *Figura 4: util-linux make install*
 
-![existe_sulogin](../imagenes/LFS/sesion11/existe_sulogin.png)
+![existe_sulogin](../imagenes/LFS/sesion36/existe_sulogin.png)
 *Figura 5: existe sulogin*
 
-![2ndo_booteo_modoemergencia](../imagenes/LFS/sesion11/2ndo_booteo_modoemergencia.png)
+![2ndo_booteo_modoemergencia](../imagenes/LFS/sesion36/2ndo_booteo_modoemergencia.png)
 *Figura 6: segundo booteo en modo emergencia*
 
-![journalctl](../imagenes/LFS/sesion11/journalctl.png)
+![journalctl](../imagenes/LFS/sesion36/journalctl.png)
 *Figura 7: journalctl*
 
-![ver_donde_Esta_montando](../imagenes/LFS/sesion11/ver_donde_Esta_montando.png)
+![ver_donde_Esta_montando](../imagenes/LFS/sesion36/ver_donde_Esta_montando.png)
 *Figura 8: ver dónde está montando*
 
-![Booteo_exitoso](../imagenes/LFS/sesion11/Booteo_exitoso.png)
+![Booteo_exitoso](../imagenes/LFS/sesion36/Booteo_exitoso.png)
 *Figura 9: booteo exitoso*
 
-![systemctl-status](../imagenes/LFS/sesion11/systemctl-status.png)
+![systemctl-status](../imagenes/LFS/sesion36/systemctl-status.png)
 *Figura 10: systemctl status*
 
 
