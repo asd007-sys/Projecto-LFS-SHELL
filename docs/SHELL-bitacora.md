@@ -827,5 +827,74 @@ Solución: Como los directorios padres necesitan existir primero, en vez de hace
 - Implementar el logger en todas las funciones
 
 
+---
+
+
+# Fecha: 10 de Enero del 2026
+# Objetivo del día: Crear la función del tutorial
+
+## Tareas realizadas:
+
+(12:02 - 13:12)
+- Planear función 
+- Función básica de tutorial, acepta un comando
+
+(13:12 - 13:58)
+- Función tutorial acepta comando y argumentos
+- Imprime correctamente después de ingresar comando
+
+### Comandos Utilizados
+
+#Determinar nombre del usb en /dev
+
+lsblk
+
+#Montar el usb y copiarlo al LFS
+
+mount /dev/sdb1 /home/asd
+
+#Ejecutar shell
+
+python3 shell.py
+
+
+#Dentro del tutorial
+
+ - pwd  #Ejecutar comando interno
+ - ls  #Ejecutar ls
+ - mkdir asd #Crear directorio asd
+ - cd asd #Moverse al directorio creado
+ - touch addy #Ejecutar comando externo, crear archivo addy
+ - cp addy addyCopia #Copiar archivo
+ - rm addy #Remover archivo
+ - echo “Termine el tutorial!” #Ejecutar ultimo comando
+
+
+### Problemas Encontrados
+
+Problema: El diseño del tutorial mostró ser más complejo de lo pensado originalmente. No se sabía dónde comenzar.
+
+Solución: Con ayuda de la inteligencia artificial, ayudó a idea el formato de guardar los pasos en una lista con tuplas. Este fue la base del diseño de la función.
+
+Problema: La función solo acepta el comando, pero se quiere ingresar también argumentos a la función de tutorial
+
+Solución: En vez de utilizar una lista de tuplas de 3 valores cada uno, se añade el argumento en cada tupla, se adaptó los parámetros de la función y de la llamada de la función acordemente. El argumento funciona: lista vacía si no tiene argumentos, y una lista si tiene uno o múltiples.
+
+Problema: El tutorial ejecuta los comandos que no son los correctos. Por ejemplo, si el paso actual pide ingresar ‘pwd’, y se ingresa ‘cat’, el comando ‘cat’ se ejecuta, esto no es deseado.
+
+Solución: Ahora, el tutorial retorna valores booleanos, si se cumplió correctamente el paso se devuelve True, si no, se devuelve false. Después, se asigna la llamada de la función a una variable, si la variable devuelve False, esta ejecuta el comando continue, que retorna al tutorial sin ejecutar ni un comando, y si es True, realiza lo que necesita.
+
+Problema: Después de la última solución, ahora ningún comando corre correctamente en el shell. Al ejecutar un comando, solo se imprime una línea vacía.
+
+Solución: La variable que se le asignó la llamada de la función se ejecuta siempre, entonces al entrar a la función y ejecutar el código if paso_actual == -1 return, este retorna un valor de tipo NONE, y se espera True para poder seguir con los comandos, al cambiar el return a True, este ahora permite ejecutar el resto del código correctamente.
+
+Problema: La implementación actual del tutorial imprime las instrucciones del próximo paso antes de ejecutar el comando del paso actual, si se ejecuta ls, las instrucciones del próximo paso quedan detrás de la salida del comando ls
+
+Solución:Se creó otra función llamada imprimir_info_tutorial, que se encarga de informar al usuario si fue exitoso el comando ingresado, y de informar la próxima instrucción. Esta función es llamada después de todos los comandos posibles (internos y externos). Así, se permite ejecutar primero el comando pedido por el tutorial, y después imprimir y avisar al usuario correctamente las próxima instrucción.
+
+
+
+
+
 
 	

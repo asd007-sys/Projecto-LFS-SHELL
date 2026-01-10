@@ -95,7 +95,7 @@ def mostrar_logs(tipo):
 
         print(f"\n=== LOG DE {nombre} ({len(lineas)} entradas) ===\n")
 
-        for linea in lineas[-30:]:  # Mostrar ultimas 30 l铆neas,para no tener demasiadas lineas
+        for linea in lineas[-30:]:  # Mostrar ultimas 30 líneas,para no tener demasiadas lineas
             print(linea.strip())
 
         print(f"\nArchivo completo: {archivo}")
@@ -114,9 +114,88 @@ def registrar_error(comando, args, tipo_error, mensaje_error):
             f.write(formateado)
     except Exception as e:  # Si falla el log, no interrumpir el shell
         pass
+
+
+PASOS_TUTORIAL = [    #Lista de tuplas de cada paso del tutorial,valores por tupla: 1ero comando correcto, 2ndo argumentos correctos, 3ro Instruccion del paso, 4to mensaje al cumplir con el requisito
+    ("pwd", [], "Escribe 'pwd'", "Perfecto."),
+    ("ls", [], "Escribe 'ls'", "Perfecto."),
+    ("mkdir", ["asd"], "Escribe 'mkdir asd'", "Has creado la carpeta asd."),
+    ("cd", ["asd"], "Escribe 'cd asd' para entrar", "Ya estas dentro."),
+    ("touch", ["addy"], "Escribe 'touch addy' para crear archivo nuevo", "Archivo addy creado"),
+    ("cp", ["addy", "addyCopia"], "'cp addy addyCopia' para copiar el archivo addy", "Archivo addy copiado"),
+    ("rm", ["addy"], "Escribe 'rm addy' para eliminar archivo addy", "Archivo addy eliminado."),
+    ("echo", ["Termine el tutorial!"], "Escribe echo \"Termine el tutorial!\" ", "Ultimo paso logrado!.")
+    
+    
+]
+
+
+paso_actual = -1 # -1 signifca fuera del tutorial, diferente a -1 significa dentro del tutorial
+
 """
 
-    Funci贸n built-in echo
+    Función tutorial
+
+         - Tutorial de funciones
+         - Utiliza lista de tuplas con 4 valores 
+         
+
+"""
+
+def tutorial(comando,args):
+    global paso_actual   #Utilizar la variable global
+
+
+    if paso_actual == -1: #Si el modo tutorial no esta activo, salir
+        return True  #Para funcionamiento esperado de la shell, la llamada de esta funcion corre siempre, si es False o None, el shell no funciona como debe e ignora comandos.
+
+    comando_esperado,argumentos, instruccion, info = PASOS_TUTORIAL[paso_actual]  #Asignar a cada varible correspondiente el valor del elemento actual de la tupla
+
+
+
+    if comando == comando_esperado and args == argumentos:  #Si el usuario ingreso el comando y los argumentos esperados
+        return True     #Permitir ejecucion del comando ingresado
+                        #La funcion imprimir_info_tutorial se encarga de los mensajes de exito
+    else:#Si el usuario ingreso el comando o  argumentos incorrectos
+        if comando == comando_esperado:  #Si el comando ingresado por el usuario es correcto y el argumento  es incorrecto
+            print(f" El comando es '{comando_esperado}', pero el argumento debe ser '{' '.join(argumentos)}'")
+        else: #Viceversa
+            print(f"Error. Se esperaba '{comando_esperado} {' '.join(argumentos)}'.")
+        return False  #Bloquear comando ingresado
+
+
+"""
+
+    Función ayudante del tutorial
+
+         - Imprime correctamente las intrucciones del proximo paso
+         - Encargado de finalizar tutorial
+
+
+"""
+
+def imprimir_info_tutorial():
+    global paso_actual  #Utilizar la variable global
+    if paso_actual == -1:  #Si el modo tutorial no esta activo, salir
+        return True
+
+
+    a, b, c, info = PASOS_TUTORIAL[paso_actual] #Solo interesa avisar al usuario la informacion de exito del paso actual, las variables a,b,c no se utilizan
+    print(f"\n {info}") #Imprimir descripcion de exito del paso actual
+
+    paso_actual += 1 #Cargar el indice del proximo paso
+
+    if paso_actual >= len(PASOS_TUTORIAL): #Si el anterior paso era el ultimo del tutorial, terminar el tutorial
+        print("?Fin del tutorial!\n")
+        paso_actual = -1 #Resetar variable para salir del modo tutorial
+    else:    #Existe un siguente paso, seguir con el tutorial
+        print(f"SIGUIENTE: {PASOS_TUTORIAL[paso_actual][2]}") #Imprime la instruccion del proximo paso a realizar
+
+
+
+"""
+
+    Función built-in echo
 
          - Imprime los argumentos recibidos separados por un espacio
          - Imprime linea vacia si no se ingresa argumentos, como lo hace echo normalmente
@@ -146,7 +225,7 @@ def echo(args):
 
 """
 
-    Funci贸n built-in cat
+    Función built-in cat
 
          - Abre archivo y lo imprime
          - Maneja archivos grandes eficientemente
@@ -184,7 +263,7 @@ def cat(args):
 
 """
 
-    Funci贸n built-in mdkir
+    Función built-in mdkir
 
          - Crea directorio con nombre ingresado
          - Maneja errores, directorio existentes o falta de privilegio
@@ -218,7 +297,7 @@ def mkdir(args):
 
 """
 
-    Funci贸n built-in rm
+    Función built-in rm
 
          - Borra archivo
          - Obliga al usuario a confirmar la eliminacion del archivo
@@ -243,7 +322,7 @@ def rm(args):
         return
 
     # Prompt de confirmacion a borrar el archivo
-    confirmacion = input(f" 驴Esta seguro que desea borrar '{archivo}'? [s/n]: ").lower().strip()
+    confirmacion = input(f" ?Esta seguro que desea borrar '{archivo}'? [s/n]: ").lower().strip()
 
     if confirmacion != 's':  # Si el usuario confirma que quiere borar el archivo
         print(" Operacion cancelada por el usuario.")
@@ -263,7 +342,7 @@ def rm(args):
         registrar_error("rm", args, "FaltaPermiso","No tiene los privilegios suficientes")  # Funcion para regisrar error
 
 """
-   Funci贸n built-in cp
+   Función built-in cp
 
         - Copia archivos
         - Precisa de exactamente dos argumentos, el primero a copiar, el segundo donde crear el archivo copiado
@@ -291,7 +370,7 @@ def cp(args):
             with open(origen, "rb") as a_origen:  # Abrir en lectura, para copiar archivo
                 with open(destino, "wb") as a_destino:  # Abrir en modo escritura, para el archivo
 
-                    Bloque_grande = 1000000  # Tama帽o asignado del bloque a leer y escribir
+                    Bloque_grande = 1000000  # Tama?o asignado del bloque a leer y escribir
 
                     while True:  # Loop de i/o
 
@@ -317,7 +396,7 @@ def cp(args):
             registrar_error("cp", args, "FaltaPermiso","No tiene los privilegios suficientes para copiar")  # Funcion para regisrar error
 
         except OSError as e:  # Error generico
-            print(f"Ocurri贸 un error durante la copia: {e}")
+            print(f"Ocurrió un error durante la copia: {e}")
             registrar_accion("cp", args, False,"Ha ocurrido un error")  # Funcion para registrar accion fallida
             registrar_error("cp", args, "ErrorGenerico","Ha ocurrido un error")  # Funcion para regisrar error
 
@@ -325,7 +404,7 @@ def cp(args):
 
 """
 
-     Funci贸n built-in cd
+     Función built-in cd
 
         - Cambia de directorio al ingresar en el shell: cd Directorio-a-cambiar
         - Al ingresar solo el comando cd, se permanece en el directorio actual y se le avisa al usuario.
@@ -359,7 +438,7 @@ def cd(args):
 
 """
 
-    Funci贸n built-in ls
+    Función built-in ls
 
     - Muestra los archivos y directorios y los discierne
     - Permite mostrar los archivos en el directorio actual o en el directorio recibido por argumento.
@@ -412,7 +491,7 @@ def ls(args):
 
 def parseador(linea_comando):
     tokens = []  # Array final del tokens parseados
-    token_actual = ""  # Acumilador del token de construcci贸n
+    token_actual = ""  # Acumilador del token de construcción
     entre_comillas = False  # Estado dentro de comillas dobles, true adentro, false afuera
     proximo_escape = False  # True: siguiente caracter literal, False: normal
 
@@ -429,12 +508,12 @@ def parseador(linea_comando):
         elif caracter.isspace() and not entre_comillas:
             # Fin de token por espacio, solo si no estamos entre comillas
             if token_actual:
-                tokens.append(token_actual)  # Se termin贸 el token, se agrega al arrays de tokens
+                tokens.append(token_actual)  # Se terminó el token, se agrega al arrays de tokens
                 token_actual = ""  # Comenzamos un nuevo token
         else:
             # Caracter normal - agregar al token actual
             token_actual += caracter
-    # Agregar el 煤ltimo token si queda alguno, por las dudas.
+    # Agregar el último token si queda alguno, por las dudas.
     if token_actual:
         tokens.append(token_actual)
 
@@ -466,10 +545,10 @@ def ejecutar_externo(comando,
                       argv)  # Reemplazamos el codigo en el espacio de memoria del hijo, por el proceso externo que se quiere ejecutar
         except FileNotFoundError:
             print(f"Error: El comando '{comando}' no fue encontrado en el sistema.")
-            sys.exit(127)  # C贸digo est谩ndar linux para "Command not found"
+            sys.exit(127)  # Código estándar linux para "Command not found"
         except Exception as e:
             print(f"Error al ejecutar: {e}")
-            sys.exit(1)  # Salir con error gen茅rico
+            sys.exit(1)  # Salir con error genérico
     else:  # Se ejecuta actualmente el proceso Padre
 
         try:
@@ -482,10 +561,10 @@ def ejecutar_externo(comando,
 
 def main():
     """
-    Funci贸n principal del REPL
+    Función principal del REPL
 
     - Muestra el directorio actual
-    - Manejo de se帽al ( Ctrl+C)
+    - Manejo de se?al ( Ctrl+C)
     - Ejecuta comandos built-in
     - Sistema de salida
 
@@ -495,7 +574,8 @@ def main():
 
 
     """
-    iniciar_logs()
+    global paso_actual #Utilizar variable global
+    iniciar_logs() #Iniciar sistema de logging, ayuda a designar directorio correcto y verificar privilegios tambien.
 
     print("Bienvenido a EduShell - Shell Educativo Universitario")
     print("Escribe 'exit' para salir\n")
@@ -503,10 +583,16 @@ def main():
     while True:
         try:
 
-            # Leer comando del usuario mostrando la direcci贸n actual en el prompt
-            comando = input(f"EduShell [{os.getcwd()}] > ").strip()
+            # Leer comando del usuario mostrando el modo actual: shell normal o tutorial
 
-            # Ignorar l铆neas vac铆as
+            if paso_actual != -1: #Si se ingreso al modo tutorial
+                comando = input(f"TUTORIAL - Paso {paso_actual + 1}  > ").strip()
+            else:
+                comando = input(f"EduShell [{os.getcwd()}] > ").strip()
+
+
+
+            # Ignorar líneas vacías
             if not comando:
                 continue
 
@@ -514,10 +600,22 @@ def main():
             partes = parseador(comando)
 
             if not partes:
-                continue  # Ignorar si el parseador no devolvi贸 tokens (ej: solo un '\' o espacios)
+                continue  # Ignorar si el parseador no devolvió tokens (ej: solo un '\' o espacios)
 
             comando_principal = partes[0]  # El primer elemento del array es el comando principal
             argumentos = partes[1:]  # Los siguientes se asumen como argumentos
+
+            if comando_principal == "tutorial":
+                paso_actual = 0   #Se cambia el valor al primer paso
+                print(f"Inicio: {PASOS_TUTORIAL[0][2]}")
+                continue
+
+
+            permitido = tutorial(comando_principal,argumentos)   #Se guarda el retorno de la funcion dependiendo si se ingreso el comando correcto (True) o incorrecto (False)
+
+            if not permitido: #Si se ingreso el comando incorrecto, no se ejecuta el comando en el shell, permite al usuario no destruir o modificar algo sin intencion.
+                continue
+
 
             if comando_principal == "ver_logs":
                 mostrar_logs("acciones")  # Acceder a la funcion con tipo=acciones para ver los logs
@@ -529,7 +627,7 @@ def main():
 
             # Ejecutar comandos built-in
             if comando_principal == "exit":
-                print("隆Hasta luego!")
+                print("?Hasta luego!")
                 break
 
             elif comando_principal == "echo":
@@ -554,16 +652,19 @@ def main():
                 rm(argumentos)
 
             elif comando_principal == "pwd":
-                # Implementaci贸n manual del comando pwd
+                # Implementación manual del comando pwd
                 print(os.getcwd())
 
             else:
                 # Si no existe el commando
                 ejecutar_externo(comando_principal, argumentos)  # Funcion nueva
 
+            if paso_actual != -1:  #Si esta activo el modo tutorial
+                imprimir_info_tutorial() #Imprimir mensaje de exito. Tambien siguiente instrucciones o de finalizacion del tutorial
+
         except KeyboardInterrupt:
             # Manejo de Ctrl+C - Termina de forma alterna
-            print("\n隆Hasta luego! (Terminado con Ctrl + C!)")
+            print("\n?Hasta luego! (Terminado con Ctrl + C!)")
             break
 
 
