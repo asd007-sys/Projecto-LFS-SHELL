@@ -95,7 +95,7 @@ def mostrar_logs(tipo):
 
         print(f"\n=== LOG DE {nombre} ({len(lineas)} entradas) ===\n")
 
-        for linea in lineas[-30:]:  # Mostrar ultimas 30 líneas,para no tener demasiadas lineas
+        for linea in lineas[-30:]:  # Mostrar ultimas 30 l铆neas,para no tener demasiadas lineas
             print(linea.strip())
 
         print(f"\nArchivo completo: {archivo}")
@@ -134,7 +134,7 @@ paso_actual = -1 # -1 signifca fuera del tutorial, diferente a -1 significa dent
 
 """
 
-    Función tutorial
+    Funci贸n tutorial
 
          - Tutorial de funciones
          - Utiliza lista de tuplas con 4 valores 
@@ -166,7 +166,7 @@ def tutorial(comando,args):
 
 """
 
-    Función ayudante del tutorial
+    Funci贸n ayudante del tutorial
 
          - Imprime correctamente las intrucciones del proximo paso
          - Encargado de finalizar tutorial
@@ -186,7 +186,7 @@ def imprimir_info_tutorial():
     paso_actual += 1 #Cargar el indice del proximo paso
 
     if paso_actual >= len(PASOS_TUTORIAL): #Si el anterior paso era el ultimo del tutorial, terminar el tutorial
-        print("?Fin del tutorial!\n")
+        print("隆Fin del tutorial!\n")
         paso_actual = -1 #Resetar variable para salir del modo tutorial
     else:    #Existe un siguente paso, seguir con el tutorial
         print(f"SIGUIENTE: {PASOS_TUTORIAL[paso_actual][2]}") #Imprime la instruccion del proximo paso a realizar
@@ -195,7 +195,7 @@ def imprimir_info_tutorial():
 
 """
 
-    Función built-in echo
+    Funci贸n built-in echo
 
          - Imprime los argumentos recibidos separados por un espacio
          - Imprime linea vacia si no se ingresa argumentos, como lo hace echo normalmente
@@ -225,7 +225,7 @@ def echo(args):
 
 """
 
-    Función built-in cat
+    Funci贸n built-in cat
 
          - Abre archivo y lo imprime
          - Maneja archivos grandes eficientemente
@@ -263,7 +263,7 @@ def cat(args):
 
 """
 
-    Función built-in mdkir
+    Funci贸n built-in mdkir
 
          - Crea directorio con nombre ingresado
          - Maneja errores, directorio existentes o falta de privilegio
@@ -297,7 +297,7 @@ def mkdir(args):
 
 """
 
-    Función built-in rm
+    Funci贸n built-in rm
 
          - Borra archivo
          - Obliga al usuario a confirmar la eliminacion del archivo
@@ -322,7 +322,7 @@ def rm(args):
         return
 
     # Prompt de confirmacion a borrar el archivo
-    confirmacion = input(f" ?Esta seguro que desea borrar '{archivo}'? [s/n]: ").lower().strip()
+    confirmacion = input(f" 驴Esta seguro que desea borrar '{archivo}'? [s/n]: ").lower().strip()
 
     if confirmacion != 's':  # Si el usuario confirma que quiere borar el archivo
         print(" Operacion cancelada por el usuario.")
@@ -342,7 +342,7 @@ def rm(args):
         registrar_error("rm", args, "FaltaPermiso","No tiene los privilegios suficientes")  # Funcion para regisrar error
 
 """
-   Función built-in cp
+   Funci贸n built-in cp
 
         - Copia archivos
         - Precisa de exactamente dos argumentos, el primero a copiar, el segundo donde crear el archivo copiado
@@ -370,7 +370,7 @@ def cp(args):
             with open(origen, "rb") as a_origen:  # Abrir en lectura, para copiar archivo
                 with open(destino, "wb") as a_destino:  # Abrir en modo escritura, para el archivo
 
-                    Bloque_grande = 1000000  # Tama?o asignado del bloque a leer y escribir
+                    Bloque_grande = 1000000  # Tama帽o asignado del bloque a leer y escribir
 
                     while True:  # Loop de i/o
 
@@ -396,7 +396,7 @@ def cp(args):
             registrar_error("cp", args, "FaltaPermiso","No tiene los privilegios suficientes para copiar")  # Funcion para regisrar error
 
         except OSError as e:  # Error generico
-            print(f"Ocurrió un error durante la copia: {e}")
+            print(f"Ocurri贸 un error durante la copia: {e}")
             registrar_accion("cp", args, False,"Ha ocurrido un error")  # Funcion para registrar accion fallida
             registrar_error("cp", args, "ErrorGenerico","Ha ocurrido un error")  # Funcion para regisrar error
 
@@ -404,7 +404,7 @@ def cp(args):
 
 """
 
-     Función built-in cd
+     Funci贸n built-in cd
 
         - Cambia de directorio al ingresar en el shell: cd Directorio-a-cambiar
         - Al ingresar solo el comando cd, se permanece en el directorio actual y se le avisa al usuario.
@@ -438,7 +438,7 @@ def cd(args):
 
 """
 
-    Función built-in ls
+    Funci贸n built-in ls
 
     - Muestra los archivos y directorios y los discierne
     - Permite mostrar los archivos en el directorio actual o en el directorio recibido por argumento.
@@ -491,7 +491,7 @@ def ls(args):
 
 def parseador(linea_comando):
     tokens = []  # Array final del tokens parseados
-    token_actual = ""  # Acumilador del token de construcción
+    token_actual = ""  # Acumilador del token de construcci贸n
     entre_comillas = False  # Estado dentro de comillas dobles, true adentro, false afuera
     proximo_escape = False  # True: siguiente caracter literal, False: normal
 
@@ -508,12 +508,12 @@ def parseador(linea_comando):
         elif caracter.isspace() and not entre_comillas:
             # Fin de token por espacio, solo si no estamos entre comillas
             if token_actual:
-                tokens.append(token_actual)  # Se terminó el token, se agrega al arrays de tokens
+                tokens.append(token_actual)  # Se termin贸 el token, se agrega al arrays de tokens
                 token_actual = ""  # Comenzamos un nuevo token
         else:
             # Caracter normal - agregar al token actual
             token_actual += caracter
-    # Agregar el último token si queda alguno, por las dudas.
+    # Agregar el 煤ltimo token si queda alguno, por las dudas.
     if token_actual:
         tokens.append(token_actual)
 
@@ -545,10 +545,10 @@ def ejecutar_externo(comando,
                       argv)  # Reemplazamos el codigo en el espacio de memoria del hijo, por el proceso externo que se quiere ejecutar
         except FileNotFoundError:
             print(f"Error: El comando '{comando}' no fue encontrado en el sistema.")
-            sys.exit(127)  # Código estándar linux para "Command not found"
+            sys.exit(127)  # C贸digo est谩ndar linux para "Command not found"
         except Exception as e:
             print(f"Error al ejecutar: {e}")
-            sys.exit(1)  # Salir con error genérico
+            sys.exit(1)  # Salir con error gen茅rico
     else:  # Se ejecuta actualmente el proceso Padre
 
         try:
@@ -561,10 +561,10 @@ def ejecutar_externo(comando,
 
 def main():
     """
-    Función principal del REPL
+    Funci贸n principal del REPL
 
     - Muestra el directorio actual
-    - Manejo de se?al ( Ctrl+C)
+    - Manejo de se帽al ( Ctrl+C)
     - Ejecuta comandos built-in
     - Sistema de salida
 
@@ -592,7 +592,7 @@ def main():
 
 
 
-            # Ignorar líneas vacías
+            # Ignorar l铆neas vac铆as
             if not comando:
                 continue
 
@@ -600,7 +600,7 @@ def main():
             partes = parseador(comando)
 
             if not partes:
-                continue  # Ignorar si el parseador no devolvió tokens (ej: solo un '\' o espacios)
+                continue  # Ignorar si el parseador no devolvi贸 tokens (ej: solo un '\' o espacios)
 
             comando_principal = partes[0]  # El primer elemento del array es el comando principal
             argumentos = partes[1:]  # Los siguientes se asumen como argumentos
@@ -627,7 +627,7 @@ def main():
 
             # Ejecutar comandos built-in
             if comando_principal == "exit":
-                print("?Hasta luego!")
+                print("隆Hasta luego!")
                 break
 
             elif comando_principal == "echo":
@@ -652,7 +652,7 @@ def main():
                 rm(argumentos)
 
             elif comando_principal == "pwd":
-                # Implementación manual del comando pwd
+                # Implementaci贸n manual del comando pwd
                 print(os.getcwd())
 
             else:
@@ -664,7 +664,7 @@ def main():
 
         except KeyboardInterrupt:
             # Manejo de Ctrl+C - Termina de forma alterna
-            print("\n?Hasta luego! (Terminado con Ctrl + C!)")
+            print("\n隆Hasta luego! (Terminado con Ctrl + C!)")
             break
 
 
