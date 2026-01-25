@@ -6727,6 +6727,169 @@ Así que cuando se encuentre con el symbolic link nulo en el directorio esperado
 *Figura 10: systemctl status*
 
 
+---
+
+# Sesión 37: 25 de Enero - Instalación de Openssh
+
+## Objetivo: Instalar Openssh y conectarse mediante ssh
+
+## Tareas Realizadas
+
+(14:32 - 14:58) 
+-  Configuración para volver a entrar al chroot (crear archivo mount.virt)
+
+(15:01 - 15:32) 
+- Instalación de Openssh
+
+(15:32- 16:05)
+- Configuraciones finales de openssh y LFS
+
+
+
+  
+## Comandos principales ejecutados:
+
+### Crear archivo mount.virt
+
+#Entrar al sistema HOST (o build system Rocky Linux)
+
+#Escribir el archivo para los montajes
+
+cat > ~/mount-virt.sh << "EOF"
+…..
+
+#Ejecutar el archivo
+
+bash ~/mount-virt.sh
+
+#Ingresar al chroot
+
+chroot /mnt/lfs /usr/bin/env -i HOME=/root TERM="$TERM" PS1="\u:\w\$ " PATH=/usr/bin:/usr/sbin /bin/bash --login
+
+
+
+### Openssh
+
+#Crea directorio con permiso 700 (solo root puede leer/modificar/ejecutar) y group es sys
+
+install -v -g sys -m700 -d /var/lib/sshd &&
+
+#Crear grupo con id = 50 llamado sshd
+
+groupadd -g 50 sshd        &&
+
+#Crear usuario para separación de privilegios, 
+
+useradd  -c 'sshd PrivSep' \
+         -d /var/lib/sshd  \
+         -g sshd           \
+         -s /bin/false     \
+         -u 50 sshd
+
+#Descripción: sshd Privstep, directorio home en /var/lib/sshd
+
+#Grupo sshd y User id 50
+
+#No puede iniciar sesión y nombre sshd
+
+
+
+#Configuración para compilar 
+
+./configure --prefix=/usr                            \
+….
+
+#Se instala en /usr, archivos de configuración en /etc/ssh
+
+#Directorio para separación de privilegios en /var/lib/sshd
+
+#Directorio path para comandos ingresados en ssh para usuario normal en /usr/bin, y para el root en /usr/sbin:/usr/bin, primero en sbin después en bin
+
+#Guardar pid(process identifier) del proceso sshd en /run
+
+
+
+
+#Instalar Paquete y sus documentaciones
+
+make install &&
+install -v -m755    contrib/ssh-copy-id /usr/bin     &&
+
+install -v -m644    contrib/ssh-copy-id.1 \
+                    /usr/share/man/man1       
+…..
+
+#Deshabilitar login del usuario root mediante ssh
+
+echo "PermitRootLogin no" >> /etc/ssh/sshd_config
+
+#Para habilitar ssh al bootear, instalar el servicio sshd.service
+
+make install-sshd
+
+#Habilitar el servicio 
+
+systemctl enable sshd
+
+### En LFS
+
+#Verificar estado del servicio
+
+systemctl start sshd
+
+#Crear usuario para conectarse
+
+ useradd -m -s /bin/bash asdy
+ passwd contraseña
+
+
+
+## Reflexiones Técnicas
+
+
+El paquete OpenSSH de BLFS permite conectarse al sistema LFS mediante SSH desde otra computadora, ya sea dentro o fuera de la red local. Esto resulta extremadamente útil para la administración remota de sistemas, especialmente en entornos de servidores.
+
+El servicio sshd funciona mediante separación de privilegios (privilege separation). Inicialmente se ejecuta como root para realizar tareas que requieren altos privilegios, como la apertura de puertos y la gestión de la autenticación. Después, los procesos que no requieren estos privilegios se ejecutan bajo el usuario del sistema sshd previamente creado. Así, cuando una posible vulnerabilidad aparece, el atacante queda limitado a un usuario sin privilegios, sin posibilidad de iniciar sesión interactiva (al tener /bin/false como shell) y sin permisos peligrosos para el sistema, logrando así contener el impacto del ataque.
+
+
+
+### Problemas Encontrados
+
+Problema: Al intentar correr el archivo mount.virt como usuario normal con sudo requería que el usuario esté en el archivo de sudoers.
+
+Solución: Se decidió seguir instalando como root en vez de usuario normal, y al verificar el funcionamiento correcto al término de los pasos de instalación, se concluye que no afectó negativamente al sistema.
+
+Problema: Se ejecutaron los comandos para loguearse sin contraseña: 
+“
+ssh-keygen &&
+ssh-copy-id -i ~/.ssh/id_ed25519.pub REMOTE_USERNAME@REMOTE_HOSTNAME
+“
+sin reemplazar la información debida y al final no se quería obtener esta función.
+
+Solución: Se decidió borrar la información creada, con ayuda de la inteligencia artificial, se ejecutó: rm -rf ~/.ssh. Y se siguió las siguientes configuraciones
+
+Problema:Pedía contraseña para conectarme desde otra computadora mediante ssh al LFS, pero no aceptaba la del root.
+
+Solución: Como previamente se deshabilitó el login por root y no existía otro usuario, se creó otro usuario para poder conectarse mediante ssh.
+
+Problema: Al intentar conectarse al LFS mediante ssh desde otra computadora, no ocurre nada
+
+Solución:La configuración de la tarjeta de red de la máquina virtual estaba como NAT, que no permitía conectarse directamente al sistema LFS, entonces se cambió a bridge, para que obtenga su propio ip en la red local y se pudo conectar exitosamente tras este cambio.
+
+### Evidencias
+
+![compilar_openssh](../imagenes/LFS/sesion37/compilar_openssh.png)
+*Figura 1: compilar_openssh*
+
+![instalar_openssh](../imagenes/LFS/sesion37/instalar_openssh.png)
+*Figura 2: instalar_opensshh*
+
+![sshd_activo](../imagenes/LFS/sesion37/sshd_activo.png)
+*Figura 3: sshd_activo*
+
+![conexion_con_ssh](../imagenes/LFS/sesion37/conexion_con_ssh.png)
+*Figura 4: conexion_con_ssh*
+
 
 
 
