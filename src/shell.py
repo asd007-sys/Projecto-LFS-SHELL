@@ -116,7 +116,54 @@ def registrar_error(comando, args, tipo_error, mensaje_error):
         pass
 
 
-PASOS_TUTORIAL = [    #Lista de tuplas de cada paso del tutorial,valores por tupla: 1ero comando correcto, 2ndo argumentos correctos, 3ro Instruccion del paso, 4to mensaje al cumplir con el requisito
+def help(args):
+    if not args:
+        print("-------------------------------------------------------")
+        print("Ingrese help seguido por algunos de los comandos built-in siguentes para averiguar cada uso:")
+        print(" - cd,ls,cp,rm,mkdir,cat,pwd,echo,exit,tutorial")
+        print("\nEjecución Externa:")
+        print(
+            " - Cualquier otro comando (como date, nano o top) se ejecuta usando fork/exec.")
+        print("-------------------------------------------------------")
+        return
+    else:
+        if args[0] == "cd":
+            print(" - cd <ruta>: Cambia el directorio de trabajo.  Ej: cd / \n")
+            return
+        if args[0] == "ls":
+            print(" - ls <ruta>: Lista el contenido de un directorio.  Ej: ls (directorio actual), ls /usr \n")
+            return
+        if args[0] == "cp":
+            print(" - cp <origen> <destino>: Copia archivos byte a byte. Ej cp hola.txt holita.txt (En mismo directorio), cp /usr/hola.txt /home/asd/holita.txt (en directorios diferentes) \n")
+            return
+        if args[0] == "rm":
+            print(" - rm <archivo>: Elimina un archivo. Ej: rm archivo, rm /home/asd/holita.txt \n")
+            return
+        if args[0] == "mkdir":
+            print(" - mkdir <dir>: Crea un directorio. Ej:mkdir asd (crear directorio en directorio actual), mkdir /home/asd/nuevo (crear directorio en ruta ingresada) \n")
+            return
+        if args[0] == "cat":
+            print(" - cat <archivo>: Muestra el contenido del archivo. Ej: cat hola.txt, cat /home/asd/hola.txt \n")
+            return
+        if args[0] == "pwd":
+            print(" - pwd: Muestra la ruta actual. \n")
+            return
+        if args[0] == "echo":
+            print(" - echo <texto>: Imprime texto en consola. Ej: echo (imprime solo una nueva linea), echo asdfg, echo \"imprimir con espacios\" \n")
+            return
+        if args[0] == "exit":
+            print(" - comando para salir del shell \n")
+            return
+        if args[0] == "tutorial":
+            print(" - funcion de tutorial basico del shell \n funciona aunque el comando falle, logrando asi poder seguir el tutorial en caso de falta de privilegios o errores de directorios ya creados. \n")
+            return
+        else:
+            print("El argumento ingresado no es un comando built-in")
+
+
+
+PASOS_TUTORIAL = [
+    # Lista de tuplas de cada paso del tutorial,valores por tupla: 1ero comando correcto, 2ndo argumentos correctos, 3ro Instruccion del paso, 4to mensaje al cumplir con el requisito
     ("pwd", [], "Escribe 'pwd'", "Perfecto."),
     ("ls", [], "Escribe 'ls'", "Perfecto."),
     ("mkdir", ["asd"], "Escribe 'mkdir asd'", "Has creado la carpeta asd."),
@@ -125,12 +172,10 @@ PASOS_TUTORIAL = [    #Lista de tuplas de cada paso del tutorial,valores por tup
     ("cp", ["addy", "addyCopia"], "'cp addy addyCopia' para copiar el archivo addy", "Archivo addy copiado"),
     ("rm", ["addy"], "Escribe 'rm addy' para eliminar archivo addy", "Archivo addy eliminado."),
     ("echo", ["Termine el tutorial!"], "Escribe echo \"Termine el tutorial!\" ", "Ultimo paso logrado!.")
-    
-    
+
 ]
 
-
-paso_actual = -1 # -1 signifca fuera del tutorial, diferente a -1 significa dentro del tutorial
+paso_actual = -1  # -1 signifca fuera del tutorial, diferente a -1 significa dentro del tutorial
 
 """
 
@@ -138,30 +183,29 @@ paso_actual = -1 # -1 signifca fuera del tutorial, diferente a -1 significa dent
 
          - Tutorial de funciones
          - Utiliza lista de tuplas con 4 valores 
-         
+
 
 """
 
-def tutorial(comando,args):
-    global paso_actual   #Utilizar la variable global
 
+def tutorial(comando, args):
+    global paso_actual  # Utilizar la variable global
 
-    if paso_actual == -1: #Si el modo tutorial no esta activo, salir
-        return True  #Para funcionamiento esperado de la shell, la llamada de esta funcion corre siempre, si es False o None, el shell no funciona como debe e ignora comandos.
+    if paso_actual == -1:  # Si el modo tutorial no esta activo, salir
+        return True  # Para funcionamiento esperado de la shell, la llamada de esta funcion corre siempre, si es False o None, el shell no funciona como debe e ignora comandos.
 
-    comando_esperado,argumentos, instruccion, info = PASOS_TUTORIAL[paso_actual]  #Asignar a cada varible correspondiente el valor del elemento actual de la tupla
+    comando_esperado, argumentos, instruccion, info = PASOS_TUTORIAL[
+        paso_actual]  # Asignar a cada varible correspondiente el valor del elemento actual de la tupla
 
-
-
-    if comando == comando_esperado and args == argumentos:  #Si el usuario ingreso el comando y los argumentos esperados
-        return True     #Permitir ejecucion del comando ingresado
-                        #La funcion imprimir_info_tutorial se encarga de los mensajes de exito
-    else:#Si el usuario ingreso el comando o  argumentos incorrectos
-        if comando == comando_esperado:  #Si el comando ingresado por el usuario es correcto y el argumento  es incorrecto
+    if comando == comando_esperado and args == argumentos:  # Si el usuario ingreso el comando y los argumentos esperados
+        return True  # Permitir ejecucion del comando ingresado
+        # La funcion imprimir_info_tutorial se encarga de los mensajes de exito
+    else:  # Si el usuario ingreso el comando o  argumentos incorrectos
+        if comando == comando_esperado:  # Si el comando ingresado por el usuario es correcto y el argumento  es incorrecto
             print(f" El comando es '{comando_esperado}', pero el argumento debe ser '{' '.join(argumentos)}'")
-        else: #Viceversa
+        else:  # Viceversa
             print(f"Error. Se esperaba '{comando_esperado} {' '.join(argumentos)}'.")
-        return False  #Bloquear comando ingresado
+        return False  # Bloquear comando ingresado
 
 
 """
@@ -174,23 +218,23 @@ def tutorial(comando,args):
 
 """
 
+
 def imprimir_info_tutorial():
-    global paso_actual  #Utilizar la variable global
-    if paso_actual == -1:  #Si el modo tutorial no esta activo, salir
+    global paso_actual  # Utilizar la variable global
+    if paso_actual == -1:  # Si el modo tutorial no esta activo, salir
         return True
 
+    a, b, c, info = PASOS_TUTORIAL[
+        paso_actual]  # Solo interesa avisar al usuario la informacion de exito del paso actual, las variables a,b,c no se utilizan
+    print(f"\n {info}")  # Imprimir descripcion de exito del paso actual
 
-    a, b, c, info = PASOS_TUTORIAL[paso_actual] #Solo interesa avisar al usuario la informacion de exito del paso actual, las variables a,b,c no se utilizan
-    print(f"\n {info}") #Imprimir descripcion de exito del paso actual
+    paso_actual += 1  # Cargar el indice del proximo paso
 
-    paso_actual += 1 #Cargar el indice del proximo paso
-
-    if paso_actual >= len(PASOS_TUTORIAL): #Si el anterior paso era el ultimo del tutorial, terminar el tutorial
+    if paso_actual >= len(PASOS_TUTORIAL):  # Si el anterior paso era el ultimo del tutorial, terminar el tutorial
         print("¡Fin del tutorial!\n")
-        paso_actual = -1 #Resetar variable para salir del modo tutorial
-    else:    #Existe un siguente paso, seguir con el tutorial
-        print(f"SIGUIENTE: {PASOS_TUTORIAL[paso_actual][2]}") #Imprime la instruccion del proximo paso a realizar
-
+        paso_actual = -1  # Resetar variable para salir del modo tutorial
+    else:  # Existe un siguente paso, seguir con el tutorial
+        print(f"SIGUIENTE: {PASOS_TUTORIAL[paso_actual][2]}")  # Imprime la instruccion del proximo paso a realizar
 
 
 """
@@ -204,23 +248,25 @@ def imprimir_info_tutorial():
 
 """
 
+
 def echo(args):
     if not args:
-        print() #Imprimir linea vacia si no hay argumentos
+        print()  # Imprimir linea vacia si no hay argumentos
         registrar_accion("echo", args, True, "Se imprimio una linea vacia")  # Funcion para registrar accion exitosa
-        return #Volver a menu principal
+        return  # Volver a menu principal
 
     try:
-        #Si args no esta vacio
-        salida=" ".join(args)  #Agregar todos los argumentos separadados por espacio
-        print(salida) #imprimir el texto con los argumentos
-        registrar_accion("echo", args, True, "Se imprimio correctamente argumentos ingresado")  # Funcion para registrar accion exitosa
-        return #Volver a menu principal
+        # Si args no esta vacio
+        salida = " ".join(args)  # Agregar todos los argumentos separadados por espacio
+        print(salida)  # imprimir el texto con los argumentos
+        registrar_accion("echo", args, True,
+                         "Se imprimio correctamente argumentos ingresado")  # Funcion para registrar accion exitosa
+        return  # Volver a menu principal
 
-    except OSError: #Si salta algun error
+    except OSError:  # Si salta algun error
         print("Ha ocurrido un error")
-        registrar_accion("echo", args, False,"Ha ocurrido un error")  # Funcion para registrar accion fallida
-        registrar_error("echo", args, "ErrorGenerico","Ha ocurrido un error")  # Funcion para regisrar error
+        registrar_accion("echo", args, False, "Ha ocurrido un error")  # Funcion para registrar accion fallida
+        registrar_error("echo", args, "ErrorGenerico", "Ha ocurrido un error")  # Funcion para regisrar error
 
 
 """
@@ -235,31 +281,39 @@ def echo(args):
 
 
 def cat(args):
-    if not args:  #Si no hay argumento (archivo a leer) recibido en la funcion
-        print("Falta ingresar el archivo a leer!, ej: cat libro.txt , cat /home/user/librito.txt") #Advertir al usuario
-        registrar_accion("cat", args, False,"Falta argumento para el nombre del archivo a leer")  # Funcion para registrar accion fallida
-        registrar_error("cat", args, "FaltaNombreArchivoALeer","Falta argumento para el nombre del archivo a leer")  # Funcion para regisrar error
-        return #Volver a menu principal
+    if not args:  # Si no hay argumento (archivo a leer) recibido en la funcion
+        print(
+            "Falta ingresar el archivo a leer!, ej: cat libro.txt , cat /home/user/librito.txt")  # Advertir al usuario
+        registrar_accion("cat", args, False,
+                         "Falta argumento para el nombre del archivo a leer")  # Funcion para registrar accion fallida
+        registrar_error("cat", args, "FaltaNombreArchivoALeer",
+                        "Falta argumento para el nombre del archivo a leer")  # Funcion para regisrar error
+        return  # Volver a menu principal
 
-    archivo = args[0]  #El primer argumento es el archivo
+    archivo = args[0]  # El primer argumento es el archivo
     try:
 
         with open(archivo, 'r') as zeta:  # Abrir el archivo a leer en modo lectura
-              for linea in zeta:  #Loopear sobre el archivo por linea
+            for linea in zeta:  # Loopear sobre el archivo por linea
                 print(linea.strip())
-        print( f"Contenido de {archivo} mostrado")
+        print(f"Contenido de {archivo} mostrado")
         registrar_accion("cat", args, True, "Lectura de archivo exitosa")  # Funcion para registrar accion exitosa
         return
-    except FileNotFoundError: #Error de archivo no encontrado
+    except FileNotFoundError:  # Error de archivo no encontrado
         print(f"Archivo no existe: {archivo}. Puede utilizar el comando ls para verificar nombre o directorio correcto")
-        registrar_accion("cat", args, False,"El archivo a leer no existe o no fue encontrado")  # Funcion para registrar accion fallida
-        registrar_error("cat", args, "NoSeEncontroArchivoALeer", "El archivo a leer no existe o no fue encontrado")  # Funcion para regisrar error
+        registrar_accion("cat", args, False,
+                         "El archivo a leer no existe o no fue encontrado")  # Funcion para registrar accion fallida
+        registrar_error("cat", args, "NoSeEncontroArchivoALeer",
+                        "El archivo a leer no existe o no fue encontrado")  # Funcion para regisrar error
         return
-    except PermissionError:#Permisos insuficientes
+    except PermissionError:  # Permisos insuficientes
         print("Permiso denegado,no tiene los privilegios necesarios")
-        registrar_accion("cat", args, False,"No tiene los privilegios suficientes para leer archivo")  # Funcion para registrar accion fallida
-        registrar_error("cat", args, "PermisoInsuficiente","No tiene los privilegios suficientes para leer archivo")  # Funcion para regisrar error
+        registrar_accion("cat", args, False,
+                         "No tiene los privilegios suficientes para leer archivo")  # Funcion para registrar accion fallida
+        registrar_error("cat", args, "PermisoInsuficiente",
+                        "No tiene los privilegios suficientes para leer archivo")  # Funcion para regisrar error
         return
+
 
 """
 
@@ -275,8 +329,10 @@ def cat(args):
 def mkdir(args):
     if not args:  # Si no se ingreso un argumento para el nombre del directorio
         print("Falta ingresar el nombre del directorio a crear, ej: mkdir nombre123")
-        registrar_accion("mkdir", args, False,"Falta argumento para el nombre del directorio a crear")  # Funcion para registrar accion fallida
-        registrar_error("mkdir", args, "FaltaNombre","Falta argumento para el nombre del directorio a crear")  # Funcion para regisrar error
+        registrar_accion("mkdir", args, False,
+                         "Falta argumento para el nombre del directorio a crear")  # Funcion para registrar accion fallida
+        registrar_error("mkdir", args, "FaltaNombre",
+                        "Falta argumento para el nombre del directorio a crear")  # Funcion para regisrar error
         return  # Volver al shell
 
     directorio = args[0]  # Nombre del directorio a crear
@@ -286,13 +342,17 @@ def mkdir(args):
         print(f"Directorio creado: {directorio}")
         registrar_accion("mkdir", args, True, "Creado")  # Funcion para registrar accion exitosa
     except FileExistsError:  # Error de que ya existe el directorio
-        print(f"ERROR, Directorio ya existe: {directorio}, ingresar un nombre no existente,puede utilizar ls para verificar nombres existentes")
-        registrar_accion("mkdir", args, False,"El archivo no existe/no fue encontrado")  # Funcion para registrar accion fallida
+        print(
+            f"ERROR, Directorio ya existe: {directorio}, ingresar un nombre no existente,puede utilizar ls para verificar nombres existentes")
+        registrar_accion("mkdir", args, False,
+                         "El archivo no existe/no fue encontrado")  # Funcion para registrar accion fallida
         registrar_error("mkdir", args, "FileExistsError", f"Directorio ya existe")  # Funcion para regisrar error
     except PermissionError:  # Error de que no tiene los privilegios para crearlo
         print("ERROR, Permiso denegado, no tiene suficientes privilegios,intente crearlo en otro directorio por favor")
-        registrar_accion("mkdir", args, False,"No tiene los privilegios suficientes")  # Funcion para registrar accion fallida
-        registrar_error("mkdir", args, "PermissionError","No tiene los privilegios suficientes")  # Funcion para regisrar error
+        registrar_accion("mkdir", args, False,
+                         "No tiene los privilegios suficientes")  # Funcion para registrar accion fallida
+        registrar_error("mkdir", args, "PermissionError",
+                        "No tiene los privilegios suficientes")  # Funcion para regisrar error
 
 
 """
@@ -308,17 +368,24 @@ def mkdir(args):
 
 def rm(args):
     if not args:  # El primer argumento es la direccion del archivo a borrar,si no existe, avisar al usuario
-        print("Le falto ingresar la ruta absoluta o relativa del archivo a borrar (Ej: rm archivo_existente, rm /home/archivo_existente )")
-        registrar_accion("rm", args, False,"Falta argumento del nombre del archivo a borrar")  # Funcion para registrar accion fallida
-        registrar_error("rm", args, "FaltaNombre","Falta argumento del nombre del archivo a borrar")  # Funcion para regisrar error
+        print(
+            "Le falto ingresar la ruta absoluta o relativa del archivo a borrar (Ej: rm archivo_existente, rm /home/archivo_existente )")
+        registrar_accion("rm", args, False,
+                         "Falta argumento del nombre del archivo a borrar")  # Funcion para registrar accion fallida
+        registrar_error("rm", args, "FaltaNombre",
+                        "Falta argumento del nombre del archivo a borrar")  # Funcion para regisrar error
         return  # Retorna al shell
 
     archivo = args[0]  # Obtener la direccion y nombre del archivo a borrar
 
-    if os.path.isdir(archivo):  # Verificar antes de confirmar si es un directorio, y avisar al usuario que solo puede borrar archivos
-        print("El comando solo soporta eliminar archivos, por favor solo ingresar archivos, puede utilizar ls para saber si es archivo o directorio")
-        registrar_accion("rm", args, False,"Prohibido borrar directorio, solo archivos")  # Funcion para registrar accion fallida
-        registrar_error("rm", args, "EsDirectorio","Prohibido borrar directorio, solo archivos")  # Funcion para regisrar error
+    if os.path.isdir(
+            archivo):  # Verificar antes de confirmar si es un directorio, y avisar al usuario que solo puede borrar archivos
+        print(
+            "El comando solo soporta eliminar archivos, por favor solo ingresar archivos, puede utilizar ls para saber si es archivo o directorio")
+        registrar_accion("rm", args, False,
+                         "Prohibido borrar directorio, solo archivos")  # Funcion para registrar accion fallida
+        registrar_error("rm", args, "EsDirectorio",
+                        "Prohibido borrar directorio, solo archivos")  # Funcion para regisrar error
         return
 
     # Prompt de confirmacion a borrar el archivo
@@ -334,12 +401,15 @@ def rm(args):
 
     except FileNotFoundError:  # Archivo no existe
         print(f"El Archivo ingresado no existe: {archivo},puede utilizar ls para buscar el nombre correcto")
-        registrar_accion("rm", args, False,"No se encontro el archivo")  # Funcion para registrar accion fallida
-        registrar_error("rm", args, "ArchivoNoEncontrado","No se encontro el archivo")  # Funcion para regisrar error
+        registrar_accion("rm", args, False, "No se encontro el archivo")  # Funcion para registrar accion fallida
+        registrar_error("rm", args, "ArchivoNoEncontrado", "No se encontro el archivo")  # Funcion para regisrar error
     except PermissionError:  # El usuario no tiene los privilegios necesario para borrar
         print("Usted carece de privilegios para borrar el archivo")
-        registrar_accion("rm", args, False,"No tiene los privilegios suficientes")  # Funcion para registrar accion fallida
-        registrar_error("rm", args, "FaltaPermiso","No tiene los privilegios suficientes")  # Funcion para regisrar error
+        registrar_accion("rm", args, False,
+                         "No tiene los privilegios suficientes")  # Funcion para registrar accion fallida
+        registrar_error("rm", args, "FaltaPermiso",
+                        "No tiene los privilegios suficientes")  # Funcion para regisrar error
+
 
 """
    Función built-in cp
@@ -355,9 +425,11 @@ def rm(args):
 
 def cp(args):
     if (len(args) != 2):  # Si la cantidad de argumentos recibidos es diferente a 2, se abandona la funcion
-        print("Esta funcion precisa de dos argumentos,primero: la ruta del archivo a copiar, segundo: la ruta del archivo a ser creado, ej: cp asd.txt /home/user/asd.txt")
-        registrar_accion("cp", args, False,"Numero de argumentos incorrecto")  # Funcion para registrar accion fallida
-        registrar_error("cp", args, "NumArgsIncorrecto","Numero de argumentos incorrecto")  # Funcion para regisrar error
+        print(
+            "Esta funcion precisa de dos argumentos,primero: la ruta del archivo a copiar, segundo: la ruta del archivo a ser creado, ej: cp asd.txt /home/user/asd.txt")
+        registrar_accion("cp", args, False, "Numero de argumentos incorrecto")  # Funcion para registrar accion fallida
+        registrar_error("cp", args, "NumArgsIncorrecto",
+                        "Numero de argumentos incorrecto")  # Funcion para regisrar error
         return  # Abandonamos
 
     else:
@@ -388,18 +460,20 @@ def cp(args):
         except FileNotFoundError:  # Si no se encuentra el archivo a copiar
             print(f"Error: El archivo de origen '{origen}' no fue encontrado, puede utilizar ls para informarse")
             registrar_accion("cp", args, False, "No se encontro el archivo")  # Funcion para registrar accion fallida
-            registrar_error("cp", args, "ArchivoNoEncontrado","No se encontro el archivo")  # Funcion para regisrar error
+            registrar_error("cp", args, "ArchivoNoEncontrado",
+                            "No se encontro el archivo")  # Funcion para regisrar error
 
         except PermissionError:  # Si no se puede acceder  por falta de privilegio el archivo a copiar
             print(f"Error: No tiene los privilegios suficientes para copiar en {destino}' ")
-            registrar_accion("cp", args, False,"No tiene los privilegios suficientes para copiar")  # Funcion para registrar accion fallida
-            registrar_error("cp", args, "FaltaPermiso","No tiene los privilegios suficientes para copiar")  # Funcion para regisrar error
+            registrar_accion("cp", args, False,
+                             "No tiene los privilegios suficientes para copiar")  # Funcion para registrar accion fallida
+            registrar_error("cp", args, "FaltaPermiso",
+                            "No tiene los privilegios suficientes para copiar")  # Funcion para regisrar error
 
         except OSError as e:  # Error generico
             print(f"Ocurrió un error durante la copia: {e}")
-            registrar_accion("cp", args, False,"Ha ocurrido un error")  # Funcion para registrar accion fallida
-            registrar_error("cp", args, "ErrorGenerico","Ha ocurrido un error")  # Funcion para regisrar error
-
+            registrar_accion("cp", args, False, "Ha ocurrido un error")  # Funcion para registrar accion fallida
+            registrar_error("cp", args, "ErrorGenerico", "Ha ocurrido un error")  # Funcion para regisrar error
 
 
 """
@@ -421,16 +495,20 @@ def cd(args):
         print(f"Usted reside en el directorio {os.getcwd()}")
         registrar_accion("cd", args, True, "Permanecer en el mismo directorio")  # Funcion para registrar accion exitosa
         nuevo_dir = "."  # La variable es asignada el directorio actual.
-        return #Terminar y no seguir ejecutando el resto del codigo
+        return  # Terminar y no seguir ejecutando el resto del codigo
 
     try:
         os.chdir(nuevo_dir)  # Cambiar de directorio a la que se paso como argumento
         print(f"EXITO Cambio a {os.getcwd()}")  # Imprimir exito para debug
-        registrar_accion("cd", args, True, "Cambiar de directorio exitosamente")  # Funcion para registrar accion exitosa
+        registrar_accion("cd", args, True,
+                         "Cambiar de directorio exitosamente")  # Funcion para registrar accion exitosa
     except FileNotFoundError:  # Atrapar error si no encuentra o existe el directorio
-        print(f"ERROR Directorio no encontrado: {nuevo_dir}. Utlize el comando ls para saber si es correcto el directorio ingresado ")
-        registrar_accion("cd", args, False, "No se pudo encontrar el directorio a ingresar")  # Funcion para registrar accion fallida
-        registrar_error("cd", args, "DirNoEncontrado", "No se pudo encontrar el directorio a ingresar")  # Funcion para regisrar error
+        print(
+            f"ERROR Directorio no encontrado: {nuevo_dir}. Utlize el comando ls para saber si es correcto el directorio ingresado ")
+        registrar_accion("cd", args, False,
+                         "No se pudo encontrar el directorio a ingresar")  # Funcion para registrar accion fallida
+        registrar_error("cd", args, "DirNoEncontrado",
+                        "No se pudo encontrar el directorio a ingresar")  # Funcion para regisrar error
     except OSError as e:  # Error generico
         registrar_accion("cd", args, False, "Ha ocurrido un error")  # Funcion para registrar accion fallida
         registrar_error("cd", args, "ErrorGenerico", "Ha ocurrido un error")  # Funcion para regisrar error
@@ -450,30 +528,37 @@ def cd(args):
 def ls(args):
     ruta = "."
     if args:
-        ruta = args[0]  # Determina la ruta a listar. Si args tiene elementos (if args),elige el primer elemento (args[0]) como la ruta, osino , usa el directorio actual .
+        ruta = args[
+            0]  # Determina la ruta a listar. Si args tiene elementos (if args),elige el primer elemento (args[0]) como la ruta, osino , usa el directorio actual .
 
     try:  # Para atrapar errores si los hay
         elementos = os.listdir(ruta)  # Listar todos los archivos y directorios en la direccion ruta
         if ruta == '.':
             print(f"Contenido de '{os.getcwd()}':")
-            registrar_accion("ls", args, True, "Listar archivos y directorios del directorio actual correctamente")  # Funcion para registrar accion exitosa
+            registrar_accion("ls", args, True,
+                             "Listar archivos y directorios del directorio actual correctamente")  # Funcion para registrar accion exitosa
         else:
             print(f"Contenido de '{ruta}':")
-            registrar_accion("ls", args, True, "Listar archivos y directorios del directorio ingresado correctamente")  # Funcion para registrar accion exitosa
+            registrar_accion("ls", args, True,
+                             "Listar archivos y directorios del directorio ingresado correctamente")  # Funcion para registrar accion exitosa
         if elementos:  # Si elementos contiene al menos un archivo o directorio
             for elem in elementos:  # Loop para determinar directorios
-                if os.path.isdir(os.path.join(ruta,elem)):  # Se verifica si el archivo actual es o no un directorio , se arma la ruta(Direccion) + archivo, y checkea si es un directorio
+                if os.path.isdir(os.path.join(ruta,
+                                              elem)):  # Se verifica si el archivo actual es o no un directorio , se arma la ruta(Direccion) + archivo, y checkea si es un directorio
                     print(f"  [Dir]  {elem}")
                 else:  # Si no es un directorio el archivo actual
                     print(f"  [Arc] {elem}")
             return
         else:  # Si elemento esta vacio
             print("El directorio esta vacio!")
-            registrar_accion("ls", args, True, "Tratar de listar un directorio vacio")  # Funcion para registrar accion exitosa
+            registrar_accion("ls", args, True,
+                             "Tratar de listar un directorio vacio")  # Funcion para registrar accion exitosa
     except FileNotFoundError as e:  # Si no existe o no se encuentra el archivo
         print(f" El directorio {ruta} no existe o no se puede acceder ")
-        registrar_accion("ls", args, False, "No se pudo encontrar el directorio a listar")  # Funcion para registrar accion fallida
-        registrar_error("ls", args, "DirNoEncontrado", "No se pudo encontrar el directorio a listar")  # Funcion para regisrar error
+        registrar_accion("ls", args, False,
+                         "No se pudo encontrar el directorio a listar")  # Funcion para registrar accion fallida
+        registrar_error("ls", args, "DirNoEncontrado",
+                        "No se pudo encontrar el directorio a listar")  # Funcion para regisrar error
     except OSError as e:  # Error generico
         registrar_accion("ls", args, False, "Ha ocurrido un error")  # Funcion para registrar accion fallida
         registrar_error("ls", args, "ErrorGenerico", "Ha ocurrido un error")  # Funcion para regisrar error
@@ -574,23 +659,22 @@ def main():
 
 
     """
-    global paso_actual #Utilizar variable global
-    iniciar_logs() #Iniciar sistema de logging, ayuda a designar directorio correcto y verificar privilegios tambien.
+    global paso_actual  # Utilizar variable global
+    iniciar_logs()  # Iniciar sistema de logging, ayuda a designar directorio correcto y verificar privilegios tambien.
 
     print("Bienvenido a EduShell - Shell Educativo Universitario")
-    print("Escribe 'exit' para salir\n")
-
+    print("Escribe 'exit' para salir")
+    print("Escribe 'help' para obetener ayuda basica\nEscribe 'tutorial' para un tutorial basico \n")
+    
     while True:
         try:
 
             # Leer comando del usuario mostrando el modo actual: shell normal o tutorial
 
-            if paso_actual != -1: #Si se ingreso al modo tutorial
+            if paso_actual != -1:  # Si se ingreso al modo tutorial
                 comando = input(f"TUTORIAL - Paso {paso_actual + 1}  > ").strip()
             else:
                 comando = input(f"EduShell [{os.getcwd()}] > ").strip()
-
-
 
             # Ignorar líneas vacías
             if not comando:
@@ -606,16 +690,19 @@ def main():
             argumentos = partes[1:]  # Los siguientes se asumen como argumentos
 
             if comando_principal == "tutorial":
-                paso_actual = 0   #Se cambia el valor al primer paso
+                paso_actual = 0  # Se cambia el valor al primer paso
                 print(f"Inicio: {PASOS_TUTORIAL[0][2]}")
                 continue
 
+            permitido = tutorial(comando_principal,
+                                 argumentos)  # Se guarda el retorno de la funcion dependiendo si se ingreso el comando correcto (True) o incorrecto (False)
 
-            permitido = tutorial(comando_principal,argumentos)   #Se guarda el retorno de la funcion dependiendo si se ingreso el comando correcto (True) o incorrecto (False)
-
-            if not permitido: #Si se ingreso el comando incorrecto, no se ejecuta el comando en el shell, permite al usuario no destruir o modificar algo sin intencion.
+            if not permitido:  # Si se ingreso el comando incorrecto, no se ejecuta el comando en el shell, permite al usuario no destruir o modificar algo sin intencion.
                 continue
 
+            if comando_principal == "help":
+                help(argumentos)
+                continue
 
             if comando_principal == "ver_logs":
                 mostrar_logs("acciones")  # Acceder a la funcion con tipo=acciones para ver los logs
@@ -659,8 +746,8 @@ def main():
                 # Si no existe el commando
                 ejecutar_externo(comando_principal, argumentos)  # Funcion nueva
 
-            if paso_actual != -1:  #Si esta activo el modo tutorial
-                imprimir_info_tutorial() #Imprimir mensaje de exito. Tambien siguiente instrucciones o de finalizacion del tutorial
+            if paso_actual != -1:  # Si esta activo el modo tutorial
+                imprimir_info_tutorial()  # Imprimir mensaje de exito. Tambien siguiente instrucciones o de finalizacion del tutorial
 
         except KeyboardInterrupt:
             # Manejo de Ctrl+C - Termina de forma alterna

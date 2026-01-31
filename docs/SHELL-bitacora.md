@@ -893,7 +893,25 @@ Problema: La implementación actual del tutorial imprime las instrucciones del p
 Solución:Se creó otra función llamada imprimir_info_tutorial, que se encarga de informar al usuario si fue exitoso el comando ingresado, y de informar la próxima instrucción. Esta función es llamada después de todos los comandos posibles (internos y externos). Así, se permite ejecutar primero el comando pedido por el tutorial, y después imprimir y avisar al usuario correctamente las próxima instrucción.
 
 
+---
 
+
+
+# Fecha: 31 de Enero del 2026
+# Objetivo del día: Crear la función help
+
+## Tareas realizadas:
+
+(09:37 - 10:16)
+
+- Función básica de ayuda help
+
+
+### Problemas Encontrados
+
+Problema: La implementación de diseño no se sabía qué hacer con el comando help al ingresarlo solo.
+
+Solución: Lo más práctico fue que el comando help indique las funciones built-in que existen y que help ayuda a describirlos, osea listar los comandos, y cada help comando especifique cada uno, en vez de que help tenga toda la información e imprima mucho de golpe.
 
 
 
