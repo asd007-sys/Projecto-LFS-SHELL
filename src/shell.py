@@ -292,9 +292,8 @@ def cat(args):
 
     archivo = args[0]  # El primer argumento es el archivo
     try:
-
         with open(archivo, 'r') as zeta:  # Abrir el archivo a leer en modo lectura
-            for linea in zeta:  # Loopear sobre el archivo por linea
+            for linea in zeta: #Loopear sobre el archivo por linea
                 print(linea.strip())
         print(f"Contenido de {archivo} mostrado")
         registrar_accion("cat", args, True, "Lectura de archivo exitosa")  # Funcion para registrar accion exitosa
@@ -313,6 +312,10 @@ def cat(args):
         registrar_error("cat", args, "PermisoInsuficiente",
                         "No tiene los privilegios suficientes para leer archivo")  # Funcion para regisrar error
         return
+    except IsADirectoryError: #Es un directorio
+        print("Usted no puede leer un directorio")
+        registrar_accion("cat", args, False, "No se puede leer un directorio")
+        registrar_error("cat", args, "IsADirectoryError","No se puede leer un directorio")
 
 
 """
@@ -509,6 +512,10 @@ def cd(args):
                          "No se pudo encontrar el directorio a ingresar")  # Funcion para registrar accion fallida
         registrar_error("cd", args, "DirNoEncontrado",
                         "No se pudo encontrar el directorio a ingresar")  # Funcion para regisrar error
+    except PermissionError:
+        print(" No tiene los privilegios suficientes ")
+        registrar_accion("ls", args, False,"No tiene los privilegios suficientes")  # Funcion para registrar accion fallida
+        registrar_error("ls", args, "PermissionError","No tiene los privilegios suficientes")  # Funcion para regisrar error
     except OSError as e:  # Error generico
         registrar_accion("cd", args, False, "Ha ocurrido un error")  # Funcion para registrar accion fallida
         registrar_error("cd", args, "ErrorGenerico", "Ha ocurrido un error")  # Funcion para regisrar error
@@ -528,37 +535,34 @@ def cd(args):
 def ls(args):
     ruta = "."
     if args:
-        ruta = args[
-            0]  # Determina la ruta a listar. Si args tiene elementos (if args),elige el primer elemento (args[0]) como la ruta, osino , usa el directorio actual .
+        ruta = args[0]  # Determina la ruta a listar. Si args tiene elementos (if args),elige el primer elemento (args[0]) como la ruta, osino , usa el directorio actual .
 
     try:  # Para atrapar errores si los hay
         elementos = os.listdir(ruta)  # Listar todos los archivos y directorios en la direccion ruta
         if ruta == '.':
             print(f"Contenido de '{os.getcwd()}':")
-            registrar_accion("ls", args, True,
-                             "Listar archivos y directorios del directorio actual correctamente")  # Funcion para registrar accion exitosa
+            registrar_accion("ls", args, True,"Listar archivos y directorios del directorio actual correctamente")  # Funcion para registrar accion exitosa
         else:
             print(f"Contenido de '{ruta}':")
-            registrar_accion("ls", args, True,
-                             "Listar archivos y directorios del directorio ingresado correctamente")  # Funcion para registrar accion exitosa
+            registrar_accion("ls", args, True,"Listar archivos y directorios del directorio ingresado correctamente")  # Funcion para registrar accion exitosa
         if elementos:  # Si elementos contiene al menos un archivo o directorio
             for elem in elementos:  # Loop para determinar directorios
-                if os.path.isdir(os.path.join(ruta,
-                                              elem)):  # Se verifica si el archivo actual es o no un directorio , se arma la ruta(Direccion) + archivo, y checkea si es un directorio
+                if os.path.isdir(os.path.join(ruta,elem)):  # Se verifica si el archivo actual es o no un directorio , se arma la ruta(Direccion) + archivo, y checkea si es un directorio
                     print(f"  [Dir]  {elem}")
                 else:  # Si no es un directorio el archivo actual
                     print(f"  [Arc] {elem}")
             return
         else:  # Si elemento esta vacio
             print("El directorio esta vacio!")
-            registrar_accion("ls", args, True,
-                             "Tratar de listar un directorio vacio")  # Funcion para registrar accion exitosa
+            registrar_accion("ls", args, True,"Tratar de listar un directorio vacio")  # Funcion para registrar accion exitosa
     except FileNotFoundError as e:  # Si no existe o no se encuentra el archivo
         print(f" El directorio {ruta} no existe o no se puede acceder ")
-        registrar_accion("ls", args, False,
-                         "No se pudo encontrar el directorio a listar")  # Funcion para registrar accion fallida
-        registrar_error("ls", args, "DirNoEncontrado",
-                        "No se pudo encontrar el directorio a listar")  # Funcion para regisrar error
+        registrar_accion("ls", args, False,"No se pudo encontrar el directorio a listar")  # Funcion para registrar accion fallida
+        registrar_error("ls", args, "DirNoEncontrado","No se pudo encontrar el directorio a listar")  # Funcion para regisrar error
+    except PermissionError:
+        print(" No tiene los privilegios suficientes ")
+        registrar_accion("ls", args, False,"No tiene los privilegios suficientes")  # Funcion para registrar accion fallida
+        registrar_error("ls", args, "PermissionError","No tiene los privilegios suficientes")  # Funcion para regisrar error
     except OSError as e:  # Error generico
         registrar_accion("ls", args, False, "Ha ocurrido un error")  # Funcion para registrar accion fallida
         registrar_error("ls", args, "ErrorGenerico", "Ha ocurrido un error")  # Funcion para regisrar error
@@ -715,6 +719,7 @@ def main():
             # Ejecutar comandos built-in
             if comando_principal == "exit":
                 print("¡Hasta luego!")
+                registrar_accion("exit", argumentos, True, "Salir del shell")
                 break
 
             elif comando_principal == "echo":
@@ -741,6 +746,7 @@ def main():
             elif comando_principal == "pwd":
                 # Implementación manual del comando pwd
                 print(os.getcwd())
+                registrar_accion("pwd", argumentos, True,"Imprimir directorio actual")  # Funcion para registrar accion exitosa
 
             else:
                 # Si no existe el commando

@@ -916,3 +916,20 @@ Solución: Lo más práctico fue que el comando help indique las funciones built
 
 
 	
+---
+
+
+# Fecha: 6 de Febrero del 2026
+# Objetivo del día: Terminar el video de prueba de comandos
+
+## Tareas realizadas:
+
+(12:08 - 14:50)
+- Crear los videos de pruebas por comandos
+
+Pequeños ajustes olvidados 
+
+- Implementar logger en exit y pwd
+- agregar PermissionError a ls y cd
+
+
