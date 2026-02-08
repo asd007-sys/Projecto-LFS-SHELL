@@ -932,4 +932,21 @@ Pequeños ajustes olvidados
 - Implementar logger en exit y pwd
 - agregar PermissionError a ls y cd
 
+---
 
+---
+
+
+# Fecha: 8 de Febrero del 2026
+# Objetivo del día: Terminar el video de prueba de comandos
+
+## Tareas realizadas:
+
+(15:36 - 16:16)
+- arreglar error handler de cp
+
+Problema:
+El except FileErrorNotFound no podía discernir si el archivo origen o carpeta destino faltaba.
+
+Solución:
+Si no existe el archivo a copiar, se imprime el error al usuario y se registra que el archivo a copiar no existe, si es el directorio destino el que no existe,entonces se avisa que no existe carpeta destino y se registra

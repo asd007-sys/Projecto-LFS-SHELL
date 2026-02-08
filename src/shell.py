@@ -459,12 +459,19 @@ def cp(args):
             print(f"Copia exitosa de '{origen}' a '{destino}'")
             registrar_accion("cp", args, True, "Archivo copiado correctamente")  # Funcion para registrar accion exitosa
 
-
         except FileNotFoundError:  # Si no se encuentra el archivo a copiar
-            print(f"Error: El archivo de origen '{origen}' no fue encontrado, puede utilizar ls para informarse")
-            registrar_accion("cp", args, False, "No se encontro el archivo")  # Funcion para registrar accion fallida
-            registrar_error("cp", args, "ArchivoNoEncontrado",
-                            "No se encontro el archivo")  # Funcion para regisrar error
+            # Verificar cual de los dos no existe
+            if not os.path.exists(origen):
+                print(f"Error: El archivo de origen '{origen}' no fue encontrado, puede utilizar ls para informarse")
+                registrar_accion("cp", args, False, "No se encontro el Archivo a copiar")  # Funcion para registrar accion fallida
+                registrar_error("cp", args, "ArchivoNoEncontrado","No se encontro el Archivo a copiar")  # Funcion para regisrar error
+            else:
+                # Si el origen existe, entonces el problema es la carpeta destino
+                destino_dir = os.path.dirname(destino)
+                print(f"Error: La carpeta destino '{destino_dir}' no existe")
+                registrar_accion("cp", args, False,"No se encontro el directorio destino a copiar")  # Funcion para registrar accion fallida
+                registrar_error("cp", args, "DirectorioNoEncontrado","No se encontro el directorio destino a copiar")  # Funcion para regisrar error        
+        
 
         except PermissionError:  # Si no se puede acceder  por falta de privilegio el archivo a copiar
             print(f"Error: No tiene los privilegios suficientes para copiar en {destino}' ")
