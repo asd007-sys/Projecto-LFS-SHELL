@@ -52,28 +52,26 @@ Implementar una shell en C con funcionalidades básicas.
 - tutorial
 
 
-Comandos Básicos
+ ## Comandos Básicos
 
-222dc0c - Enfoque TP y Crear REPL con pwd 
-914fc16 - Crear el comando ls para shell.py
-3f707d8 - SHELL - Crear la función de cd
-6f0f11c - SHELL - Crear la función de cp
-e91bce3 - SHELL - Crear la función rm
-bc260f3 - Crear la función mkdir
-caa2923 - SHELL - Crear la función echo
-e55b2f1 - SHELL - Crear la función cat
+- 222dc0c - Enfoque TP y Crear REPL con pwd 
+- 914fc16 - Crear el comando ls para shell.py
+- f707d8 - SHELL - Crear la función de cd
+- 6f0f11c - SHELL - Crear la función de cp
+- e91bce3 - SHELL - Crear la función rm
+- bc260f3 - Crear la función mkdir
+- caa2923 - SHELL - Crear la función echo
+- e55b2f1 - SHELL - Crear la función cat
 
-Logging
+## Logging
 
-e40d80e - SHELL - Crear las funciones del Logger
-4328029 - SHELL - Implementar logger en todas las funciones
+- e40d80e - SHELL - Crear las funciones del Logger
+- 4328029 - SHELL - Implementar logger en todas las funciones
 
-Funcionalidades Extras
+##  Funcionalidades Extras
 
-937212a - SHELL - función help creada
-152b8ff - SHELL - Crear funcion tutorial
-164558f - SHELL - Retoques finales - Creacion del video con comandos
-023a9f2 - SHELL - retoques finales 2 para video
+- 937212a - SHELL - función help creada
+- 152b8ff - SHELL - Crear funcion tutorial
 
 
 
@@ -81,7 +79,7 @@ Funcionalidades Extras
 
 
 
-Se utilizó inteligencia artificial como herramienta de apoyo para:
+### Se utilizó inteligencia artificial como herramienta de apoyo para:
 
 - Mejora de la redacción y corrección gramatical de la documentación.
 - Asistencia en la resolución de problemas encontrados durante el desarrollo.
